@@ -1,0 +1,39 @@
+[0.717s] Invoking command in '/home/lopatoj/Projects/raspi4/ros2_ws/src/simple_node': PYTHONPATH=/home/lopatoj/Projects/raspi4/ros2_ws/build/simple_node/prefix_override:/home/lopatoj/Projects/raspi4/ros2_ws/install/simple_node/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/simple_node build --build-base /home/lopatoj/Projects/raspi4/ros2_ws/build/simple_node/build install --record /home/lopatoj/Projects/raspi4/ros2_ws/build/simple_node/install.log --single-version-externally-managed
+[0.948s] running egg_info
+[0.949s] creating ../../build/simple_node/simple_node.egg-info
+[0.949s] writing ../../build/simple_node/simple_node.egg-info/PKG-INFO
+[0.949s] writing dependency_links to ../../build/simple_node/simple_node.egg-info/dependency_links.txt
+[0.949s] writing entry points to ../../build/simple_node/simple_node.egg-info/entry_points.txt
+[0.949s] writing requirements to ../../build/simple_node/simple_node.egg-info/requires.txt
+[0.949s] writing top-level names to ../../build/simple_node/simple_node.egg-info/top_level.txt
+[0.950s] writing manifest file '../../build/simple_node/simple_node.egg-info/SOURCES.txt'
+[0.951s] reading manifest file '../../build/simple_node/simple_node.egg-info/SOURCES.txt'
+[0.951s] writing manifest file '../../build/simple_node/simple_node.egg-info/SOURCES.txt'
+[0.952s] running build
+[0.952s] running build_py
+[0.952s] creating /home/lopatoj/Projects/raspi4/ros2_ws/build/simple_node/build
+[0.952s] creating /home/lopatoj/Projects/raspi4/ros2_ws/build/simple_node/build/lib
+[0.952s] creating /home/lopatoj/Projects/raspi4/ros2_ws/build/simple_node/build/lib/simple_node
+[0.952s] copying simple_node/__init__.py -> /home/lopatoj/Projects/raspi4/ros2_ws/build/simple_node/build/lib/simple_node
+[0.952s] copying simple_node/simple_node.py -> /home/lopatoj/Projects/raspi4/ros2_ws/build/simple_node/build/lib/simple_node
+[0.952s] running install
+[0.961s] /usr/lib/python3/dist-packages/setuptools/command/install.py:34: SetuptoolsDeprecationWarning: setup.py install is deprecated. Use build and pip and other standards-based tools.
+[0.961s]   warnings.warn(
+[0.961s] running install_lib
+[0.962s] creating /home/lopatoj/Projects/raspi4/ros2_ws/install/simple_node/lib/python3.10/site-packages/simple_node
+[0.962s] copying /home/lopatoj/Projects/raspi4/ros2_ws/build/simple_node/build/lib/simple_node/__init__.py -> /home/lopatoj/Projects/raspi4/ros2_ws/install/simple_node/lib/python3.10/site-packages/simple_node
+[0.962s] copying /home/lopatoj/Projects/raspi4/ros2_ws/build/simple_node/build/lib/simple_node/simple_node.py -> /home/lopatoj/Projects/raspi4/ros2_ws/install/simple_node/lib/python3.10/site-packages/simple_node
+[0.963s] byte-compiling /home/lopatoj/Projects/raspi4/ros2_ws/install/simple_node/lib/python3.10/site-packages/simple_node/__init__.py to __init__.cpython-310.pyc
+[0.963s] byte-compiling /home/lopatoj/Projects/raspi4/ros2_ws/install/simple_node/lib/python3.10/site-packages/simple_node/simple_node.py to simple_node.cpython-310.pyc
+[0.963s] running install_data
+[0.964s] creating /home/lopatoj/Projects/raspi4/ros2_ws/install/simple_node/share/ament_index
+[0.964s] creating /home/lopatoj/Projects/raspi4/ros2_ws/install/simple_node/share/ament_index/resource_index
+[0.964s] creating /home/lopatoj/Projects/raspi4/ros2_ws/install/simple_node/share/ament_index/resource_index/packages
+[0.964s] copying resource/simple_node -> /home/lopatoj/Projects/raspi4/ros2_ws/install/simple_node/share/ament_index/resource_index/packages
+[0.964s] copying package.xml -> /home/lopatoj/Projects/raspi4/ros2_ws/install/simple_node/share/simple_node
+[0.964s] running install_egg_info
+[0.966s] Copying ../../build/simple_node/simple_node.egg-info to /home/lopatoj/Projects/raspi4/ros2_ws/install/simple_node/lib/python3.10/site-packages/simple_node-0.0.0-py3.10.egg-info
+[0.966s] running install_scripts
+[0.989s] Installing simple_node script to /home/lopatoj/Projects/raspi4/ros2_ws/install/simple_node/lib/simple_node
+[0.989s] writing list of installed files to '/home/lopatoj/Projects/raspi4/ros2_ws/build/simple_node/install.log'
+[1.012s] Invoked command in '/home/lopatoj/Projects/raspi4/ros2_ws/src/simple_node' returned '0': PYTHONPATH=/home/lopatoj/Projects/raspi4/ros2_ws/build/simple_node/prefix_override:/home/lopatoj/Projects/raspi4/ros2_ws/install/simple_node/lib/python3.10/site-packages:${PYTHONPATH} /usr/bin/python3 setup.py egg_info --egg-base ../../build/simple_node build --build-base /home/lopatoj/Projects/raspi4/ros2_ws/build/simple_node/build install --record /home/lopatoj/Projects/raspi4/ros2_ws/build/simple_node/install.log --single-version-externally-managed
