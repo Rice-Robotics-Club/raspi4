@@ -5,6 +5,6 @@ def main(args=None):
     node = Node('my_node_name')
     rclpy.spin(node)
     rclpy.shutdown()
+    rclpy.shutdown()
 if __name__ == '__main__':
     main()
-    
