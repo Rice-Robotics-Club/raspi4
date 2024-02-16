@@ -1,3 +1,0 @@
-[console_scripts]
-simple_node = simple_node:main
-
