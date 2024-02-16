@@ -1,2 +1,3 @@
 # raspi4
-RAspi 4 is kool
+
+Repository containing ROS2 workspace.
