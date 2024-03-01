@@ -1,5 +1,7 @@
 import rclpy
 from rclpy.node import Node
+from odrive_can.msgs import ControllerStatus
+from odrive.enums import ProcedureResult
 
 class SimpleNode(Node):
     def __init__(self):
