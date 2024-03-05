@@ -1,4 +1,5 @@
 import rclpy
+import subprocess
 from rclpy.node import Node
 from odrive_can.srv import AxisState
 from odrive_can.msg import ControlMessage
