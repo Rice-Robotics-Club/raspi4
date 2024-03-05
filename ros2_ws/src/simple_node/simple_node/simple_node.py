@@ -11,27 +11,28 @@ class SimpleNode(Node):
         
         # Create a client for the set_axis_state service
         self.state = self.create_client(AxisState, 'request_axis_state')
+        while not self.state.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('waiting for AxisState service...')
         self.axis_request = AxisState.Request()
         
         # Create a publisher for the 
-        self.publisher_ = self.create_publisher(ControlMessage, 'control_message', 10)
-        self.timer = self.create_timer(0.1, self.control)
+        self.control = self.create_publisher(ControlMessage, 'control_message', 10)
+        self.timer = self.create_timer(0.1, self.control_message)
         
-    def control(self):
+    def control_message(self):
         msg = ControlMessage()
         msg.control_mode = 2
         msg.input_mode = 1
         msg.input_pos = 0.0
         msg.input_vel = 1.0
         msg.input_torque = 0.0
-        self.publisher_.publish(msg)
+        self.control.publish(msg)
     
     def set_axis_state(self, s):
         self.axis_request.axis_requested_state = s
-        self.future = self.cli.call_async(self.axis_request)
+        self.future = self.state.call_async(self.axis_request)
         rclpy.spin_until_future_complete(self, self.future)
         self.get_logger().info('Result: %r' % (self.future.result().axis_state))
-        return self.future.result()
         
 
 def main(args=None):
