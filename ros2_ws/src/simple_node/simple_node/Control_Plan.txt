@@ -30,17 +30,21 @@ Preliminary code:
 ## motor1 is top motor
 ## motor2 is bottom motor
 
-proning_angle1 = 0 # [rad]
-proning_angle2 = 0 # [rad] (this angle needs to be determined beforehand to offset the angle the motor thinks its at vs what we think its at when prone)
-poising_torque = 0.24 # [Nm] (torque setpoint for bottom motor when poising)
 
+### Determine angle offset. We need to define a 0 angle, but the ODrive will have it's own definition of the 0 angle. We need to determine the offset so that we can use our definition in the code. 
+proning_angle1 = 0  # [rad]
+proning_angle2 = 0  # [rad] 
+
+# Torque setpoint for the bottom motor when poising
+poising_torque = 0.24 # [Nm] 
+
+# Create control message objects for each motor
 control_message_motor1 = ControlMessage()
 control_message_motor2 = ControlMessage()
 
-control_message_motor1.input_mode = INPUT_MODE_PASSTHROUGH
-control_message_motor2.input_mode = INPUT_MODE_PASSTHROUGH
-
 ### PRONING:
+
+
 
 control_message_motor1.control_mode = CONTROL_MODE_POSITION_CONTROL
 control_message_motor2.control_mode = CONTROL_MODE_POSITION_CONTROL
