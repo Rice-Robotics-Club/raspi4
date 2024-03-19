@@ -37,8 +37,10 @@ ODriveCanNode::ODriveCanNode(const std::string& node_name) : rclcpp::Node(node_n
     rclcpp::QoS odrv_stat_qos(rclcpp::KeepAll{});
     odrv_publisher_ = rclcpp::Node::create_publisher<ODriveStatus>("odrive_status", odrv_stat_qos);
 
+    std::string control_name = "control_message_" + rclcpp::Node::get_parameter("node_id").as_string();
+
     rclcpp::QoS ctrl_msg_qos(rclcpp::KeepAll{});
-    subscriber_ = rclcpp::Node::create_subscription<ControlMessage>("control_message", ctrl_msg_qos, std::bind(&ODriveCanNode::subscriber_callback, this, _1));
+    subscriber_ = rclcpp::Node::create_subscription<ControlMessage>(control_name, ctrl_msg_qos, std::bind(&ODriveCanNode::subscriber_callback, this, _1));
 
     rclcpp::QoS srv_qos(rclcpp::KeepAll{});
     service_ = rclcpp::Node::create_service<AxisState>("request_axis_state", std::bind(&ODriveCanNode::service_callback, this, _1, _2), srv_qos.get_rmw_qos_profile());
