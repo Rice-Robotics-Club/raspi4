@@ -37,7 +37,7 @@ ODriveCanNode::ODriveCanNode(const std::string& node_name) : rclcpp::Node(node_n
     rclcpp::QoS odrv_stat_qos(rclcpp::KeepAll{});
     odrv_publisher_ = rclcpp::Node::create_publisher<ODriveStatus>("odrive_status", odrv_stat_qos);
 
-    std::string control_name = "control_message_" + rclcpp::Node::get_parameter("node_id").as_string();
+    std::string control_name = "control_message_" + std::to_string(rclcpp::Node::get_parameter("node_id").as_int());
 
     rclcpp::QoS ctrl_msg_qos(rclcpp::KeepAll{});
     subscriber_ = rclcpp::Node::create_subscription<ControlMessage>(control_name, ctrl_msg_qos, std::bind(&ODriveCanNode::subscriber_callback, this, _1));
