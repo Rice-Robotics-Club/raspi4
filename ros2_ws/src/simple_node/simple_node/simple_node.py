@@ -19,13 +19,7 @@ class SimpleNode(Node):
         self.control = self.create_publisher(ControlMessage, 'control_message', 10)
         self.timer = self.create_timer(0.1, self.control_message)
     
-    def control_message(self):
-        msg = ControlMessage()
-        msg.control_mode = 2
-        msg.input_mode = 1
-        msg.input_pos = 0.0
-        msg.input_vel = 1.0
-        msg.input_torque = 0.0
+    def control_message(self, msg):
         self.control.publish(msg)
     
     def set_axis_state(self, s):
@@ -40,6 +34,9 @@ def main(args=None):
     node = SimpleNode()
     node.set_axis_state(8) # CLOSED_LOOP_CONTROL
     rclpy.spin(node)
+
+    #### Add control code here
+    
     rclpy.shutdown()
     
 if __name__ == '__main__':
