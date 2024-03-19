@@ -40,6 +40,9 @@ def main(args=None):
     node = SimpleNode()
     node.set_axis_state(8) # CLOSED_LOOP_CONTROL
     rclpy.spin(node)
+
+    #### Add control code here
+    
     rclpy.shutdown()
     
 if __name__ == '__main__':
