@@ -17,8 +17,8 @@ class SimpleNode(Node):
         
         # Create a publisher for the 
         self.control = self.create_publisher(ControlMessage, 'control_message', 10)
-		self.timer = self.create_timer(0.1, self.control_message)
-        
+        self.timer = self.create_timer(0.1, self.control_message)
+    
     def control_message(self):
         msg = ControlMessage()
         msg.control_mode = 2
