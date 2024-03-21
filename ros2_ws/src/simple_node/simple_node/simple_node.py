@@ -19,7 +19,7 @@ class SimpleNode(Node):
         self.control = []
         self.control.append(self.create_publisher(ControlMessage, 'control_message_0', 10))
         self.control.append(self.create_publisher(ControlMessage, 'control_message_1', 10))
-        self.timer = self.create_timer(0.1, self.control_message)
+        # self.timer = self.create_timer(0.1, self.control_message)
     
     def control_message(self, msg, node_id=0):
         self.control[node_id].publish(msg)
