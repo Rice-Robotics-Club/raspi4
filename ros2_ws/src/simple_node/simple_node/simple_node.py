@@ -35,7 +35,6 @@ def main(args=None):
     rclpy.init(args=args)
     node = SimpleNode()
     node.set_axis_state(8) # CLOSED_LOOP_CONTROL
-    rclpy.spin(node)
     
     message = ControlMessage()
     message.control_mode = 2
@@ -43,7 +42,7 @@ def main(args=None):
     message.input_pos = 0.0
     message.input_vel = 2.0
     message.input_torque = 0.0
-    node.control_message(message, 0)
+    node.control_message(message, node_id=0)
     
     message = ControlMessage()
     message.control_mode = 2
@@ -51,8 +50,9 @@ def main(args=None):
     message.input_pos = 0.0
     message.input_vel = 1.0
     message.input_torque = 0.0
-    node.control_message(message, 1)
+    node.control_message(message, node_id=1)
     
+    rclpy.spin(node)
     rclpy.shutdown()
     
 if __name__ == '__main__':
