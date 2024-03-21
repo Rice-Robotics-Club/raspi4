@@ -3,7 +3,7 @@ launch:
 - node:
     pkg: "odrive_can"
     exec: "odrive_can_node"
-    name: "can_node_1"
+    name: "can_node_0"
     namespace: "odrive_axis0"
     param:
     -
@@ -16,7 +16,7 @@ launch:
 - node:
     pkg: "odrive_can"
     exec: "odrive_can_node"
-    name: "can_node_2"
+    name: "can_node_1"
     namespace: "odrive_axis0"
     param:
     -
