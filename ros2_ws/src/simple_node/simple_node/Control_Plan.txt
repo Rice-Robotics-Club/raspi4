@@ -4,95 +4,113 @@ One interesting limitation that we will have to deal with is that the worm gears
 
 THE PROCESS:
 
-Proning:
+1.Proning:
 Assuming the leg begins in the standard position (both angles at 45 deg), the jump will have an initial Proning stage where the bottom leg is connected by the servo connector to the top leg. Both angles will need to be equal - thus they will both have an angle of 0. Position control in both motors will be used to move the legs, and the servo will extend to connect the two legs.
 
-Poising:
+2.Poising:
 Once prone, the Poising stage will begin, where the legs remain still but the bottom motor switches to torque control to fully extend the spring. This stage should be done as fast as possible, as the motor gets REALLY hot when running at max torque. 
 
-Pouncing:
+3.Pouncing:
 Immediately after the full torque is reached, the Pouncing stage begins. The servo will release, allowing the spring to move the bottom leg. The bottom motor will continue to provide maximum torque, giving the spring a “wall” to extend off of. The exact profile of torque against time will depend on the spring constant. For our first jump, we will keep it at max torque. 
 
-Bracing:
+4.Bracing:
 Midair, the torque profile will have moved the controlled end of the spring some angle. The other end will have returned to 90 degrees behind the controlled end. The Bracing stage will use position control for both motors to return the leg segments to a normal position to prepare for a landing, ie. allow the spring and the motors to absorb the robot’s kinetic energy. For this first attempt, the leg angles will both be 70 degrees.
 
-Landing:
+5.Landing:
 Finally, the Landing stage will be when the leg actually lands and returns to the standard position. During this phase, the motors will transition from the bracing angles to the standard angles during the landing. The exact trajectory is to be determined by testing. For now, we will just use position control in both motors. As the angle is detected to vary the control will be initiated.
-
+Idea: Keep the position set to 70 as the leg lands, but then as the position crosses the minimum angle the setpoint changes to 45
 
 From these tests we will gather data from both of the motors and from the 6-axis sensor. Additionally a scale will be placed on the foot to measure force. This data will be used to iterate our motor controls and improve the jump height. Specifically, we want to estimate the spring constant, the inertias of the legs, and 
 __________________________
-Preliminary code:
+Preliminary python code:
 
-
-## assuming motor is already properly calibrated
-## assuming leg is in standard position (both angles at 45 deg)
+## assuming motors are already properly calibrated
+## assuming leg begins in standard position (both angles at 45 deg)
 ## motor1 is top motor
 ## motor2 is bottom motor
 
+### Determine angle offset. We need to define a 0 angle, but the ODrive will have it's own definition of the 0 angle. We need to determine the offset so that we can use our definition in the code. The following variables are defined as the difference between our 0 point and the ODrive's 0 point.
+zeroangle1 = 0  # [rad]
+zeroangle2 = 0  # [rad] 
 
-### Determine angle offset. We need to define a 0 angle, but the ODrive will have it's own definition of the 0 angle. We need to determine the offset so that we can use our definition in the code. 
-proning_angle1 = 0  # [rad]
-proning_angle2 = 0  # [rad] 
+	# Bracing angle setpoint when bracing
+bracing_angle = 70 * (3.1415/180) [rad]
 
-# Torque setpoint for the bottom motor when poising
+	# Standard position angle
+standard_angle = 45 * (3.1415/180) [rad]
+
+	# Torque setpoint for the bottom motor when poising
 poising_torque = 0.24 # [Nm] 
 
-# Create control message objects for each motor
+	# Create control message objects for each motor
 control_message_motor1 = ControlMessage()
 control_message_motor2 = ControlMessage()
 
-### PRONING:
+	# Set motors to pass-through input mode
+control_message_motor1.input_mode = 1
+control_message_motor2.input_mode = 1
 
+	## PUBLISH CONTROL MESSAGES ##
 
+### STAGE 1 PRONING:
+	# set motors to position control
+control_message_motor1.control_mode = 3
+control_message_motor2.control_mode = 3
+	# set both motors to 0 position
+control_message_motor1.input_pos = 0 - zeroangle1
+control_message_motor2.input_pos = 0 - zeroangle2
 
-control_message_motor1.control_mode = CONTROL_MODE_POSITION_CONTROL
-control_message_motor2.control_mode = CONTROL_MODE_POSITION_CONTROL
+	##Publish control messages here##
+	##Print to terminal or some shit##
+	###Wait 5 seconds###
 
-control_message_motor1.input_pos = proning_angle1
-control_message_motor2.input_pos = proning_angle2
+### STAGE 2 POISING:
 
-##Publish control messages here##
+	##Swing out the Servo##
 
-	### Wait 5 seconds ###
-
-### POISING:
-
-##insert code here to swing the servo out##
-
-control_message_motor2.control_mode=ControlMode.CONTROL_MODE_TORQUE_CONTROL
+	# Set bottom motor to torque control
+control_message_motor2.control_mode = 1
+	# Set bottom motor torque to poising_torque
 control_message_motor2.input_torque = poising_torque
 
-##Publish control messages here##
+	##Publish control messages here##
+	##Print to terminal or some shit##
+	###Wait 0.5 seconds###
 
-	### Wait 1.5 seconds ###
+### STAGE 3 POUNCING:
 
-### POUNCING:
+	##Swing in the Servo##
 
-##insert code here to swing the servo in##
+	#Set top motor to position control
+control_message_motor1.control_mode = 3
+	#Set bottom motor to torque control
+control_message_motor2.control_mode = 1
 
-control_message_motor1.input_pos = 70 * (3.1415/180) - proning_angle1
+	#Set top leg angle to 70 degrees
+control_message_motor1.input_pos = bracing_angle - proning_angle1
 
-##Publish control messages here##
+	##Publish control messages here##
+	##Print to terminal or some shit##
+	### Wait 0.125 seconds ###  (actual time needs to be figured out)
 
-	### Wait 0.5 seconds ###
+### STAGE 4 BRACING:
 
-### BRACING:
+	#Set both motors to position control
+control_message_motor1.control_mode = 3
+control_message_motor2.control_mode = 3
+	#Set bot motors to 70 degrees
+control_message_motor2.input_pos = bracing_angle - proning_angle2
+control_message_motor1.input_pos = bracing_angle - proning_angle1
 
-control_message_motor2.control_mode=ControlMode.CONTROL_MODE_TORQUE_CONTROL
+	##Publish control message here##
+	### Wait 0.125 seconds ###
 
-control_message_motor2.input_pos = 70 *(3.1415/180) - proning_angle2
-control_message_motor1.input_pos = 70 *(3.1415/180) - proning_angle1
+### STAGE 5 LANDING:
 
-##Publish control message here##
+# ideally this would start right as the angles cross their minimum value during the land, but just in case our code isn't as developed as we need beforehand we will just do this
 
-	### Wait 0.25 seconds ###
+control_message_motor2.input_pos = standard_angle - proning_angle2
+control_message_motor1.input_pos = standard_angle - proning_angle1
 
-### LANDING:
-
-# ideally this would start right as the foot touches the ground. However for now we will just wait for a few seconds because first jump wont include the 6axis sensor
-
-control_message_motor2.input_pos = 45 *(3.1415/180) - proning_angle2
-control_message_motor1.input_pos = 45 *(3.1415/180) - proning_angle1
-
-##Publish control messages here##
+	##Publish control messages here##
+	##Print to terminal or some shit##
