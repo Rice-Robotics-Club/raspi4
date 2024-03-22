@@ -1,0 +1,10 @@
+launch:
+
+- node:
+    pkg: "catbot"
+    exec: "simple_node"
+    name: "can_node"
+    namespace: "odrive_axis0"
+
+
+
