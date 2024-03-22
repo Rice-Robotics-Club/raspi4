@@ -15,7 +15,7 @@ class ServoControlNode(Node):
         angle = msg.data
         self.get_logger().info(f'Received angle: {angle}')
         # gpiozero needs a value between -1 and 1
-        servo_value = angle/90
+        servo_value = angle/90 - 1
         self.servo.value = servo_value
         sleep(1)
 
