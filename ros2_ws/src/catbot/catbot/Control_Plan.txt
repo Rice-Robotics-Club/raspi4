@@ -20,7 +20,7 @@ Midair, the torque profile will have moved the controlled end of the spring some
 Finally, the Landing stage will be when the leg actually lands and returns to the standard position. During this phase, the motors will transition from the bracing angles to the standard angles during the landing. The exact trajectory is to be determined by testing. For now, we will just use position control in both motors. As the angle is detected to vary the control will be initiated.
 Idea: Keep the position set to 70 as the leg lands, but then as the position crosses the minimum angle the setpoint changes to 45
 
-From these tests we will gather data from both of the motors and from the 6-axis sensor. Additionally a scale will be placed on the foot to measure force. This data will be used to iterate our motor controls and improve the jump height. Specifically, we want to estimate the spring constant, the inertias of the legs, and 
+From these tests we will gather data from both of the motors and from the 6-axis sensor. Additionally a scale will be placed on the foot to measure force. This data will be used to iterate our motor controls and improve the jump height. Specifically, we want to estimate the spring constant and the inertias of the legs, and to have velocity/torque/current/voltage graphs over time for the jump.
 __________________________
 Preliminary python code:
 
@@ -29,7 +29,7 @@ Preliminary python code:
 ## motor1 is top motor
 ## motor2 is bottom motor
 
-### Determine angle offset. We need to define a 0 angle, but the ODrive will have it's own definition of the 0 angle. We need to determine the offset so that we can use our definition in the code. The following variables are defined as the difference between our 0 point and the ODrive's 0 point.
+### Determine angle offset. We need to define a 0 angle, but the ODrive will have it's own definition of the 0 angle. We need to determine the offset so that we can use our definition in the code. The following variables are defined as the difference between our 0 point and the ODrive's 0 point. This can be measureed from the ODrive as <axis>.pos_estimate. Or, the ODrive can be booted when the leg is fully proned while <axis>.controller.config.absolute_setpoints = False, which would set our two definitions of the angle equal.
 zeroangle1 = 0  # [rad]
 zeroangle2 = 0  # [rad] 
 
