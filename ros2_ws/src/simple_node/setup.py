@@ -21,6 +21,7 @@ setup(
     entry_points={
         'console_scripts': [
             'simple_node = simple_node.simple_node:main'
+            'odrive_stopper = simple_node.odrive_stopper:main'
         ],
     },
 )
