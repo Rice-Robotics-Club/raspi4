@@ -6,15 +6,28 @@ class Stop(Node):
     def __init__(self):
         super().__init__('stop')
         
-        # Create a client for the set_axis_state service
-        self.state = self.create_client(AxisState, 'request_axis_state')
-        while not self.state.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('waiting for AxisState service...')
+        # Create clients for the request_axis_state services
+        self.axis_state = []
+        self.axis_state[0] = self.create_client(AxisState, '/odrive_axis0/request_axis_state')
+        self.axis_state[1] = self.create_client(AxisState, '/odrive_axis1/request_axis_state')
+        
+        # Wait for the services to be available
+        while not self.axis_state_0.wait_for_service(timeout_sec=1.0) or not self.axis_state_1.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('waiting for AxisState services...')
+            
+        # Create a request for the request_axis_state services
         self.axis_request = AxisState.Request()
-        self.axis_request.axis_requested_state = 1
-        self.future = self.state.call_async(self.axis_request)
+        self.axis_request.axis_requested_state = 1 # AXIS_STATE_IDLE
+        
+        # /odrive_axis0/
+        self.future = self.axis_state[0].call_async(self.axis_request)
         rclpy.spin_until_future_complete(self, self.future)
-        self.get_logger().info('Result: %r' % (self.future.result().axis_state))
+        self.get_logger().info('Stop result: %r' % (self.future.result().axis_state))
+        
+        # /odrive_axis1/
+        self.future = self.axis_state[1].call_async(self.axis_request)
+        rclpy.spin_until_future_complete(self, self.future)
+        self.get_logger().info('Stop result: %r' % (self.future.result().axis_state))
         
 def main(args=None):
     rclpy.init(args=args)
