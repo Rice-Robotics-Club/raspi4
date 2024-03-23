@@ -1,8 +1,7 @@
 import rclpy
-import subprocess
 from rclpy.node import Node
 from odrive_can.srv import AxisState
-from odrive_can.msg import ControlMessage
+from odrive_can.msg import ControlMessage, ControllerStatus
 
 class ControlNode(Node):
     def __init__(self):
@@ -29,67 +28,66 @@ class ControlNode(Node):
         )
 
         # Create ControlMessage objects for both motors
-            #Top motor
+        # Top motor
         self.msg0 = ControlMessage()
         self.msg0.control_mode = 2
         self.msg0.input_mode = 1
-        self.msg0.input_pos = 0.0
-        self.msg0.input_vel = 0.0
-        self.msg0.input_torque = 0.0
-            #Bottom Motor
+        # Bottom Motor
         self.msg1 = ControlMessage()
         self.msg1.control_mode = 2
         self.msg1.input_mode = 1
-        self.msg1.input_pos = 0.0
-        self.msg1.input_vel = 0.0
-        self.msg1.input_torque = 0.0
 
-        # Find reference angles for the motors
-        self.zeroangle0 = self.odrive_status0.pos_estimate  # [rad]
-        self.zeroangle1 = self.odrive_status1.pos_estimate  # [rad]
+        # Reference angles for the motors will be updated in the callbacks
+        self.zeroangle0 = None
+        self.zeroangle1 = None
 
         # Set up publishers to the ODrives
-        self.control = []
-        self.control.append(self.create_publisher(ControlMessage, 'control_message_0', 10))   #Top Motor
-        self.control.append(self.create_publisher(ControlMessage, 'control_message_1', 10))   #Bottom Motor
+        self.control0 = self.create_publisher(ControlMessage, 'control_message_0', 10)  # Top Motor
+        self.control1 = self.create_publisher(ControlMessage, 'control_message_1', 10)  # Bottom Motor
+
         # Create timer
         self.timer = self.create_timer(0.1, self.control_message)
     
+    def controller_status_callback_axis0(self, msg):
+        if self.zeroangle0 is None:
+            self.zeroangle0 = msg.pos_estimate
+        self.get_logger().info(f'Axis 0: pos_estimate={msg.pos_estimate}, vel_estimate={msg.vel_estimate}, torque_estimate={msg.torque_estimate}')
+
+    def controller_status_callback_axis1(self, msg):
+        if self.zeroangle1 is None:
+            self.zeroangle1 = msg.pos_estimate
+        self.get_logger().info(f'Axis 1: pos_estimate={msg.pos_estimate}, vel_estimate={msg.vel_estimate}, torque_estimate={msg.torque_estimate}')
+
     def control_message(self):
-        #For this specific script we will initiate the leg in proned position and raise it to standard position (angles of 0 to angles of 45 deg)
+        # For this specific script, we will initiate the leg in proned position and raise it to standard position
+        # (angles of 0 to angles of 45 deg)
 
-        #Set motors to position control
-        self.msg0.control_mode = 3
-        self.msg1.control_mode = 3
+        if self.zeroangle0 is not None and self.zeroangle1 is not None:
+            # Set motors to position control
+            self.msg0.control_mode = 3
+            self.msg1.control_mode = 3
 
-        #Set motor angles to 45 deg
-        self.msg0.input_pos = 45 * (3.1415/180) - self.zeroangle0
-        self.msg0.input_pos = 45 * (3.1415/180) - self.zeroangle1
+            # Set motor angles to 45 deg
+            self.msg0.input_pos = 45 * (3.1415 / 180) - self.zeroangle0
+            self.msg1.input_pos = 45 * (3.1415 / 180) - self.zeroangle1
 
-        #Publish control messages
-        self.control[0].publish(self.msg0)
-        self.control[1].publish(self.msg1)
+            # Publish control messages
+            self.control0.publish(self.msg0)
+            self.control1.publish(self.msg1)
 
-        #Wait a second
-
-        #Swing out the servo
-
-    
     def set_axis_state(self, s):
         self.axis_request.axis_requested_state = s
         self.future = self.state.call_async(self.axis_request)
         rclpy.spin_until_future_complete(self, self.future)
         self.get_logger().info('Result: %r' % (self.future.result().axis_state))
-        
 
 def main(args=None):
     rclpy.init(args=args)
     node = ControlNode()
-    node.set_axis_state(8) # CLOSED_LOOP_CONTROL
+    node.set_axis_state(8)  # CLOSED_LOOP_CONTROL
     rclpy.spin(node)
-    node.control_message
-    node.set_axis_state(1) # AXIS_STATE_IDLE
+    node.set_axis_state(1)  # AXIS_STATE_IDLE
     rclpy.shutdown()
-    
+
 if __name__ == '__main__':
     main()
