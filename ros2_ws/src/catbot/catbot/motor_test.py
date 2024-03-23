@@ -48,12 +48,12 @@ class MotorTest(Node):
         self.axis_request.axis_requested_state = s
         
         # /odrive_axis0/
-        self.future = self.axis_state_0.call_async(self.axis_request)
+        self.future = self.axis_state[0].call_async(self.axis_request)
         rclpy.spin_until_future_complete(self, self.future)
         self.get_logger().info('Result: %r' % (self.future.result().axis_state))
         
         # /odrive_axis1/
-        self.future = self.axis_state_1.call_async(self.axis_request)
+        self.future = self.axis_state[1].call_async(self.axis_request)
         rclpy.spin_until_future_complete(self, self.future)
         self.get_logger().info('Result: %r' % (self.future.result().axis_state))
         
