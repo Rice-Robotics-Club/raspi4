@@ -4,4 +4,3 @@ launch:
     pkg: "catbot"
     exec: "stop"
     name: "stop"
-    namespace: "odrive_axis0"
