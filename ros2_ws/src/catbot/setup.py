@@ -23,7 +23,7 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'simple_node = catbot.simple_node:main'
+            'motor_test = catbot.motor_test:main'
         ],
     },
 )
