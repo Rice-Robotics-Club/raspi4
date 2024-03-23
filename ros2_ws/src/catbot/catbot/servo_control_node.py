@@ -9,7 +9,7 @@ class ServoControlNode(Node):
         super().__init__('servo_control_node')
         self.subscription = self.create_subscription(
             Float64, 'servo_angle', self.angle_callback, 10)
-        self.servo = Servo(25)  # Assuming the servo is connected to GPIO pin 0
+        self.servo = Servo(21)  # Assuming the servo is connected to GPIO pin 0
 
     def angle_callback(self, msg):
         angle = msg.data
