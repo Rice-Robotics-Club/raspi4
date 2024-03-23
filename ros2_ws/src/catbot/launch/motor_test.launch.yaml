@@ -31,5 +31,10 @@ launch:
     exec: "motor_test"
     name: "motor_test"
 
+- node:
+    pkg: "catbot"
+    exec: "listener_node"
+    name: "listener_node"
+
 
 
