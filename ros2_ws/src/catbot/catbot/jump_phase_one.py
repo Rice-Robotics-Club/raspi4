@@ -15,17 +15,27 @@ class SimpleNode(Node):
             self.get_logger().info('waiting for AxisState service...')
         self.axis_request = AxisState.Request()
         
-        # Create a publisher for the 
-        self.msg = ControlMessage()
-        self.msg.control_mode = 2
-        self.msg.input_mode = 1
-        self.msg.input_pos = 0.0
-        self.msg.input_vel = 2.0
-        self.msg.input_torque = 0.0
-        
+        # Create ControlMessage objects for both motors
+        #Top motor
+        self.msg0 = ControlMessage()
+        self.msg0.control_mode = 2
+        self.msg0.input_mode = 1
+        self.msg0.input_pos = 0.0
+        self.msg0.input_vel = 0.0
+        self.msg0.input_torque = 0.0
+        #Bottom Motor
+        self.msg1 = ControlMessage()
+        self.msg1.control_mode = 2
+        self.msg1.input_mode = 1
+        self.msg1.input_pos = 0.0
+        self.msg1.input_vel = 0.0
+        self.msg1.input_torque = 0.0
+
+        # Set up publishers to the ODrives
         self.control = []
-        self.control.append(self.create_publisher(ControlMessage, 'control_message_0', 10))
-        self.control.append(self.create_publisher(ControlMessage, 'control_message_1', 10))
+        self.control.append(self.create_publisher(ControlMessage, 'control_message_0', 10))   #Top Motor
+        self.control.append(self.create_publisher(ControlMessage, 'control_message_1', 10))   #Bottom Motor\
+        # Create timer
         self.timer = self.create_timer(0.1, self.control_message)
     
     def control_message(self):
