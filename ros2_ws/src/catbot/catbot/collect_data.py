@@ -5,53 +5,71 @@ from odrive_can.msg import ODriveStatus, ControllerStatus
 class ODriveStatusListener(Node):
     def __init__(self):
         super().__init__('odrive_status_listener')
-        self.odrive_status_subscriber = self.create_subscription(
+        # Set up subscribers for axis0
+        self.odrive_status_subscriber_axis0 = self.create_subscription(
             ODriveStatus,
-            'odrive_status',
-            self.odrive_status_callback,
+            '/odrive_axis0/odrive_status',
+            self.odrive_status_callback_axis0,
             10
         )
-        self.controller_status_subscriber = self.create_subscription(
+        self.controller_status_subscriber_axis0 = self.create_subscription(
             ControllerStatus,
-            'controller_status',
-            self.controller_status_callback,
+            '/odrive_axis0/controller_status',
+            self.controller_status_callback_axis0,
             10
         )
-      
-        # Open log files for appending messages
-        self.odrive_log_file = open('odrive_status_log.txt', 'a')
-        self.controller_log_file = open('controller_status_log.txt', 'a')
+        # Set up subscribers for axis1
+        self.odrive_status_subscriber_axis1 = self.create_subscription(
+            ODriveStatus,
+            '/odrive_axis1/odrive_status',
+            self.odrive_status_callback_axis1,
+            10
+        )
+        self.controller_status_subscriber_axis1 = self.create_subscription(
+            ControllerStatus,
+            '/odrive_axis1/controller_status',
+            self.controller_status_callback_axis1,
+            10
+        )
 
-    def odrive_status_callback(self, msg):
-        log_message = f'ODrive Status: {msg}\n'
-        self.get_logger().info(log_message)
-        self.odrive_log_file.write(log_message)
+        self.odrive_log_file_axis0 = open('odrive_status_log_axis0.txt', 'a')
+        self.controller_log_file_axis0 = open('controller_status_log_axis0.txt', 'a')
+        self.odrive_log_file_axis1 = open('odrive_status_log_axis1.txt', 'a')
+        self.controller_log_file_axis1 = open('controller_status_log_axis1.txt', 'a')
 
-    def controller_status_callback(self, msg):
-        log_message = f'Controller Status: {msg}\n'
+    def odrive_status_callback_axis0(self, msg):
+        log_message = f'ODrive Axis0 Status: {msg}\n'
         self.get_logger().info(log_message)
-        self.controller_log_file.write(log_message)
+        self.odrive_log_file_axis0.write(log_message)
+
+    def controller_status_callback_axis0(self, msg):
+        log_message = f'Controller Axis0 Status: {msg}\n'
+        self.get_logger().info(log_message)
+        self.controller_log_file_axis0.write(log_message)
+
+    def odrive_status_callback_axis1(self, msg):
+        log_message = f'ODrive Axis1 Status: {msg}\n'
+        self.get_logger().info(log_message)
+        self.odrive_log_file_axis1.write(log_message)
+
+    def controller_status_callback_axis1(self, msg):
+        log_message = f'Controller Axis1 Status: {msg}\n'
+        self.get_logger().info(log_message)
+        self.controller_log_file_axis1.write(log_message)
 
     def close_log_files(self):
-        self.odrive_log_file.close()
-        self.controller_log_file.close()
+        self.odrive_log_file_axis0.close()
+        self.controller_log_file_axis0.close()
+        self.odrive_log_file_axis1.close()
+        self.controller_log_file_axis1.close()
 
 def main(args=None):
     rclpy.init(args=args)
     odrive_status_listener = ODriveStatusListener()
     rclpy.spin(odrive_status_listener)
-    odrive_status_listener.close_log_files()  # Close log files before shutting down
+    odrive_status_listener.close_log_files()
     odrive_status_listener.destroy_node()
     rclpy.shutdown()
 
 if __name__ == '__main__':
     main()
-
-'''
-These log files can be accessed later. They should be in the directory where the script was run. We can also modify these two lines:
-
-        self.odrive_log_file = open('odrive_status_log.txt', 'a')
-        self.controller_log_file = open('controller_status_log.txt', 'a')
-
-by providing an absolute path where they publish to. 
-'''

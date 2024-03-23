@@ -5,24 +5,44 @@ from odrive_can.msg import ODriveStatus, ControllerStatus
 class ODriveStatusListener(Node):
     def __init__(self):
         super().__init__('odrive_status_listener')
-        self.odrive_status_subscriber = self.create_subscription(
+        # Set up subscribers for axis0
+        self.odrive_status_subscriber_axis0 = self.create_subscription(
             ODriveStatus,
-            'odrive_status',
-            self.odrive_status_callback,
+            '/odrive_axis0/odrive_status',
+            self.odrive_status_callback_axis0,
             10
         )
-        self.controller_status_subscriber = self.create_subscription(
+        self.controller_status_subscriber_axis0 = self.create_subscription(
             ControllerStatus,
-            'controller_status',
-            self.controller_status_callback,
+            '/odrive_axis0/controller_status',
+            self.controller_status_callback_axis0,
+            10
+        )
+        # Set up subscribers for axis1
+        self.odrive_status_subscriber_axis1 = self.create_subscription(
+            ODriveStatus,
+            '/odrive_axis1/odrive_status',
+            self.odrive_status_callback_axis1,
+            10
+        )
+        self.controller_status_subscriber_axis1 = self.create_subscription(
+            ControllerStatus,
+            '/odrive_axis1/controller_status',
+            self.controller_status_callback_axis1,
             10
         )
 
-    def odrive_status_callback(self, msg):
-        self.get_logger().info(f'ODrive Status: {msg}')
+    def odrive_status_callback_axis0(self, msg):
+        self.get_logger().info(f'ODrive Axis0 Status: {msg}')
 
-    def controller_status_callback(self, msg):
-        self.get_logger().info(f'Controller Status: {msg}')
+    def controller_status_callback_axis0(self, msg):
+        self.get_logger().info(f'Controller Axis0 Status: {msg}')
+
+    def odrive_status_callback_axis1(self, msg):
+        self.get_logger().info(f'ODrive Axis1 Status: {msg}')
+
+    def controller_status_callback_axis1(self, msg):
+        self.get_logger().info(f'Controller Axis1 Status: {msg}')
 
 def main(args=None):
     rclpy.init(args=args)
