@@ -5,9 +5,9 @@ from odrive_can.srv import AxisState
 from odrive_can.msg import ControlMessage
     
 
-class SimpleNode(Node):
+class MotorTest(Node):
     def __init__(self):
-        super().__init__('simple_node')
+        super().__init__('motor_test')
         
         # Create a client for the set_axis_state service
         self.state = self.create_client(AxisState, 'request_axis_state')
@@ -43,7 +43,7 @@ class SimpleNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    node = SimpleNode()
+    node = MotorTest()
     node.set_axis_state(8) # CLOSED_LOOP_CONTROL
     rclpy.spin(node)
     node.set_axis_state(1) # AXIS_STATE_IDLE

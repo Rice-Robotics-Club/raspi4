@@ -25,6 +25,7 @@ setup(
         'console_scripts': [
             'simple_node = catbot.simple_node:main',
             'stop = catbot.stop:main',
+            'motor_test = catbot.motor_test:main'
         ],
     },
 )
