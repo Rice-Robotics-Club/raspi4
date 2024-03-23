@@ -2,9 +2,9 @@ import rclpy
 from rclpy.node import Node
 from odrive_can.srv import AxisState
 
-class ODriveStopper(Node):
+class Stop(Node):
     def __init__(self):
-        super().__init__('stopper')
+        super().__init__('stop')
         
         # Create a client for the set_axis_state service
         self.state = self.create_client(AxisState, 'request_axis_state')
@@ -18,7 +18,7 @@ class ODriveStopper(Node):
         
 def main(args=None):
     rclpy.init(args=args)
-    node = ODriveStopper()
+    node = Stop()
     rclpy.spin_once(node)
     rclpy.shutdown()
     
