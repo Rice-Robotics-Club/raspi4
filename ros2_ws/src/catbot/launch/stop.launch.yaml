@@ -2,6 +2,6 @@ launch:
 
 - node:
     pkg: "catbot"
-    exec: "odrive_stopper"
-    name: "stop_node"
+    exec: "stop"
+    name: "stop"
     namespace: "odrive_axis0"
