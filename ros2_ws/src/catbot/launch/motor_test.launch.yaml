@@ -35,6 +35,3 @@ launch:
     pkg: "catbot"
     exec: "listener_node"
     name: "listener_node"
-
-
-
