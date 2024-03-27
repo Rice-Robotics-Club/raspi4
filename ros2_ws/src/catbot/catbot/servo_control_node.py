@@ -12,6 +12,7 @@ class ServoControlNode(Node):
             Float64, 'servo_angle', self.angle_callback, 10)
         
         # just to see if it works :)
+        print("testing time!")
         self.servo.test(2)
 
     # not using this rn - just testing in init TODO make angle setting work
