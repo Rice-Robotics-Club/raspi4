@@ -1,29 +1,37 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64
-from gpiozero import Servo
+import root_servo_control
 from time import sleep
 
 class ServoControlNode(Node):
-    def __init__(self):
+    def __init__(self, servo_wrapper: root_servo_control.ServoWrapper):
         super().__init__('servo_control_node')
+        self.servo = servo_wrapper
         self.subscription = self.create_subscription(
             Float64, 'servo_angle', self.angle_callback, 10)
-        self.servo = Servo(11)  # Assuming the servo is connected to GPIO pin 0
+        
+        # just to see if it works :)
+        self.servo.test()
 
+    # not using this rn - just testing in init TODO make angle setting work
     def angle_callback(self, msg):
         angle = msg.data
         self.get_logger().info(f'Received angle: {angle}')
         # gpiozero needs a value between -1 and 1
         servo_value = angle/90 - 1
-        self.servo.value = servo_value
+
         sleep(1)
 
 def main(args=None):
     rclpy.init(args=args)
-    node = ServoControlNode()
+    servo = root_servo_control.ServoWrapper(11) # TODO make node init with a non-predetermined id
+    node = ServoControlNode(servo)
+
     rclpy.spin(node)
+
     node.destroy_node()
+    servo.shutdown()
     rclpy.shutdown()
 
 if __name__ == '__main__':
