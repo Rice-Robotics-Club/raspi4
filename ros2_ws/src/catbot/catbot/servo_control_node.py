@@ -1,11 +1,11 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64
-import root_servo_control
+from .root_servo_control import ServoWrapper
 from time import sleep
 
 class ServoControlNode(Node):
-    def __init__(self, servo_wrapper: root_servo_control.ServoWrapper):
+    def __init__(self, servo_wrapper: ServoWrapper):
         super().__init__('servo_control_node')
         self.servo = servo_wrapper
         self.subscription = self.create_subscription(
@@ -25,7 +25,7 @@ class ServoControlNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    servo = root_servo_control.ServoWrapper(11) # TODO make node init with a non-predetermined id
+    servo = ServoWrapper(11) # TODO make node init with a non-predetermined id
     node = ServoControlNode(servo)
 
     rclpy.spin(node)
