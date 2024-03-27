@@ -12,7 +12,7 @@ class ServoControlNode(Node):
             Float64, 'servo_angle', self.angle_callback, 10)
         
         # just to see if it works :)
-        self.servo.test()
+        self.servo.test(2)
 
     # not using this rn - just testing in init TODO make angle setting work
     def angle_callback(self, msg):
