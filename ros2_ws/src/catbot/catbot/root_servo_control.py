@@ -4,6 +4,7 @@ import time
 class ServoWrapper():
     def __init__(self, id):
         print("starting servo at id: " + str(id))
+        GPIO.cleanup()
 
         self.id = id
         GPIO.setmode(GPIO.BOARD)
