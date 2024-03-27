@@ -4,10 +4,11 @@ import time
 class ServoWrapper():
     def __init__(self, id):
         print("starting servo at id: " + str(id))
-        GPIO.cleanup()
 
         self.id = id
         GPIO.setmode(GPIO.BOARD)
+        GPIO.cleanup()
+
         GPIO.setup(id, GPIO.OUT)
         self.servo = GPIO.PWM(id, 50)
         self.servo.start(0)
