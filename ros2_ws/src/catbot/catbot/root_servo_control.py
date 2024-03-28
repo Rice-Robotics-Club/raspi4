@@ -39,11 +39,12 @@ class ServoWrapper():
         self.servo.ChangeDutyCycle(duty)
 
         # idk if this sleeps the entire robot TODO test
-        time.sleep(0.5)
+        time.sleep(1)
         self.servo.ChangeDutyCycle(0)
 
     def shutdown(self):
         print("shutting down servo...")
 
+        self.servo.ChangeDutyCycle(0)
         self.servo.stop()
         GPIO.cleanup()
