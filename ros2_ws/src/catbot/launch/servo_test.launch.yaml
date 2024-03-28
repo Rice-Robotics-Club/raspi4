@@ -4,11 +4,7 @@ launch:
     pkg: "catbot"
     exec: "servo_control_node"
     name: "servo_control_node"
-    namespace: "servo_control_node"
     param:
     -
-      name: "node_id"
+      name: "pin"
       value: 21
-    -
-      name: "interface"
-      value: "can0"
