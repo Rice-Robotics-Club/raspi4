@@ -8,7 +8,7 @@ class ServoControlNode(Node):
     def __init__(self):
         super().__init__('servo_control_node')
         
-        self.declare_parameter('pin', rclpy.Parameter.Type.INT)
+        self.declare_parameter('pin', rclpy.Parameter.Type.INTEGER)
         
         self.servo = ServoWrapper(self.get_parameter('pin'))
         self.subscription = self.create_subscription(
