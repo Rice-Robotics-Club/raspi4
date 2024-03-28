@@ -34,6 +34,13 @@ class ServoWrapper():
         print("test done!")
         self.servo.stop()
 
+    def set(self, angle):
+        duty = float(angle) / 180 * 5 + 2 # change from 1-180 range to 2-7 range
+        self.servo.ChangeDutyCycle(duty)
+
+        # idk if this sleeps the entire robot TODO test
+        time.sleep(0.5)
+
     def shutdown(self):
         print("shutting down servo...")
 
