@@ -24,13 +24,13 @@ class ServoControlNode(Node):
         angle = msg.data
         self.get_logger().info(f'Received angle: {angle}')
         # gpiozero needs a value between -1 and 1
-        servo_value = angle/90 - 1
+        servo = (angle/90.0) - 1.0
 
         sleep(1)
 
 def main(args=None):
     rclpy.init(args=args)
-    servo = ServoWrapper(11) # TODO make node init with a non-predetermined id
+    servo = ServoWrapper(12) # TODO make node init with a non-predetermined id
     node = ServoControlNode(servo)
 
     rclpy.spin(node)
