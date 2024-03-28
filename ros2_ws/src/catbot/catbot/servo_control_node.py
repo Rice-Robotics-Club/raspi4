@@ -10,7 +10,7 @@ class ServoControlNode(Node):
         
         self.declare_parameter('pin', rclpy.Parameter.Type.INTEGER)
         
-        self.servo = ServoWrapper(self.get_parameter('pin'))
+        self.servo = ServoWrapper(self.get_parameter('pin').value)
         self.subscription = self.create_subscription(
             Float64, 'servo_angle', self.angle_callback, 10)
         
