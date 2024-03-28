@@ -9,9 +9,9 @@ class ServoControlNode(Node):
     def __init__(self):
         super().__init__('servo_control_node')
         
-        self.declare_parameter('pin', rclpy.Parameter.Type.INT)
+        self.declare_parameter('pin', rclpy.Parameter.Type.INTEGER)
         
-        self.servo = Servo(self.get_parameter('pin'))
+        self.servo = Servo(self.get_parameter('pin').value)
         self.subscription = self.create_subscription(
             Float64, 'servo_angle', self.angle_callback, 10)
 

@@ -7,8 +7,5 @@ launch:
     namespace: "servo_control_node"
     param:
     -
-      name: "node_id"
-      value: 21
-    -
-      name: "interface"
-      value: "can0"
+      name: "pin"
+      value: 12
