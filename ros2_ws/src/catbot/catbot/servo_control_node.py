@@ -1,6 +1,7 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64
+from gpiozero import Servo
 from .root_servo_control import ServoWrapper
 from time import sleep
 
@@ -10,27 +11,18 @@ class ServoControlNode(Node):
         
         self.declare_parameter('pin', rclpy.Parameter.Type.INT)
         
-        self.servo = ServoWrapper(self.get_parameter('pin'))
+        self.servo = Servo(self.get_parameter('pin'))
         self.subscription = self.create_subscription(
             Float64, 'servo_angle', self.angle_callback, 10)
-        
-        # just to see if it works :)
-        self.get_logger().info("testing time!")
-        try:
-            self.servo.test(2)
-        except:
-            self.get_logger().info("test failed!")
 
-    def destroy_node(self):
-        self.servo.shutdown()
-        super().destroy_node()
 
     # not using this rn - just testing in init TODO make angle setting work
     def angle_callback(self, msg):
         angle = msg.data
         self.get_logger().info(f'Received angle: {angle}')
         # gpiozero needs a value between -1 and 1
-        servo = (angle/90.0) - 1.0
+        angle_to_servo = (angle/90.0) - 1.0
+        self.servo.value = angle_to_servo
 
         sleep(1)
 
