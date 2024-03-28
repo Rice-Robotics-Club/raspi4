@@ -5,9 +5,12 @@ from .root_servo_control import ServoWrapper
 from time import sleep
 
 class ServoControlNode(Node):
-    def __init__(self, servo_wrapper: ServoWrapper):
+    def __init__(self):
         super().__init__('servo_control_node')
-        self.servo = servo_wrapper
+        
+        self.declare_parameter('pin', rclpy.Parameter.Type.INT)
+        
+        self.servo = ServoWrapper(self.get_parameter('pin'))
         self.subscription = self.create_subscription(
             Float64, 'servo_angle', self.angle_callback, 10)
         
@@ -18,6 +21,9 @@ class ServoControlNode(Node):
         except:
             self.get_logger().info("test failed!")
 
+    def destroy_node(self):
+        self.servo.shutdown()
+        super().destroy_node()
 
     # not using this rn - just testing in init TODO make angle setting work
     def angle_callback(self, msg):
@@ -30,13 +36,9 @@ class ServoControlNode(Node):
 
 def main(args=None):
     rclpy.init(args=args)
-    servo = ServoWrapper(12) # TODO make node init with a non-predetermined id
-    node = ServoControlNode(servo)
-
+    node = ServoControlNode()
     rclpy.spin(node)
-
     node.destroy_node()
-    servo.shutdown()
     rclpy.shutdown()
 
 if __name__ == '__main__':
