@@ -7,7 +7,6 @@ class ServoWrapper():
 
         self.id = id
         GPIO.setmode(GPIO.BOARD)
-        GPIO.cleanup()
 
         GPIO.setup(id, GPIO.OUT)
         self.servo = GPIO.PWM(id, 50)
