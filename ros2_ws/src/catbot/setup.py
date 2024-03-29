@@ -27,7 +27,8 @@ setup(
             'stop = catbot.stop:main',
             'motor_test = catbot.motor_test:main',
             'listener_node = catbot.listener_node:main',
-            'servo_control_node = catbot.servo_control_node:main'
+            'servo_control_node = catbot.servo_control_node:main',
+            'jump = catbot.jump:main',
         ],
     },
 )
