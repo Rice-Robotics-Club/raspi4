@@ -3,8 +3,10 @@ from rclpy.node import Node
 from std_msgs.msg import Float64
 from odrive_can.msg import ControllerStatus, ControlMessage
 
-TORQUE_SPIKE_THRESHOLD = 0.05  # Need to find actual working threshold for torque spike detection
+TORQUE_SPIKE_THRESHOLD = 0.05  # Need to find the actual working threshold for torque spike detection
 MAX_TORQUE = -0.48
+SERVO_MOVE_TIME = 1.0  # Time in seconds for the servo to move to 180 degrees
+TORQUE_RAMP_TIME = 1.0  # Time in seconds for the torque to ramp up
 
 class MotorServoTestNode(Node):
     def __init__(self):
@@ -12,6 +14,8 @@ class MotorServoTestNode(Node):
         
         # Set initial state
         self.max_torque_reached = False
+        self.servo_timer = None
+        self.torque_timer = None
         
         # Create a publisher for the motor control messages
         self.motor_control_publisher = self.create_publisher(ControlMessage, '/odrive_axis0/control_message', 10)
@@ -33,16 +37,39 @@ class MotorServoTestNode(Node):
     def controller_status_callback(self, msg):
         if not self.max_torque_reached:
             if msg.torque_estimate > TORQUE_SPIKE_THRESHOLD:
-                # Set motor velocity to zero
+                # Set motor velocity to zero and schedule servo to move to 180 degrees
                 self.send_motor_velocity(0.0)
-                # Set servo to 180 degrees
-                self.set_servo_angle(180)
+                self.cancel_timers()  # Cancel any existing timers
+                self.servo_timer = self.create_timer(SERVO_MOVE_TIME, self.move_servo_to_180)
             elif msg.torque_estimate >= MAX_TORQUE:
-                # Set servo to 90 degrees
-                self.set_servo_angle(90)
+                # Upon reaching max torque, move servo to 90 degrees
                 self.max_torque_reached = True
-                # Set motor to max torque
-                self.send_motor_max_torque(MAX_TORQUE)
+                self.cancel_timers()  # Cancel any existing timers
+                self.torque_timer = self.create_timer(TORQUE_RAMP_TIME, self.move_servo_to_90)
+
+    def move_servo_to_180(self):
+        # Set servo to 180 degrees and schedule torque ramp
+        self.set_servo_angle(180)
+        self.cancel_timers()  # Cancel any existing timers
+        self.torque_timer = self.create_timer(TORQUE_RAMP_TIME, self.ramp_up_torque)
+
+    def ramp_up_torque(self):
+        # Set motor to max torque
+        self.send_motor_max_torque(MAX_TORQUE)
+
+    def move_servo_to_90(self):
+        # Set servo to 90 degrees
+        self.set_servo_angle(90)
+
+    def cancel_timers(self):
+        # Cancel the servo timer if it exists
+        if self.servo_timer:
+            self.servo_timer.cancel()
+            self.servo_timer = None
+        # Cancel the torque timer if it exists
+        if self.torque_timer:
+            self.torque_timer.cancel()
+            self.torque_timer = None
 
     def send_motor_velocity(self, velocity):
         control_msg = ControlMessage()
