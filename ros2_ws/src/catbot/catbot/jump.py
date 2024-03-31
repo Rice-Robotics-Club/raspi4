@@ -11,7 +11,8 @@ class ControlNode(Node):
     def __init__(self):
         super().__init__('control_node')
 
-        self.phase = 'Proning'  # Initial phase
+        self.gear_ratio = None 
+        self.phase = 'Init'  # Initial phase
         self.poising_torque = 0.24  # [Nm]
         self.bracing_angle = 70 * (3.1415 / 180)  # [rad]
         self.standard_angle = 45 * (3.1415 / 180)  # [rad]
@@ -30,10 +31,15 @@ class ControlNode(Node):
             10
         )
 
-        # Create a ControlMessage object for the motor
-        self.motor_msg = ControlMessage()
-        self.motor_msg.control_mode = 2  # Set to pass-through mode initially
-        self.motor_msg.input_mode = 1
+        # Create ControlMessage objects for the motors
+        # Top Motor
+        self.motor_msg1 = ControlMessage()
+        self.motor_msg1.control_mode = 3 # Set to position control initially
+        self.motor_msg1.input_mode = 1 # Set to pass-through mode initially
+        # Bottom Motor
+        self.motor_msg2 = ControlMessage()
+        self.motor_msg2.control_mode = 3  # Set to position control initially
+        self.motor_msg2.input_mode = 1 # Set to pass-through mode initially
 
         # Set up publisher to the ODrive
         self.motor_control_publisher = self.create_publisher(ControlMessage, '/odrive_axis0/control_message', 10)
@@ -41,73 +47,103 @@ class ControlNode(Node):
         # Set up publisher for the servo
         self.servo_publisher = self.create_publisher(Float64, 'servo_angle', 10)
 
-        # Reference angle for the motor will be updated in the callback
-        self.zero_angle = None
+        # Reference angles for the motors will be updated in the callback
+        self.zero_angle1 = None
+        self.zero_angle2 = None
 
     def controller_status_callback(self, msg):
-        if self.zero_angle is None:
-            self.zero_angle = msg.pos_estimate
-
-        if self.phase == 'Proning':
-            # Set motor to position control
-            self.motor_msg.control_mode = 3
+        #### THIS ASSUMES THAT WE INITIALIZE THE LEG IN PRONED POSITION ####
+        if self.zero_angle1 is None:
+            self.zero_angle1 = msg1.pos_estimate   
+        elif self.zero_angle2 is None:
+            self.zero_angle2 = msg2.pos_estimate
+        
+        if self.phase == 'Init':
+            # TODO: Write initialization phase that has the leg slowly go from proned, to bracing angle, to standard angle.
+            self.get_logger().info('Initializing...')
+            # Set motors to trajectory control
+            # Code goes here
+            
+            # Update phase to Proning
+            self.phase = 'Proning'
+            self.get_logger().info('Beginning to Proning phase')
+        
+        elif self.phase == 'Proning':
+            # Set motors to position control
+            self.motor_msg1.control_mode = 3
+            self.motor_msg2.control_mode = 3
             # Set motor to 0 position (proned position)
-            self.motor_msg.input_pos = 0 - self.zero_angle
+            self.motor_msg1.input_pos = 0 - self.zero_angle1
+            self.motor_msg2.input_pos = 0 - self.zero_angle2
             # Publish control message for the motor
-            self.motor_control_publisher.publish(self.motor_msg)
+            self.motor_control_publisher.publish(self.motor_msg1)
+            self.motor_control_publisher.publish(self.motor_msg2)
             # Move servo to connect the legs
             self.set_servo_angle(180)
             # Update phase to Poising
             self.phase = 'Poising'
             self.get_logger().info('Transitioning to Poising phase')
+            
+            ## Wait a few seconds ##
                 
         elif self.phase == 'Poising':
-            # Set motor to torque control
-            self.motor_msg.control_mode = 1
-            # Set motor torque to poising_torque
-            self.motor_msg.input_torque = self.poising_torque
+            # Set bottom motor to torque control
+            self.motor_msg2.control_mode = 1
+            # Set bottom motor torque to poising_torque
+            self.motor_msg2.input_torque = self.poising_torque
             # Publish control message for the motor
-            self.motor_control_publisher.publish(self.motor_msg)
+            self.motor_control_publisher.publish(self.motor_msg2)
             self.get_logger().info('Poising: Torque set for the motor')
             # Update phase to Pouncing
             self.phase = 'Pouncing'
             self.get_logger().info('Transitioning to Pouncing phase')
 
+            ## Wait a fraction of a second ##
+
         elif self.phase == 'Pouncing':
             # Release the servo to allow the spring to actuate the bottom leg
             self.set_servo_angle(90)
-            # Set motor to provide maximum torque
-            self.motor_msg.input_torque = MAX_TORQUE
+            # Set bottom motor to provide maximum torque
+            self.motor_msg2.input_torque = MAX_TORQUE
+            # Set top motor to bracing angle (temp fix)
+            self.motor_msg1.input_pos = self.bracing_angle - self.zero_angle2
             # Publish control message for the motor
-            self.motor_control_publisher.publish(self.motor_msg)
+            self.motor_control_publisher.publish(self.motor_msg1)
+            self.motor_control_publisher.publish(self.motor_msg2)
+            
             self.get_logger().info('Pouncing: Motor set to max torque')
             # Update phase to Bracing
             self.phase = 'Bracing'
             self.get_logger().info('Transitioning to Bracing phase')
 
         elif self.phase == 'Bracing':
-            # Set motor to position control
-            self.motor_msg.control_mode = 3
+            # Set bottom motor to position control
+            self.motor_msg2.control_mode = 3
             # Set motor to bracing angle
-            self.motor_msg.input_pos = self.bracing_angle - self.zero_angle
+            self.motor_msg2.input_pos = self.bracing_angle - self.zero_angle
             # Publish control message for the motor
-            self.motor_control_publisher.publish(self.motor_msg)
-            self.get_logger().info('Bracing: Motor set to bracing angle')
+            self.motor_control_publisher.publish(self.motor_msg2)
+            self.get_logger().info('Bracing: Positions set to bracing angles')
             # Update phase to Landing
             self.phase = 'Landing'
             self.get_logger().info('Transitioning to Landing phase')
 
         elif self.phase == 'Landing':
-            # Set motor to position control
-            self.motor_msg.control_mode = 3
+            # Set motors to position control
+            self.motor_msg1.control_mode = 3
+            self.motor_msg2.control_mode = 3
             # Set motor to standard angle
-            self.motor_msg.input_pos = self.standard_angle - self.zero_angle
+            self.motor_msg1.input_pos = self.standard_angle - self.zero_angle
+            self.motor_msg2.input_pos = self.standard_angle - self.zero_angle
             # Publish control message for the motor
-            self.motor_control_publisher.publish(self.motor_msg)
+            self.motor_control_publisher.publish(self.motor_msg1)
+            self.motor_control_publisher.publish(self.motor_msg2)
             self.get_logger().info('Landing: Motor set to standard angle')
             # Reset phase to 'Proning' for the next jump
             self.phase = 'Proning'
             self.get_logger().info('Jump completed. Resetting to Proning phase for next jump')
+
+            ## Wait like 10 seconds ##
 
     def set_servo_angle(self, angle):
         angle_msg = Float64()
