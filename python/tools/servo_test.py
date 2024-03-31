@@ -12,16 +12,16 @@ def set_servo_angle(angle):
     duty_cycle = angle / 18.0 + 2
     servo_pwm.ChangeDutyCycle(duty_cycle)
 
-# Set the servo to 180 degrees
-set_servo_angle(180)
-time.sleep(1)  # Wait for the servo to move
-
 # Set the servo to 90 degrees
 set_servo_angle(90)
-time.sleep(1)  # Wait for the servo to move
+time.sleep(10)  # Wait for the servo to move
+
+# Set the servo to 180 degrees
+set_servo_angle(180)
+time.sleep(3)  # Wait for the servo to move
 
 # Set the servo to 0 degrees
-set_servo_angle(0)
+set_servo_angle(90)
 time.sleep(1)  # Wait for the servo to move
 
 # Clean up
