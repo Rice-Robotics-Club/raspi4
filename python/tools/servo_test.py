@@ -3,7 +3,7 @@ import RPi.GPIO as GPIO
 
 # Set up the GPIO for the servo
 GPIO.setmode(GPIO.BCM)
-servo_pin = 19
+servo_pin = 18
 GPIO.setup(servo_pin, GPIO.OUT)
 servo_pwm = GPIO.PWM(servo_pin, 50)  # 50 Hz (20 ms PWM period)
 servo_pwm.start(0)
