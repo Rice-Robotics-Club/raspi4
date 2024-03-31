@@ -7,7 +7,7 @@ db = cantools.database.load_file("odrive-cansimple.dbc")
 
 # Set up the CAN bus
 bus = can.Bus("can0", bustype="socketcan")
-axis_id = 0x1  # Assuming the axis ID is set to 1
+axis_id = 0x0
 
 def send_can_message(message_name, **kwargs):
     msg = db.get_message_by_name(message_name)
