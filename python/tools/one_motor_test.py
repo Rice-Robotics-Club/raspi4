@@ -32,5 +32,17 @@ def set_motor_velocity(velocity):
 
 # Calibrate the motor
 calibrate_motor()
+time.sleep(1)
 
-# Test shifting the motor back and forth
+# Test shifting the motor back and forth between positive and negative velocity
+for _ in range(10):
+    set_motor_velocity(10)
+    time.sleep(1)
+    set_motor_velocity(-10)
+    time.sleep(1)
+    
+# Set the motor to idle state
+send_can_message('Axis0_Set_Axis_State', Axis_Requested_State=0x01)
+
+# Properly shut down the SocketCAN bus
+bus.shutdown()
