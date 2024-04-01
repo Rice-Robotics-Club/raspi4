@@ -1,31 +1,45 @@
-def calibrate_motor():
-    # Set the motor to full calibration sequence
-    send_can_message('Axis0_Set_Axis_State', Axis_Requested_State=0x03)
-    time.sleep(20)  # Wait for calibration to complete
-    
-    # Check for motor errors
-    send_can_message('Axis0_Get_Motor_Error')
-    motor_error = receive_can_message()
-    
-    # Check for encoder errors
-    send_can_message('Axis0_Get_Encoder_Error')
-    encoder_error = receive_can_message()
+import time
+import can
+import cantools
 
-    if motor_error and encoder_error:
-        if motor_error['Motor_Error'] != 0 or encoder_error['Encoder_Error'] != 0:
-            print(f"Calibration failed with Motor Error: {motor_error['Motor_Error']} and Encoder Error: {encoder_error['Encoder_Error']}")
-            return False
+# Load the DBC file
+dbc = cantools.database.load_file('odrive-cansimple.dbc')
 
-    # Set the motor to closed-loop control mode
-    send_can_message('Axis0_Set_Axis_State', Axis_Requested_State=0x08)
-    time.sleep(2)
-    
-    # Check if the motor is in closed-loop control mode
-    send_can_message('Axis0_Get_Axis_State')
-    axis_state = receive_can_message()
-    if axis_state and axis_state['Axis_State'] == 8:
-        print("Calibration successful and motor is in closed-loop control mode")
-        return True
+# Set up the CAN bus
+bus = can.interface.Bus(bustype='socketcan', channel='can0', bitrate=250000)
+
+# Define a function to send CAN messages
+def send_can_message(message_id, data):
+    message = can.Message(arbitration_id=message_id, data=data, is_extended_id=False)
+    bus.send(message)
+
+# Define a function to receive CAN messages
+def receive_can_message(timeout=1.0):
+    message = bus.recv(timeout)
+    return message
+
+# Calibrate the motor
+def calibrate_motor(axis_id):
+    # Send the command to enter AXIS_STATE_FULL_CALIBRATION_SEQUENCE
+    message = dbc.get_message_by_name('Set_Axis_State')
+    data = message.encode({'Axis_State': 3})
+    send_can_message(message.frame_id | axis_id, data)
+
+    # Wait for calibration to complete
+    time.sleep(20)
+
+    # Check if the motor is calibrated
+    message = dbc.get_message_by_name('Get_Axis_State')
+    send_can_message(message.frame_id | axis_id, b'')
+    response = receive_can_message()
+    if response:
+        decoded_message = dbc.decode_message(response.arbitration_id, response.data)
+        if decoded_message['Axis_State'] == 8:  # AXIS_STATE_CLOSED_LOOP_CONTROL
+            print("Motor calibrated successfully")
+        else:
+            print("Motor calibration failed")
     else:
-        print("Calibration failed or motor is not in closed-loop control mode")
-        return False
+        print("No response received")
+
+# Calibrate the motor with axis ID 0
+calibrate_motor(axis_id=0)
