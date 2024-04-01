@@ -21,15 +21,15 @@ def receive_can_message(timeout=1.0):
 # Calibrate the motor
 def calibrate_motor(axis_id):
     # Send the command to enter AXIS_STATE_FULL_CALIBRATION_SEQUENCE
-    message = dbc.get_message_by_name('Set_Axis_State')
-    data = message.encode({'Axis_State': 3})
+    message = dbc.get_message_by_name('Axis0_Set_Axis_State')
+    data = message.encode({'Axis_Requested_State': 3})
     send_can_message(message.frame_id | axis_id, data)
 
     # Wait for calibration to complete
     time.sleep(20)
 
     # Check if the motor is calibrated
-    message = dbc.get_message_by_name('Get_Axis_State')
+    message = dbc.get_message_by_name('Axis0_Heartbeat')
     send_can_message(message.frame_id | axis_id, b'')
     response = receive_can_message()
     if response:
