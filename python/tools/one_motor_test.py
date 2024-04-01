@@ -15,31 +15,26 @@ def send_can_message(message_name, **kwargs):
     message = can.Message(arbitration_id=msg.frame_id | axis_id << 5, is_extended_id=False, data=data)
     bus.send(message)
 
-# Set the motor to closed-loop control mode
-send_can_message('Axis0_Set_Axis_State', Axis_Requested_State=0x08)
-time.sleep(2)  # Wait for the motor to enter closed-loop control
+def set_motor_state(state, control_mode=None, input_mode=None, position=None, velocity=None, torque=None):
+    send_can_message('Axis0_Set_Axis_State', Axis_Requested_State=state)
+    time.sleep(2)
+    if control_mode is not None:
+        send_can_message('Axis0_Set_Controller_Mode', Control_Mode=control_mode, Input_Mode=input_mode)
+    if position is not None:
+        send_can_message('Axis0_Set_Input_Pos', Input_Pos=position, Vel_FF=0.0, Torque_FF=0.0)
+    elif velocity is not None:
+        send_can_message('Axis0_Set_Input_Vel', Input_Vel=velocity, Input_Torque_FF=0.0)
+    elif torque is not None:
+        send_can_message('Axis0_Set_Input_Torque', Input_Torque=torque)
 
-# Set position control mode
-send_can_message('Axis0_Set_Controller_Mode', Control_Mode=0x03, Input_Mode=0x00)
+# Set the motor to closed-loop control mode and move to position
+set_motor_state(0x08, control_mode=0x03, position=5.0)
 
-# Move the motor to position 5.0 revolutions
-send_can_message('Axis0_Set_Input_Pos', Input_Pos=5.0, Vel_FF=0.0, Torque_FF=0.0)
-time.sleep(3)  # Wait for the motor to reach the position
+# Set velocity control mode and move at a velocity
+set_motor_state(0x08, control_mode=0x02, velocity=1.0)
 
-# Set velocity control mode
-send_can_message('Axis0_Set_Controller_Mode', Control_Mode=0x02, Input_Mode=0x00)
-
-# Move the motor at a velocity of 1.0 revolution per second
-send_can_message('Axis0_Set_Input_Vel', Input_Vel=1.0, Input_Torque_FF=0.0)
-time.sleep(3)  # Wait for the motor to reach the velocity
-
-# Set torque control mode
-send_can_message('Axis0_Set_Controller_Mode', Control_Mode=0x01, Input_Mode=0x00)
-
-# Apply a torque of 0.2 Nm
-send_can_message('Axis0_Set_Input_Torque', Input_Torque=0.2)
-time.sleep(3)  # Wait for the motor to apply the torque
+# Set torque control mode and apply a torque
+set_motor_state(0x08, control_mode=0x01, torque=0.2)
 
 # Stop the motor
-send_can_message('Axis0_Set_Input_Vel', Input_Vel=0.0, Input_Torque_FF=0.0)
-send_can_message('Axis0_Set_Axis_State', Axis_Requested_State=0x01)  # Set to idle state
+set_motor_state(0x01)
