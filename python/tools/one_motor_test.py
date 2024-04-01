@@ -23,24 +23,35 @@ def calibrate_motor():
     send_can_message('Axis0_Set_Axis_State', Axis_Requested_State=0x08)
     time.sleep(2)
 
-def set_motor_velocity(velocity):
-    # Set velocity control mode
+def set_initial_conditions():
+    # Set initial position control mode and position
+    send_can_message('Axis0_Set_Controller_Mode', Control_Mode=0x03, Input_Mode=0x00)
+    send_can_message('Axis0_Set_Input_Pos', Input_Pos=0.0, Vel_FF=0.0, Torque_FF=0.0)
+    time.sleep(2)
+    # Set initial velocity control mode and velocity
     send_can_message('Axis0_Set_Controller_Mode', Control_Mode=0x02, Input_Mode=0x00)
-    # Move the motor at the specified velocity
-    send_can_message('Axis0_Set_Input_Vel', Input_Vel=velocity, Input_Torque_FF=0.0)
-    time.sleep(3)  # Wait for the motor to reach the velocity
+    send_can_message('Axis0_Set_Input_Vel', Input_Vel=0.0, Input_Torque_FF=0.0)
+    time.sleep(2)
+    # Set initial torque control mode and torque
+    send_can_message('Axis0_Set_Controller_Mode', Control_Mode=0x01, Input_Mode=0x00)
+    send_can_message('Axis0_Set_Input_Torque', Input_Torque=0.0)
+    time.sleep(2)
+    # Revert to velocity control for the test
+    send_can_message('Axis0_Set_Controller_Mode', Control_Mode=0x02, Input_Mode=0x00)
 
 # Calibrate the motor
 calibrate_motor()
-time.sleep(1)
+
+# Set initial conditions
+set_initial_conditions()
 
 # Test shifting the motor back and forth between positive and negative velocity
-for _ in range(10):
+for _ in range(3):
     set_motor_velocity(10)
     time.sleep(1)
     set_motor_velocity(-10)
     time.sleep(1)
-    
+
 # Set the motor to idle state
 send_can_message('Axis0_Set_Axis_State', Axis_Requested_State=0x01)
 
