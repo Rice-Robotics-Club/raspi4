@@ -15,7 +15,7 @@ def send_can_message(message_name, **kwargs):
     message = can.Message(arbitration_id=msg.frame_id | axis_id << 5, is_extended_id=False, data=data)
     bus.send(message)
 
-def set_motor_state(state, control_mode=None, input_mode=None, position=None, velocity=None, torque=None):
+def set_motor_state(state, control_mode=None, input_mode=0x00, position=None, velocity=None, torque=None):
     send_can_message('Axis0_Set_Axis_State', Axis_Requested_State=state)
     time.sleep(2)
     if control_mode is not None:
