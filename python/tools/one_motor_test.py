@@ -22,8 +22,8 @@ def set_motor_to_closed_loop_control():
 def set_position(position, vel_ff=0.0, torque_ff=0.0):
     send_can_message('Axis0_Set_Input_Pos', Input_Pos=position, Vel_FF=vel_ff, Torque_FF=torque_ff)
 
-def set_velocity(velocity):
-    send_can_message('Axis0_Set_Input_Vel', Input_Vel=velocity)
+def set_velocity(velocity, input_torque_ff=0.0):
+    send_can_message('Axis0_Set_Input_Vel', Input_Vel=velocity, Input_Torque_FF=input_torque_ff)
 
 def set_torque(torque):
     send_can_message('Axis0_Set_Input_Torque', Input_Torque=torque)
