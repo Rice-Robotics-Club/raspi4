@@ -26,7 +26,7 @@ def calibrate_motor():
     # Set the motor to full calibration sequence
     send_can_message('Axis0_Set_Axis_State', Axis_Requested_State=0x03)
     print("Calibration started. Please wait...")
-    time.sleep(10)  # Wait for calibration to complete
+    time.sleep(15)  # Wait for calibration to complete
 
     # Check if calibration was successful
     state_msg = receive_can_message()
