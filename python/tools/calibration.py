@@ -3,7 +3,7 @@ import cantools
 import time
 
 # Load the DBC file
-db = cantools.database.load_string("odrive-cansimple.dbc")
+db = cantools.database.load_file("odrive-cansimple.dbc")
 
 # Set up the CAN bus
 bus = can.Bus("can0", bustype="socketcan")
@@ -31,9 +31,12 @@ def calibrate_motor():
     # Check for errors
     send_can_message('Axis0_Get_Axis_Error', Get_Axis_Error=0x00)
     axis_error = receive_can_message()
-    if axis_error:
-        if axis_error['Axis_Error'] != 0:
-            print(f"Calibration failed with Axis Error: {axis_error['Axis_Error']}")
+    send_can_message('Axis0_Get_Motor_Error', Get_Motor_Error=0x00)
+    motor_error = receive_can_message()
+
+    if axis_error and motor_error:
+        if axis_error['Axis_Error'] != 0 or motor_error['Motor_Error'] != 0:
+            print(f"Calibration failed with Axis Error: {axis_error['Axis_Error']} and Motor Error: {motor_error['Motor_Error']}")
             return False
 
     # Set the motor to closed-loop control mode
