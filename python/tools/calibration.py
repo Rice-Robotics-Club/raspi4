@@ -29,14 +29,14 @@ def calibrate_motor():
     time.sleep(20)  # Wait for calibration to complete
     
     # Check for errors
-    send_can_message('Axis0_Get_Axis_Error', Get_Axis_Error=0x00)
-    axis_error = receive_can_message()
     send_can_message('Axis0_Get_Motor_Error', Get_Motor_Error=0x00)
     motor_error = receive_can_message()
+    send_can_message('Axis0_Get_Encoder_Error', Get_Encoder_Error=0x00)
+    encoder_error = receive_can_message()
 
-    if axis_error and motor_error:
-        if axis_error['Axis_Error'] != 0 or motor_error['Motor_Error'] != 0:
-            print(f"Calibration failed with Axis Error: {axis_error['Axis_Error']} and Motor Error: {motor_error['Motor_Error']}")
+    if motor_error and encoder_error:
+        if motor_error['Motor_Error'] != 0 or encoder_error['Encoder_Error'] != 0:
+            print(f"Calibration failed with Motor Error: {motor_error['Motor_Error']} and Encoder Error: {encoder_error['Encoder_Error']}")
             return False
 
     # Set the motor to closed-loop control mode
