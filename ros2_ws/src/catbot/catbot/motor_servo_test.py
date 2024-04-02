@@ -8,6 +8,7 @@ MAX_TORQUE = -0.48
 SERVO_MOVE_TIME = 1.0  # Time in seconds for the servo to move to 180 degrees
 TORQUE_RAMP_TIME = 1.0  # Time in seconds for the torque to ramp up
 
+# this node will init, spin until testing process is complete (leg jumps), then shutdown
 class MotorServoTestNode(Node):
     def __init__(self):
         super().__init__('motor_servo_test_node')
