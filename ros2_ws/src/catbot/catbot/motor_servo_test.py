@@ -23,8 +23,7 @@ class MotorServoTestNode(Node):
 
         # states during jump test
         self.started = False
-        self.init_time = None
-        self.curr_time = None
+        self.curr_loops = 0
 
         # Create clients for the request_axis_state services
         self.axis_state0 = self.create_client(AxisState, '/odrive_axis0/request_axis_state')
@@ -50,28 +49,31 @@ class MotorServoTestNode(Node):
             10
         )
 
+        self.set_desired_states_timer = self.create_timer(1, self.set_desired_states)
+
     def controller_status_callback(self, msg):
-        if not self.started:
-            self.started = True
-            self.init_time = float(self._clock.now().seconds_nanoseconds()[0]) 
-            # initialize jump test - lock servo
-            self.set_servo_angle(180)
-        self.curr_time = float(self._clock.now().seconds_nanoseconds()[0])
+        
 
         self.curr_torque_estimate = msg.torque_estimate
         self.curr_pos_estimate = msg.pos_estimate
 
-        self.get_logger().info('recieved controller status callback! Time diff = ' + str(self.curr_time) +' hehe = = = ' + str(self.init_time))
+    def set_desired_states(self):
+        self.curr_loops = self.curr_loops + 1
 
+        # safety measure
         if self.curr_pos_estimate < (- (LEG_TO_MOTOR_RATIO) / 4.0): 
             # once leg is released, leg will rotate past 90 degrees - once that happens, set to 90
             self.send_motor_pos((- (LEG_TO_MOTOR_RATIO) / 4.0))
-        
-        if self.curr_time - self.init_time > 4.0:
+
+        if self.curr_loops < 3:
+            self.set_servo_angle(180)
+        elif self.curr_loops < 5:
+            self.send_motor_torque(MAX_TORQUE_NEGATIVE)
+        elif self.curr_loops < 7:
             # last stage of test process
             self.set_servo_angle(90)
-        elif self.curr_time - self.init_time > 2.0:
-            self.send_motor_torque(MAX_TORQUE_NEGATIVE)
+        else:
+            self.send_motor_pos((- (LEG_TO_MOTOR_RATIO) / 4.0))
 
     def send_motor_pos(self, pos):
         control_msg = ControlMessage()
