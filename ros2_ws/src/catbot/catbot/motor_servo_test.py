@@ -61,9 +61,9 @@ class MotorServoTestNode(Node):
         self.curr_loops = self.curr_loops + 1
 
         # safety measure
-        if self.curr_pos_estimate < (- (LEG_TO_MOTOR_RATIO) / 4.0): 
-            # once leg is released, leg will rotate past 90 degrees - once that happens, set to 90
-            self.send_motor_pos((- (LEG_TO_MOTOR_RATIO) / 4.0))
+        # if self.curr_pos_estimate < (- (LEG_TO_MOTOR_RATIO) / 4.0): 
+        #     # once leg is released, leg will rotate past 90 degrees - once that happens, set to 90
+        #     self.send_motor_pos((- (LEG_TO_MOTOR_RATIO) / 4.0))
 
         self.send_motor_pos(float(self.curr_loops / 16.0))
         
@@ -84,6 +84,8 @@ class MotorServoTestNode(Node):
         control_msg.input_vel = 0.0 # feedforward
         control_msg.input_torque = 0.0 # feedforward
         self.motor_control_publisher.publish(control_msg)
+        self.get_logger().info('sent pos: ' + str(pos))
+
 
     def send_motor_torque(self, torque : float):
         control_msg = ControlMessage()
