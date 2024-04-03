@@ -7,6 +7,7 @@ from odrive_can.srv import AxisState
 
 TORQUE_SPIKE_THRESHOLD = 0.05  # Need to find the actual working threshold for torque spike detection
 MAX_TORQUE_NEGATIVE = -0.48
+TEST_TORQUE = 0.1
 SERVO_MOVE_TIME = 1.0  # Time in seconds for the servo to move to 180 degrees
 TORQUE_RAMP_TIME = 1.0  # Time in seconds for the torque to ramp up
 NANOSEC_TO_SEC = 1000000000
@@ -63,7 +64,7 @@ class MotorServoTestNode(Node):
             # once leg is released, leg will rotate past 90 degrees - once that happens, set to 90
             self.send_motor_pos((- (LEG_TO_MOTOR_RATIO) / 4.0))
 
-        self.send_motor_torque(MAX_TORQUE_NEGATIVE)
+        self.send_motor_torque(TEST_TORQUE)
 
         # if self.curr_loops < 3:
         #     self.set_servo_angle(180)
