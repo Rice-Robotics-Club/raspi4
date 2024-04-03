@@ -53,10 +53,10 @@ class MotorServoTestNode(Node):
     def controller_status_callback(self, msg):
         if not self.started:
             self.started = True
-            self.init_time = float(self._clock.now().seconds_nanoseconds()[1]) / float(NANOSEC_TO_SEC) 
+            self.init_time = float(self._clock.now().seconds_nanoseconds()[0]) 
             # initialize jump test - lock servo
             self.set_servo_angle(180)
-        self.curr_time = float(self._clock.now().seconds_nanoseconds()[1]) / float(NANOSEC_TO_SEC)
+        self.curr_time = float(self._clock.now().seconds_nanoseconds()[0])
 
         self.curr_torque_estimate = msg.torque_estimate
         self.curr_pos_estimate = msg.pos_estimate
