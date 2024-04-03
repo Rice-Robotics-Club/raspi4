@@ -87,7 +87,7 @@ class MotorServoTestNode(Node):
 
     def set_servo_angle(self, angle):
         angle_msg = Float64()
-        angle_msg.data = angle
+        angle_msg.data = float(angle)
         self.servo_angle_publisher.publish(angle_msg)
     
     def set_axis_state(self, s):
