@@ -65,7 +65,7 @@ class MotorServoTestNode(Node):
         #     # once leg is released, leg will rotate past 90 degrees - once that happens, set to 90
         #     self.send_motor_pos((- (LEG_TO_MOTOR_RATIO) / 4.0))
 
-        self.send_motor_pos(float(self.curr_loops / 16.0))
+        self.send_motor_pos(float(self.curr_loops / 2))
         
         # if self.curr_loops < 3:
         #     self.set_servo_angle(180)
