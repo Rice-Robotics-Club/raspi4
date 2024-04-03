@@ -5,7 +5,7 @@
                 "approx_init_pos": 0.0,
                 "approx_init_pos_valid": false,
                 "circular_output_range": 1.0,
-                "circular": true,
+                "circular": false,
                 "index_gpio": 10,
                 "index_offset": 0.0,
                 "index_offset_valid": false,
@@ -62,15 +62,15 @@
                 "vel": 6.36619758605957
             },
             "can": {
-                "bus_voltage_msg_rate_ms": 0,
-                "encoder_msg_rate_ms": 0,
-                "error_msg_rate_ms": 0,
+                "bus_voltage_msg_rate_ms": 100,
+                "encoder_msg_rate_ms": 100,
+                "error_msg_rate_ms": 100,
                 "heartbeat_msg_rate_ms": 100,
-                "iq_msg_rate_ms": 0,
+                "iq_msg_rate_ms": 100,
                 "is_extended": false,
                 "node_id": 0,
-                "temperature_msg_rate_ms": 0,
-                "torques_msg_rate_ms": 0,
+                "temperature_msg_rate_ms": 100,
+                "torques_msg_rate_ms": 100,
                 "version_msg_rate_ms": 0
             },
             "general_lockin": {

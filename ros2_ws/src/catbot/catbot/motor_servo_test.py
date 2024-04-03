@@ -1,12 +1,16 @@
+import time
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64
 from odrive_can.msg import ControllerStatus, ControlMessage
+from odrive_can.srv import AxisState
 
 TORQUE_SPIKE_THRESHOLD = 0.05  # Need to find the actual working threshold for torque spike detection
-MAX_TORQUE = -0.48
+MAX_TORQUE_NEGATIVE = -0.48
 SERVO_MOVE_TIME = 1.0  # Time in seconds for the servo to move to 180 degrees
 TORQUE_RAMP_TIME = 1.0  # Time in seconds for the torque to ramp up
+NANOSEC_TO_SEC = 1000000000
+LEG_TO_MOTOR_RATIO = 30 # 1 motor rotation = 1/30 leg rotation
 
 # this node will init, spin until testing process is complete (leg jumps), then shutdown
 class MotorServoTestNode(Node):
@@ -14,9 +18,23 @@ class MotorServoTestNode(Node):
         super().__init__('motor_servo_test_node')
         
         # Set initial state
-        self.max_torque_reached = False
-        self.servo_timer = None
-        self.torque_timer = None
+        self.curr_torque_estimate = None
+        self.curr_pos_estimate = None
+
+        # states during jump test
+        self.started = False
+        self.init_time = None
+        self.curr_time = None
+
+        # Create clients for the request_axis_state services
+        self.axis_state0 = self.create_client(AxisState, '/odrive_axis0/request_axis_state')
+        
+        # Wait for the services to be available
+        while not self.axis_state0.wait_for_service(timeout_sec=1.0) or not self.axis_state1.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('waiting for AxisState services...')
+            
+        # Create a request for the request_axis_state services
+        self.axis_request = AxisState.Request()
         
         # Create a publisher for the motor control messages
         self.motor_control_publisher = self.create_publisher(ControlMessage, '/odrive_axis0/control_message', 10)
@@ -32,66 +50,59 @@ class MotorServoTestNode(Node):
             10
         )
 
-        # Start the motor with a constant negative velocity
-        self.send_motor_velocity(-2.0) 
-
     def controller_status_callback(self, msg):
-        if not self.max_torque_reached:
-            if msg.torque_estimate > TORQUE_SPIKE_THRESHOLD:
-                # Set motor velocity to zero and schedule servo to move to 180 degrees
-                self.send_motor_velocity(0.0)
-                self.cancel_timers()  # Cancel any existing timers
-                self.servo_timer = self.create_timer(SERVO_MOVE_TIME, self.move_servo_to_180)
-            elif msg.torque_estimate >= MAX_TORQUE:
-                # Upon reaching max torque, move servo to 90 degrees
-                self.max_torque_reached = True
-                self.cancel_timers()  # Cancel any existing timers
-                self.torque_timer = self.create_timer(TORQUE_RAMP_TIME, self.move_servo_to_90)
+        if not self.started:
+            self.started = True
+            self.init_time = self._clock.now() * NANOSEC_TO_SEC
+            # initialize jump test - lock servo
+            self.set_servo_angle(180)
+        self.curr_time = self._clock.now() * NANOSEC_TO_SEC
 
-    def move_servo_to_180(self):
-        # Set servo to 180 degrees and schedule torque ramp
-        self.set_servo_angle(180)
-        self.cancel_timers()  # Cancel any existing timers
-        self.torque_timer = self.create_timer(TORQUE_RAMP_TIME, self.ramp_up_torque)
+        self.curr_torque_estimate = msg.torque_estimate
+        self.curr_pos_estimate = msg.pos_estimate
 
-    def ramp_up_torque(self):
-        # Set motor to max torque
-        self.send_motor_max_torque(MAX_TORQUE)
+        if self.curr_pos_estimate < (- (LEG_TO_MOTOR_RATIO) / 4.0): 
+            # once leg is released, leg will rotate past 90 degrees - once that happens, set to 90
+            self.send_motor_pos((- (LEG_TO_MOTOR_RATIO) / 4.0))
+        
+        if self.curr_time - self.init_time > 4.0:
+            # last stage of test process
+            self.set_servo_angle(90)
+        elif self.curr_time - self.init_time > 2.0:
+            self.send_motor_torque(MAX_TORQUE_NEGATIVE)
 
-    def move_servo_to_90(self):
-        # Set servo to 90 degrees
-        self.set_servo_angle(90)
-
-    def cancel_timers(self):
-        # Cancel the servo timer if it exists
-        if self.servo_timer:
-            self.servo_timer.cancel()
-            self.servo_timer = None
-        # Cancel the torque timer if it exists
-        if self.torque_timer:
-            self.torque_timer.cancel()
-            self.torque_timer = None
-
-    def send_motor_velocity(self, velocity):
+    def send_motor_pos(self, pos):
         control_msg = ControlMessage()
-        control_msg.control_mode = 2  # Control mode for velocity
-        control_msg.input_vel = velocity
+        control_msg.control_mode = 3  # Control mode for pos
+        control_msg.input_pos = pos
+        control_msg.input_vel = 0 # feedforward
+        control_msg.input_torque = 0 # feedforward
         self.motor_control_publisher.publish(control_msg)
 
-    def send_motor_max_torque(self, torque):
+    def send_motor_torque(self, torque):
         control_msg = ControlMessage()
-        control_msg.control_mode = 3  # Control mode for torque
-        control_msg.input_torque = torque
+        control_msg.control_mode = 1  # Control mode for torque
+        control_msg.input_torque = torque # feedforward
         self.motor_control_publisher.publish(control_msg)
 
     def set_servo_angle(self, angle):
         angle_msg = Float64()
         angle_msg.data = angle
         self.servo_angle_publisher.publish(angle_msg)
+    
+    def set_axis_state(self, s):
+        self.axis_request.axis_requested_state = s
+        
+        # /odrive_axis0/
+        self.future = self.axis_state0.call_async(self.axis_request)
+        rclpy.spin_until_future_complete(self, self.future)
+        self.get_logger().info('Result: %r' % (self.future.result().axis_state))
 
 def main(args=None):
     rclpy.init(args=args)
     node = MotorServoTestNode()
+    time.sleep(2) # wait for other nodes to set up
+    node.set_axis_state(8) # CLOSED_LOOP_CONTROL
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
