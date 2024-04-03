@@ -63,15 +63,17 @@ class MotorServoTestNode(Node):
             # once leg is released, leg will rotate past 90 degrees - once that happens, set to 90
             self.send_motor_pos((- (LEG_TO_MOTOR_RATIO) / 4.0))
 
-        if self.curr_loops < 3:
-            self.set_servo_angle(180)
-        elif self.curr_loops < 5:
-            self.send_motor_torque(MAX_TORQUE_NEGATIVE)
-        elif self.curr_loops < 7:
-            # last stage of test process
-            self.set_servo_angle(90)
-        else:
-            self.send_motor_pos((- (LEG_TO_MOTOR_RATIO) / 4.0))
+        self.send_motor_torque(MAX_TORQUE_NEGATIVE)
+
+        # if self.curr_loops < 3:
+        #     self.set_servo_angle(180)
+        # elif self.curr_loops < 5:
+        #     self.send_motor_torque(MAX_TORQUE_NEGATIVE)
+        # elif self.curr_loops < 7:
+        #     # last stage of test process
+        #     self.set_servo_angle(90)
+        # else:
+        #     self.send_motor_pos((- (LEG_TO_MOTOR_RATIO) / 4.0))
 
     def send_motor_pos(self, pos):
         control_msg = ControlMessage()
