@@ -30,7 +30,7 @@ class MotorServoTestNode(Node):
         self.axis_state0 = self.create_client(AxisState, '/odrive_axis0/request_axis_state')
         
         # Wait for the services to be available
-        while not self.axis_state0.wait_for_service(timeout_sec=1.0) or not self.axis_state1.wait_for_service(timeout_sec=1.0):
+        while not self.axis_state0.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('waiting for AxisState services...')
             
         # Create a request for the request_axis_state services
