@@ -18,8 +18,8 @@ class MotorServoTestNode(Node):
         super().__init__('motor_servo_test_node')
         
         # Set initial state
-        self.curr_torque_estimate = None
-        self.curr_pos_estimate = None
+        self.curr_torque_estimate = 0
+        self.curr_pos_estimate = 0 # note this may not be true on boot up!
 
         # states during jump test
         self.started = False
@@ -52,8 +52,6 @@ class MotorServoTestNode(Node):
         self.set_desired_states_timer = self.create_timer(1, self.set_desired_states)
 
     def controller_status_callback(self, msg):
-        
-
         self.curr_torque_estimate = msg.torque_estimate
         self.curr_pos_estimate = msg.pos_estimate
 
