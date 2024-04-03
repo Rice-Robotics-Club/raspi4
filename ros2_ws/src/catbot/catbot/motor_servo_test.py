@@ -1,3 +1,4 @@
+import math
 import time
 import rclpy
 from rclpy.node import Node
@@ -84,9 +85,10 @@ class MotorServoTestNode(Node):
         control_msg.input_torque = 0.0 # feedforward
         self.motor_control_publisher.publish(control_msg)
 
-    def send_motor_torque(self, torque):
+    def send_motor_torque(self, torque : float):
         control_msg = ControlMessage()
         control_msg.control_mode = 1  # Control mode for torque
+        control_msg.input_vel = torque / abs(torque)
         control_msg.input_torque = torque # feedforward
         self.motor_control_publisher.publish(control_msg)
 
