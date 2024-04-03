@@ -61,8 +61,8 @@ class MotorServoTestNode(Node):
         self.curr_torque_estimate = msg.torque_estimate
         self.curr_pos_estimate = msg.pos_estimate
 
-        self.get_logger().info('recieved controller status callback!')
-        
+        self.get_logger().info('recieved controller status callback! Time diff = ' + str(self.curr_time - self.init_time))
+
         if self.curr_pos_estimate < (- (LEG_TO_MOTOR_RATIO) / 4.0): 
             # once leg is released, leg will rotate past 90 degrees - once that happens, set to 90
             self.send_motor_pos((- (LEG_TO_MOTOR_RATIO) / 4.0))
