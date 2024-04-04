@@ -3,33 +3,35 @@ from rclpy.node import Node
 from odrive_can.srv import AxisState
 from odrive_can.msg import ControlMessage, ControllerStatus
 from std_msgs.msg import Float64
+from rclpy.executors import MultiThreadedExecutor
+import threading
 
-TORQUE_SPIKE_THRESHOLD = 0.05  # Need to find actual working threshold for torque spike detection
-MAX_TORQUE = -0.48
+TORQUE_SPIKE_THRESHOLD = 0.05  # Placeholder for torque spike detection threshold
+MAX_TORQUE = -0.48  # Maximum torque value
 
 class ControlNode(Node):
     def __init__(self):
         super().__init__('control_node')
+        self.gear_ratio = None
+        self.phase = 'Init'  # Starting phase
+        self.poising_torque = 0.24  # Poising torque [Nm]
+        self.bracing_angle = 70 * (3.1415 / 180)  # Convert bracing angle to radians
+        self.standard_angle = 45 * (3.1415 / 180)  # Convert standard angle to radians
 
-        self.gear_ratio = None 
-        self.phase = 'Init'  # Initial phase
-        self.poising_torque = 0.24  # [Nm]
-        self.bracing_angle = 70 * (3.1415 / 180)  # [rad]
-        self.standard_angle = 45 * (3.1415 / 180)  # [rad]
+        # AxisState service clients for both axes
+        self.state_client_axis0 = self.create_client(AxisState, '/odrive_axis0/request_axis_state')
+        self.state_client_axis1 = self.create_client(AxisState, '/odrive_axis1/request_axis_state')
+        while not self.state_client_axis0.wait_for_service(timeout_sec=1.0) or \
+              not self.state_client_axis1.wait_for_service(timeout_sec=1.0):
+            self.get_logger().info('Waiting for AxisState services...')
+        self.axis_request_axis0 = AxisState.Request()
+        self.axis_request_axis1 = AxisState.Request()
 
-        # Create a client for the set_axis_state service
-        self.state_client = self.create_client(AxisState, '/odrive_axis0/request_axis_state')
-        while not self.state_client.wait_for_service(timeout_sec=1.0):
-            self.get_logger().info('waiting for AxisState service...')
-        self.axis_request = AxisState.Request()
+        self.initialize_communication()
+        self.initialize_motor_messages()
 
-        # Set up subscriber for the ODrive controller status
-        self.controller_status_subscriber = self.create_subscription(
-            ControllerStatus,
-            '/odrive_axis0/controller_status',
-            self.controller_status_callback,
-            10
-        )
+        self.zero_angle1 = None  # Reference angle for the top motor
+        self.zero_angle2 = None  # Reference angle for the bottom motor
 
         # Create ControlMessage objects for the motors
         # Top Motor
@@ -42,14 +44,11 @@ class ControlNode(Node):
         self.motor_msg2.input_mode = 1 # Set to pass-through mode initially
 
         # Set up publisher to the ODrive
-        self.motor_control_publisher = self.create_publisher(ControlMessage, '/odrive_axis0/control_message', 10)
+        self.motor_control_publisher1 = self.create_publisher(ControlMessage, '/odrive_axis0/control_message', 10)
+        self.motor_control_publisher2 = self.create_publisher(ControlMessage, '/odrive_axis1/control_message', 10)
 
         # Set up publisher for the servo
         self.servo_publisher = self.create_publisher(Float64, 'servo_angle', 10)
-
-        # Reference angles for the motors will be updated in the callback
-        self.zero_angle1 = None
-        self.zero_angle2 = None
 
     def controller_status_callback(self, msg):
         #### THIS ASSUMES THAT WE INITIALIZE THE LEG IN PRONED POSITION ####
@@ -159,10 +158,14 @@ class ControlNode(Node):
 def main(args=None):
     rclpy.init(args=args)
     node = ControlNode()
+    executor = MultiThreadedExecutor()
     node.set_axis_state(8)  # CLOSED_LOOP_CONTROL
-    rclpy.spin(node)
-    node.set_axis_state(1)  # AXIS_STATE_IDLE
-    rclpy.shutdown()
+    executor.add_node(node)
+    try:
+        executor.spin()
+    finally:
+        node.set_axis_state(1)  # AXIS_STATE_IDLE
+        rclpy.shutdown()
 
 if __name__ == '__main__':
     main()
