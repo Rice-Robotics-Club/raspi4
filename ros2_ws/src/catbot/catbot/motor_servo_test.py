@@ -110,8 +110,10 @@ class MotorServoTestNode(Node):
 def main(args=None):
     rclpy.init(args=args)
     node = MotorServoTestNode()
+    node.set_servo_angle(180)
     time.sleep(2) # wait for other nodes to set up
     node.set_axis_state(8) # CLOSED_LOOP_CONTROL
+    node.set_servo_angle(0)
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
