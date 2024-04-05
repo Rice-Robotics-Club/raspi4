@@ -42,9 +42,6 @@ class ControlNode(Node):
             10
         )
 
-        self.initialize_communication()
-        self.initialize_motor_messages()
-
         self.zero_angle1 = None  # Reference angle for the top motor
         self.zero_angle2 = None  # Reference angle for the bottom motor
 
@@ -65,8 +62,6 @@ class ControlNode(Node):
         # Set up publisher for the servo
         self.servo_publisher = self.create_publisher(Float64, 'servo_angle', 10)
 
-#### CALLBACKS ASSUME THAT WE INITIALIZE THE LEG IN PRONED POSITION ####
-    #TODO : initialization
     def controller_status_callback_axis0(self, msg):
         # Callback for axis0 motor status updates
         if self.zero_angle1 is None:
@@ -86,27 +81,45 @@ class ControlNode(Node):
     def check_and_update_phase(self):
         # This method checks if both motors have their zero angles set and updates the phase accordingly
         if self.zero_angle1 is not None and self.zero_angle2 is not None:
-            if self.phase == 'Init':
-                self.phase = 'Proning'
-                self.get_logger().info('Initialization complete. Transitioning to Proning phase.')
-    '''
-    def controller_status_callback(self, msg):
-        if self.zero_angle1 is None:
-            self.zero_angle1 = msg1.pos_estimate   
-        elif self.zero_angle2 is None:
-            self.zero_angle2 = msg2.pos_estimate
-        
-        if self.phase == 'Init':
-            # TODO: Write initialization phase that has the leg slowly go from proned, to bracing angle, to standard angle.
-            self.get_logger().info('Initializing...')
-            # Set motors to trajectory control
-            # Code goes here
-            
-            # Update phase to Proning
-            self.phase = 'Proning'
-            self.get_logger().info('Beginning to Proning phase')
-    '''
+            self.get_logger().info('Starting motor initialization sequence.')
     
+            # Set motors to velocity control mode for initialization
+            self.motor_msg1.control_mode = 2  # Assuming '2' is the mode for velocity control
+            self.motor_msg2.control_mode = 2  # Adjust mode value as needed
+
+            # Set a positive velocity for both motors for initial movement
+            self.motor_msg1.input_vel = 0.5  # Placeholder velocity
+            self.motor_msg2.input_vel = 0.5  # Placeholder velocity
+    
+            # Publish velocity commands to start motors
+            self.motor_control_publisher1.publish(self.motor_msg1)
+            self.motor_control_publisher2.publish(self.motor_msg2)
+    
+            # Schedule to change velocity to negative after a few seconds
+            threading.Timer(3, self.set_negative_velocity).start()
+    
+    def set_negative_velocity(self):
+        # Set a negative velocity for both motors for a brief period
+        self.motor_msg1.input_vel = -0.3  # Placeholder negative velocity
+        self.motor_msg2.input_vel = -0.3  # Placeholder negative velocity
+    
+        # Publish velocity commands to reverse motors
+        self.motor_control_publisher1.publish(self.motor_msg1)
+        self.motor_control_publisher2.publish(self.motor_msg2)
+    
+        # Schedule to stop motors and transition to Proning phase after the negative velocity period
+        threading.Timer(2, self.stop_motors_and_transition).start()
+    
+    def stop_motors_and_transition(self):
+        # Stop the motors by setting velocity to 0
+        self.motor_msg1.input_vel = 0
+        self.motor_msg2.input_vel = 0
+        self.motor_control_publisher1.publish(self.motor_msg1)
+        self.motor_control_publisher2.publish(self.motor_msg2)
+    
+        # Update phase to Proning and log transition
+        self.phase = 'Proning'
+        self.get_logger().info('Initialization complete. Transitioning to Proning phase.')
 
     def start_proning_phase(self):
         self.phase = 'Proning'
@@ -169,58 +182,61 @@ class ControlNode(Node):
         self.get_logger().info('Transitioning to Bracing phase')
         self.bracing_phase()
 
-        elif self.phase == 'Bracing':
-            # Set bottom motor to position control
-            self.motor_msg2.control_mode = 3
-            # Set motor to bracing angle
-            self.motor_msg2.input_pos = self.bracing_angle - self.zero_angle
-            # Publish control message for the motor
-            self.motor_control_publisher.publish(self.motor_msg2)
-            self.get_logger().info('Bracing: Positions set to bracing angles')
-            # Update phase to Landing
-            self.phase = 'Landing'
-            self.get_logger().info('Transitioning to Landing phase')
+    def bracing_phase(self):
+        # Set bottom motor to position control
+        self.motor_msg2.control_mode = 3
+        # Set motor to bracing angle
+        self.motor_msg2.input_pos = self.bracing_angle - self.zero_angle2
+        # Publish control message for the motor
+        self.motor_control_publisher2.publish(self.motor_msg2)
+        self.get_logger().info('Bracing: Positions set to bracing angles')
+        # Schedule transition to Landing phase
+        threading.Timer(1, self.transition_to_landing).start() 
 
-        elif self.phase == 'Landing':
-            # Set motors to position control
-            self.motor_msg1.control_mode = 3
-            self.motor_msg2.control_mode = 3
-            # Set motor to standard angle
-            self.motor_msg1.input_pos = self.standard_angle - self.zero_angle
-            self.motor_msg2.input_pos = self.standard_angle - self.zero_angle
-            # Publish control message for the motor
-            self.motor_control_publisher.publish(self.motor_msg1)
-            self.motor_control_publisher.publish(self.motor_msg2)
-            self.get_logger().info('Landing: Motor set to standard angle')
-            # Reset phase to 'Proning' for the next jump
-            self.phase = 'Proning'
-            self.get_logger().info('Jump completed. Resetting to Proning phase for next jump')
-
-            ## Wait like 10 seconds ##
+    def transition_to_landing(self):
+        self.phase = 'Landing'
+        self.get_logger().info('Transitioning to Landing phase')
+        self.landing_phase()
+    
+    def landing_phase(self):
+        # Set motors to position control
+        self.motor_msg1.control_mode = 3
+        self.motor_msg2.control_mode = 3
+        # Set motors to standard angle
+        self.motor_msg1.input_pos = self.standard_angle - self.zero_angle1
+        self.motor_msg2.input_pos = self.standard_angle - self.zero_angle2
+        # Publish control messages for both motors
+        self.motor_control_publisher1.publish(self.motor_msg1)
+        self.motor_control_publisher2.publish(self.motor_msg2)
+        self.get_logger().info('Landing: Motors set to standard angle')
+        # Assuming immediate reset to Proning for the next cycle
+        self.phase = 'Proning'
+        self.get_logger().info('Jump completed. Resetting to Proning phase for next jump')
 
     def set_servo_angle(self, angle):
         angle_msg = Float64()
         angle_msg.data = angle
         self.servo_publisher.publish(angle_msg)
-
-    def set_axis_state(self, state):
-        self.axis_request.axis_requested_state = state
-        future = self.state_client.call_async(self.axis_request)
-        rclpy.spin_until_future_complete(self, future)
-        self.get_logger().info(f'Result for odrive_axis0: {future.result().axis_state}')
-
-'''
+        
 def main(args=None):
-    rclpy.init(args=args)
-    node = ControlNode()
+    rclpy.init(args=args)  # Initialize ROS 2
+    control_node = ControlNode()
+
+    # Use a MultiThreadedExecutor to manage the node's callbacks
     executor = MultiThreadedExecutor()
-    node.set_axis_state(8)  # CLOSED_LOOP_CONTROL
-    executor.add_node(node)
+    executor.add_node(control_node)
+    
     try:
-        executor.spin()
+        executor.spin()  # Keep node alive and responsive
+    except KeyboardInterrupt:
+        # Handle Ctrl+C 
+        pass
+        
     finally:
-        node.set_axis_state(1)  # AXIS_STATE_IDLE
+        # Cleanup before exiting
+        executor.shutdown()
+        control_node.destroy_node()
         rclpy.shutdown()
-'''
+
 if __name__ == '__main__':
     main()
