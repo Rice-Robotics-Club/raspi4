@@ -1,0 +1,3 @@
+Setting up can
+sudo ip link set can0 up type can bitrate 25000
+sudo chmod g_rw /dev/gpiomem
