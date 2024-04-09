@@ -30,6 +30,7 @@ setup(
             'servo_control_node = catbot.servo_control_node:main',
             'jump = catbot.jump:main',
             'motor_servo_test = catbot.motor_servo_test:main',
+            'two_motor_and_servo = catbot.two_motor_and_servo:main',
         ],
     },
 )
