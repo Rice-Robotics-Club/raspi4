@@ -129,9 +129,9 @@ def main(args=None):
     node = MotorServoTestNode()
 
     # Angle conversions for 45 and 70 degrees to radians
-    standard_angle_rad = 45 * (3.1415 / 180)
-    bracing_angle_rad = 70 * (3.1415 / 180)
-    poising_torque = -0.48  # Maximum torque for Poising stage
+    standard_angle = 45 * (3.1415 / 180)  # [rad]
+    bracing_angle = 70 * (3.1415 / 180)   # [rad]
+    poising_torque = -0.48  # Maximum torque for Poising stage   !!! MAKE SURE THE SIGN IS CORRECT !!!
 
     try:
         node.get_logger().info('Jump sequence started.')
@@ -152,39 +152,34 @@ def main(args=None):
 
         # Move from flat position to standard position (45 degrees)
         node.get_logger().info('Moving to standard position...')
-        node.send_control_message(motor_id=0, mode=3, pos=standard_angle_rad)  # Top motor to 45 degrees
-        node.send_control_message(motor_id=1, mode=3, pos=standard_angle_rad)  # Bottom motor to 45 degrees
-        time.sleep(2)  # Wait for the motors to reach the standard position; adjust as needed
+        node.send_control_message(motor_id=0, mode=3, pos=standard_angle - zero_angle0)  # Top motor to 45 degrees
+        node.send_control_message(motor_id=1, mode=3, pos=standard_angle - zero_angle1)  # Bottom motor to 45 degrees
+        time.sleep(2)  # Wait for the motors to reach the standard position; adjust as needed. In future iterations detect when the motors reach standard posiition.
         
         # Proning - extend the servo to connect the two legs, moving both to 0 position
         node.get_logger().info('Moving to proning position...')
-        node.send_control_message(motor_id=0, mode=3, pos=0)  # Top motor to 0 position
-        node.send_control_message(motor_id=1, mode=3, pos=0)  # Bottom motor to 0 position
+        node.send_control_message(motor_id=0, mode=3, pos=0 - zero_angle0)  # Top motor to 0 position
+        node.send_control_message(motor_id=1, mode=3, pos=0 - zer_angle1)  # Bottom motor to 0 position
         node.set_servo_angle(180)
-        time.sleep(5)  # Wait for the proning to complete; adjust as needed
+        time.sleep(5)  # Wait for the proning to complete; adjust as needed. In future iterations detect when the motors reach proned position.
 
         # Poising - bottom motor switches to torque control
         node.get_logger().info('Poising: Applying torque...')
         node.send_control_message(motor_id=1, mode=1, torque=poising_torque)
-        time.sleep(0.5)  # Adjust as needed for the poising to complete
+        time.sleep(0.5)  # Adjust as needed for the poising to complete. In future iterations detect when the motor rotates to the spring's maximum deflection.
 
         # Pouncing - release the servo allowing the spring to extend the bottom leg
-        node.get_logger().info('Pouncing: Releasing servo and maintaining torque...')
+        node.get_logger().info('Pouncing: Releasing servo and setting motors to bracing position...')
         node.set_servo_angle(90)
-        # Continue to provide maximum torque
-        node.send_control_message(motor_id=1, mode=1, torque=poising_torque)
-        time.sleep(0.125)  # Adjust as needed based on the spring constant and system behavior
-
-        # Bracing - prepare for landing midair
-        node.get_logger().info('Bracing: Moving to bracing position...')
-        node.send_control_message(motor_id=0, mode=3, pos=bracing_angle_rad)  # Top motor to bracing angle
-        node.send_control_message(motor_id=1, mode=3, pos=bracing_angle_rad)  # Bottom motor to bracing angle
-        time.sleep(0.125)  # Adjust as needed
+        # Set motors to bracing position
+        node.send_control_message(motor_id=0, mode=3, pos=bracing_angle - zero_angle0)  # Top motor to bracing angle
+        node.send_control_message(motor_id=1, mode=3, pos=bracing_angle - zero_angle1)  # Bottom motor to bracing angle
+        time.sleep(0.125)  # Adjust as needed based. in future iterations detect when the motors induce a current to switch to landing position
 
         # Landing - transition to the standard position
         node.get_logger().info('Landing: Moving to standard position...')
-        node.send_control_message(motor_id=0, mode=3, pos=standard_angle_rad)  # Top motor to standard angle
-        node.send_control_message(motor_id=1, mode=3, pos=standard_angle_rad)  # Bottom motor to standard angle
+        node.send_control_message(motor_id=0, mode=3, pos=standard_angle - zero_angle0)  # Top motor to standard angle
+        node.send_control_message(motor_id=1, mode=3, pos=standard_angle - zero_angle1)  # Bottom motor to standard angle
         time.sleep(2)  # Wait for the landing to stabilize; adjust as needed
 
     except KeyboardInterrupt:
