@@ -124,5 +124,76 @@ def main(args=None):
     node.destroy_node()
     rclpy.shutdown()
 
+"""
+    rclpy.init(args=args)
+    node = MotorServoTestNode()
+
+    # Angle conversions for 45 and 70 degrees to radians
+    standard_angle_rad = 45 * (3.1415 / 180)
+    bracing_angle_rad = 70 * (3.1415 / 180)
+    poising_torque = -0.48  # Maximum torque for Poising stage
+
+    try:
+        node.get_logger().info('Jump sequence started.')
+
+        # Initialize zero angles
+        zero_angle0 = None
+        zero_angle1 = None
+    
+        # Wait until we have the initial position estimate
+        while zero_angle0 is None or zero_angle1 is None:
+            rclpy.spin_once(node, timeout_sec=0.1)
+            if zero_angle0 is None:
+                zero_angle0 = node.curr_pos_estimate0
+                node.get_logger().info(f'Zero angle for motor 0 set to: {zero_angle0}')
+            if zero_angle1 is None:
+                zero_angle1 = node.curr_pos_estimate1
+                node.get_logger().info(f'Zero angle for motor 1 set to: {zero_angle1}')
+
+        # Move from flat position to standard position (45 degrees)
+        node.get_logger().info('Moving to standard position...')
+        node.send_control_message(motor_id=0, mode=3, pos=standard_angle_rad)  # Top motor to 45 degrees
+        node.send_control_message(motor_id=1, mode=3, pos=standard_angle_rad)  # Bottom motor to 45 degrees
+        time.sleep(2)  # Wait for the motors to reach the standard position; adjust as needed
+        
+        # Proning - extend the servo to connect the two legs, moving both to 0 position
+        node.get_logger().info('Moving to proning position...')
+        node.send_control_message(motor_id=0, mode=3, pos=0)  # Top motor to 0 position
+        node.send_control_message(motor_id=1, mode=3, pos=0)  # Bottom motor to 0 position
+        node.set_servo_angle(180)
+        time.sleep(5)  # Wait for the proning to complete; adjust as needed
+
+        # Poising - bottom motor switches to torque control
+        node.get_logger().info('Poising: Applying torque...')
+        node.send_control_message(motor_id=1, mode=1, torque=poising_torque)
+        time.sleep(0.5)  # Adjust as needed for the poising to complete
+
+        # Pouncing - release the servo allowing the spring to extend the bottom leg
+        node.get_logger().info('Pouncing: Releasing servo and maintaining torque...')
+        node.set_servo_angle(90)
+        # Continue to provide maximum torque
+        node.send_control_message(motor_id=1, mode=1, torque=poising_torque)
+        time.sleep(0.125)  # Adjust as needed based on the spring constant and system behavior
+
+        # Bracing - prepare for landing midair
+        node.get_logger().info('Bracing: Moving to bracing position...')
+        node.send_control_message(motor_id=0, mode=3, pos=bracing_angle_rad)  # Top motor to bracing angle
+        node.send_control_message(motor_id=1, mode=3, pos=bracing_angle_rad)  # Bottom motor to bracing angle
+        time.sleep(0.125)  # Adjust as needed
+
+        # Landing - transition to the standard position
+        node.get_logger().info('Landing: Moving to standard position...')
+        node.send_control_message(motor_id=0, mode=3, pos=standard_angle_rad)  # Top motor to standard angle
+        node.send_control_message(motor_id=1, mode=3, pos=standard_angle_rad)  # Bottom motor to standard angle
+        time.sleep(2)  # Wait for the landing to stabilize; adjust as needed
+
+    except KeyboardInterrupt:
+        node.get_logger().info('Jump sequence interrupted.')
+    finally:
+        # Clean shutdown of nodes and RCL
+        node.destroy_node()
+        rclpy.shutdown()
+"""
+
 if __name__ == '__main__':
     main()
