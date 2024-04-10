@@ -79,10 +79,10 @@ class MotorServoTestNode(Node):
   
       angle: 0-180 degress
       """
-        angle_msg = Float64()
-        angle_msg.data = angle
-        self.servo_angle_publisher.publish(angle_msg)
-        self.get_logger().info(f'Set servo angle to {angle} degrees')
+    angle_msg = Float64()
+    angle_msg.data = angle
+    self.servo_angle_publisher.publish(angle_msg)
+    self.get_logger().info(f'Set servo angle to {angle} degrees')
   
     def set_axis_state(self, motor_id, state):
       """
