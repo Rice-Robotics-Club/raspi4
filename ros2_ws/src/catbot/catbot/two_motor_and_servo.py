@@ -74,15 +74,15 @@ class MotorServoTestNode(Node):
             self.get_logger().error(f'Invalid motor_id: {motor_id}')
 
     def set_servo_angle(self, angle):
-      """
-      Set the servo angle
-  
-      angle: 0-180 degress
-      """
-    angle_msg = Float64()
-    angle_msg.data = angle
-    self.servo_angle_publisher.publish(angle_msg)
-    self.get_logger().info(f'Set servo angle to {angle} degrees')
+        """
+        Set the servo angle
+    
+        angle: 0-180 degress
+        """
+        angle_msg = Float64()
+        angle_msg.data = angle
+        self.servo_angle_publisher.publish(angle_msg)
+        self.get_logger().info(f'Set servo angle to {angle} degrees')
   
     def set_axis_state(self, motor_id, state):
       """
