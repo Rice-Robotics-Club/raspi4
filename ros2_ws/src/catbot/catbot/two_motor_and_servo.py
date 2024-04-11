@@ -61,7 +61,7 @@ class MotorServoTestNode(Node):
         torque: Desired torque (relevant if mode is 1 or for feedforward in other controls).
         """
         control_msg = ControlMessage()
-        control_msg.control_mode = mode
+        control_msg.control_mode = int(mode)
         control_msg.input_mode = 1
         control_msg.input_pos = float(pos)
         control_msg.input_vel = float(vel)
@@ -94,10 +94,12 @@ class MotorServoTestNode(Node):
       """
       axis_request = AxisState.Request()
       axis_request.axis_requested_state = state
-  
-      future = self.axis_state0.call_async(axis_request) if motor_id == 0 else self.axis_state1.call_async(axis_request)
+      if motor_id == 0:  
+        future = self.axis_state0.call_async(axis_request)  
+      else:
+        future = self.axis_state1.call_async(axis_request)
         
-      rclpy.spin_until_future_complete(self, future)
+      rclpy.spin_until_future_complete(self, future, 6.0)
     
       if future.result() is not None:
           self.get_logger().info(f'Result for motor {motor_id}: {future.result().axis_state}')
