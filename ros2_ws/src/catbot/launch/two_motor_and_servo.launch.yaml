@@ -24,7 +24,7 @@ launch:
       value: 1
     -
       name: "interface"
-      value: "can0"
+      value: "can1"
 
 - node:
     pkg: "catbot"
