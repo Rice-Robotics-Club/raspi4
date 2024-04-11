@@ -75,8 +75,10 @@ class MotorServoTestNode(Node):
         elif self.curr_loops < 5:
             # last stage of test process
             self.set_servo_angle(90)
-        else:
+        elif self.curr_loops < 8:
             self.send_motor_pos((- (LEG_TO_MOTOR_RATIO) / 4.0))
+        else:
+            self.send_motor_pos(0)
 
     def send_motor_pos(self, pos):
         control_msg = ControlMessage()
@@ -86,7 +88,7 @@ class MotorServoTestNode(Node):
         control_msg.input_vel = 0.0 # feedforward
         control_msg.input_torque = 0.0 # feedforward
         self.motor_control_publisher.publish(control_msg)
-        self.get_logger().info('sent pos: ' + str(pos))
+        # self.get_logger().info('sent pos: ' + str(pos))
 
 
     def send_motor_torque(self, torque : float):
