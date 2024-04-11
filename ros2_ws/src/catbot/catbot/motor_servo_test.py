@@ -66,13 +66,13 @@ class MotorServoTestNode(Node):
             self.send_motor_pos((- (LEG_TO_MOTOR_RATIO) / 4.0))
 
         # self.send_motor_pos(float(self.curr_loops / 2))
-        if self.curr_loops < 1:
+        if self.curr_loops < 2:
             self.send_motor_pos(0)
-        elif self.curr_loops < 2:
+        elif self.curr_loops < 3:
             self.set_servo_angle(180)
-        elif self.curr_loops < 3.5:
+        elif self.curr_loops < 4.5:
             self.send_motor_torque(MAX_TORQUE_NEGATIVE)
-        elif self.curr_loops < 4.0:
+        elif self.curr_loops < 5:
             # last stage of test process
             self.set_servo_angle(90)
         else:
