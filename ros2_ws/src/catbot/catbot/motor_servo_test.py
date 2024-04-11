@@ -51,14 +51,14 @@ class MotorServoTestNode(Node):
             10
         )
 
-        self.set_desired_states_timer = self.create_timer(1, self.set_desired_states)
+        self.set_desired_states_timer = self.create_timer(0.5, self.set_desired_states)
 
     def controller_status_callback(self, msg):
         self.curr_torque_estimate = msg.torque_estimate
         self.curr_pos_estimate = msg.pos_estimate
 
     def set_desired_states(self):
-        self.curr_loops = self.curr_loops + 1
+        self.curr_loops = self.curr_loops + 0.5
 
         # safety measure
         if self.curr_pos_estimate < (- (LEG_TO_MOTOR_RATIO) / 4.0): 
@@ -71,7 +71,7 @@ class MotorServoTestNode(Node):
             self.set_servo_angle(180)
         elif self.curr_loops < 5:
             self.send_motor_torque(MAX_TORQUE_NEGATIVE)
-        elif self.curr_loops < 7:
+        elif self.curr_loops < 5.5:
             # last stage of test process
             self.set_servo_angle(90)
         else:
@@ -117,7 +117,6 @@ def main(args=None):
     node.set_servo_angle(180)
     time.sleep(2) # wait for other nodes to set up
     node.set_axis_state(8) # CLOSED_LOOP_CONTROL
-    node.set_servo_angle(0)
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
