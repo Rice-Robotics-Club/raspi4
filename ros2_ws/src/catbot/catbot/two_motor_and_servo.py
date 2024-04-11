@@ -99,7 +99,7 @@ class MotorServoTestNode(Node):
       else:
         future = self.axis_state1.call_async(axis_request)
         
-      rclpy.spin_until_future_complete(self, future, 6.0)
+      rclpy.spin_until_future_complete(self, future, timeout_sec=6.0)
     
       if future.result() is not None:
           self.get_logger().info(f'Result for motor {motor_id}: {future.result().axis_state}')
