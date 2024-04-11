@@ -7,7 +7,7 @@ from odrive_can.msg import ControllerStatus, ControlMessage
 from odrive_can.srv import AxisState
 
 TORQUE_SPIKE_THRESHOLD = 0.05  # Need to find the actual working threshold for torque spike detection
-MAX_TORQUE_NEGATIVE = -0.48
+MAX_TORQUE_NEGATIVE = -0.05 #-0.48 TEST VAL
 TEST_TORQUE = 0.1
 SERVO_MOVE_TIME = 1.0  # Time in seconds for the servo to move to 180 degrees
 TORQUE_RAMP_TIME = 1.0  # Time in seconds for the torque to ramp up
@@ -61,21 +61,21 @@ class MotorServoTestNode(Node):
         self.curr_loops = self.curr_loops + 1
 
         # safety measure
-        # if self.curr_pos_estimate < (- (LEG_TO_MOTOR_RATIO) / 4.0): 
-        #     # once leg is released, leg will rotate past 90 degrees - once that happens, set to 90
-        #     self.send_motor_pos((- (LEG_TO_MOTOR_RATIO) / 4.0))
+        if self.curr_pos_estimate < (- (LEG_TO_MOTOR_RATIO) / 4.0): 
+            # once leg is released, leg will rotate past 90 degrees - once that happens, set to 90
+            self.send_motor_pos((- (LEG_TO_MOTOR_RATIO) / 4.0))
 
-        self.send_motor_pos(float(self.curr_loops / 2))
+        # self.send_motor_pos(float(self.curr_loops / 2))
         
-        # if self.curr_loops < 3:
-        #     self.set_servo_angle(180)
-        # elif self.curr_loops < 5:
-        #     self.send_motor_torque(MAX_TORQUE_NEGATIVE)
-        # elif self.curr_loops < 7:
-        #     # last stage of test process
-        #     self.set_servo_angle(90)
-        # else:
-        #     self.send_motor_pos((- (LEG_TO_MOTOR_RATIO) / 4.0))
+        if self.curr_loops < 3:
+            self.set_servo_angle(180)
+        elif self.curr_loops < 5:
+            self.send_motor_torque(MAX_TORQUE_NEGATIVE)
+        elif self.curr_loops < 7:
+            # last stage of test process
+            self.set_servo_angle(90)
+        else:
+            self.send_motor_pos((- (LEG_TO_MOTOR_RATIO) / 4.0))
 
     def send_motor_pos(self, pos):
         control_msg = ControlMessage()
