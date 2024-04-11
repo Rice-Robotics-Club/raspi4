@@ -66,12 +66,13 @@ class MotorServoTestNode(Node):
             self.send_motor_pos((- (LEG_TO_MOTOR_RATIO) / 4.0))
 
         # self.send_motor_pos(float(self.curr_loops / 2))
-        
-        if self.curr_loops < 3:
+        if self.curr_loops < 1:
+            self.send_motor_pos(0)
+        elif self.curr_loops < 2:
             self.set_servo_angle(180)
-        elif self.curr_loops < 5:
+        elif self.curr_loops < 3.5:
             self.send_motor_torque(MAX_TORQUE_NEGATIVE)
-        elif self.curr_loops < 5.5:
+        elif self.curr_loops < 4.0:
             # last stage of test process
             self.set_servo_angle(90)
         else:
@@ -115,7 +116,7 @@ def main(args=None):
     rclpy.init(args=args)
     node = MotorServoTestNode()
     node.set_servo_angle(180)
-    time.sleep(2) # wait for other nodes to set up
+    time.sleep(0.5) # wait for other nodes to set up
     node.set_axis_state(8) # CLOSED_LOOP_CONTROL
     rclpy.spin(node)
     node.destroy_node()
