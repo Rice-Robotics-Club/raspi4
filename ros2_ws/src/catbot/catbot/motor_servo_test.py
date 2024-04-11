@@ -79,7 +79,7 @@ class MotorServoTestNode(Node):
 
     def send_motor_pos(self, pos):
         control_msg = ControlMessage()
-        control_msg.input_mode = 1 # this might work?
+        control_msg.input_mode = 1
         control_msg.control_mode = 3  # Control mode for pos
         control_msg.input_pos = float(pos)
         control_msg.input_vel = 0.0 # feedforward
@@ -90,7 +90,10 @@ class MotorServoTestNode(Node):
 
     def send_motor_torque(self, torque : float):
         control_msg = ControlMessage()
+        control_msg.input_mode = 1
         control_msg.control_mode = 1  # Control mode for torque
+        control_msg.input_pos = 0.0
+        control_msg.input_vel = 0.0
         # control_msg.input_vel = torque / abs(torque)
         control_msg.input_torque = torque # feedforward
         self.motor_control_publisher.publish(control_msg)

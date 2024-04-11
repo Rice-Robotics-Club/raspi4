@@ -62,6 +62,7 @@ class MotorServoTestNode(Node):
         """
         control_msg = ControlMessage()
         control_msg.control_mode = mode
+        control_msg.input_mode = 1
         control_msg.input_pos = float(pos)
         control_msg.input_vel = float(vel)
         control_msg.input_torque = float(torque)
