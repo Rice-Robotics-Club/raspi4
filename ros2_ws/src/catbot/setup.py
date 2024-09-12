@@ -28,6 +28,7 @@ setup(
             'motor_test = catbot.motor_test:main',
             'listener_node = catbot.listener_node:main',
             'servo_control_node = catbot.servo_control_node:main',
+            'servo_test = catbot.servo_test_node:main',
             'jump = catbot.jump:main',
             'motor_servo_test = catbot.motor_servo_test:main',
             'two_motor_and_servo = catbot.two_motor_and_servo:main',
