@@ -10,6 +10,7 @@ class ServoNode(Node):
         self.declare_parameter('pin', rclpy.Parameter.Type.INTEGER)
         
         self.servo = AngularServo(self.get_parameter('pin'), min_angle=0, max_angle=135)
+        
         self.get_logger().info(f"initializing servo w/ pin {self.get_parameter('pin')}")
         
         self.subscription = self.create_subscription(
