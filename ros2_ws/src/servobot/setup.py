@@ -4,10 +4,6 @@ from glob import glob
 
 package_name = 'servobot'
 
-def get_console_script(file: str):
-    file_name = file[:len(file)-3]
-    return f"{file_name} = {package_name}.{file_name}:main"
-
 setup(
     name=package_name,
     version='0.0.0',
