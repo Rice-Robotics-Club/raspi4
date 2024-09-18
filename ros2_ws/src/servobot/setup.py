@@ -1,8 +1,12 @@
 from setuptools import find_packages, setup
 import os
-import glob
+from glob import glob
 
 package_name = 'servobot'
+
+def get_console_script(file: str):
+    file_name = file[:len(file)-3]
+    return f"{file_name} = {package_name}.{file_name}:main"
 
 setup(
     name=package_name,
@@ -12,7 +16,7 @@ setup(
         ('share/ament_index/resource_index/packages',
             ['resource/' + package_name]),
         ('share/' + package_name, ['package.xml']),
-        ('share/' + package_name + '/launch', ['launch/main.launch.yaml'])
+        ('share/' + package_name + '/launch', glob(os.path.join('launch', '*.launch.yaml')))
     ],
     install_requires=['setuptools'],
     zip_safe=True,
@@ -23,7 +27,8 @@ setup(
     tests_require=['pytest'],
     entry_points={
         'console_scripts': [
-            'servo_node = servobot.servo_node:main'
+            'servo_node = servobot.servo_node:main',
+            'control_node = servobot.control_node:main'
         ],
     },
 )
