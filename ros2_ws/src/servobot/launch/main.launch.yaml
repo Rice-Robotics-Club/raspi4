@@ -1,0 +1,22 @@
+launch:
+
+- node:
+    pkg: "servobot"
+    exec: "servo_node"
+    name: "servo_node_0"
+    param:
+    -
+      name: "pin"
+      value: 12
+
+- node:
+    pkg: "servobot"
+    exec: "servo_node"
+    name: "servo_node_1"
+    param:
+    -
+      name: "pin"
+      value: 13
+
+
+
