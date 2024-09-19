@@ -2,8 +2,20 @@ launch:
 
 - node:
     pkg: "servobot"
+    exec: "control_node"
+    name: "control_node"
+
+- node:
+    pkg: "servobot"
+    exec: "leg_node"
+    name: "leg_node_0"
+    namespace: "leg_0"
+
+- node:
+    pkg: "servobot"
     exec: "servo_node"
     name: "servo_node_0"
+    namespace: "leg_0/servo_0"
     param:
     -
       name: "pin"
@@ -12,5 +24,29 @@ launch:
       name: "mock"
       value: True
 
+- node:
+    pkg: "servobot"
+    exec: "servo_node"
+    name: "servo_node_1"
+    namespace: "leg_0/servo_1"
+    param:
+    -
+      name: "pin"
+      value: 13
+    -
+      name: "mock"
+      value: True
 
+- node:
+    pkg: "servobot"
+    exec: "servo_node"
+    name: "servo_node_2"
+    namespace: "leg_0/servo_2"
+    param:
+    -
+      name: "pin"
+      value: 14
+    -
+      name: "mock"
+      value: True
 

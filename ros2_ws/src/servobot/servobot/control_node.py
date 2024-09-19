@@ -4,10 +4,11 @@ from std_msgs.msg import Float64
 
 
 class ControlNode(Node):
-    def __init__():
+    def __init__(self):
         super().__init__("control_node")
         
-    def 
+    def timer_callback(self):
+        pass
 
 
 def main(args=None):

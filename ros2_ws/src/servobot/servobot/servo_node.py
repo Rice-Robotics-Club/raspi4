@@ -14,7 +14,7 @@ class ServoNode(Node):
         )
 
         self.get_logger().info(
-            f"initializing {'mock' if self.mock else ''} servo w/ pin: {self.pin}"
+            f"initializing {'MOCK' if self.mock else ''} {self.get_name()} w/ pin: {self.pin}"
         )
 
         self.servo = (
