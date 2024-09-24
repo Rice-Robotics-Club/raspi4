@@ -7,5 +7,5 @@
         "/opt/ros/humble/lib/python3.10/site-packages",
         "/opt/ros/humble/local/lib/python3.10/dist-packages"
     ],
-    "ros.distro": ""
+    "ros.distro": "humble"
 }
