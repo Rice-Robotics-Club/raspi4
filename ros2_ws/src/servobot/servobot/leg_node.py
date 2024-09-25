@@ -7,6 +7,8 @@ from enum import Enum
 
 
 FRAMES = 8
+
+# TODO: figure out what to put here
 MOTOR_1_POSITION_ARRAY = [0, 0, 0, 0, 0, 0, 0, 0]
 MOTOR_2_POSITION_ARRAY = [0, 0, 0, 0, 0, 0, 0, 0]
 MOTOR_3_POSITION_ARRAY = [0, 0, 0, 0, 0, 0, 0, 0]
@@ -25,8 +27,8 @@ class LegNode(Node):
 
         self.get_logger().info(f"initializing {self.get_name()}")
 
-        self.limb = Limb(self.declare_parameter("limb"))
-        self.offset = int(self.declare_parameter("start_index"))
+        self.limb = Limb(self.declare_parameter("limb", 0))
+        self.offset = int(self.declare_parameter("start_index", 0))
 
         self.servo0 = self.create_publisher(Float64, "servo_0/servo_angle", 10)
         self.servo1 = self.create_publisher(Float64, "servo_1/servo_angle", 10)
