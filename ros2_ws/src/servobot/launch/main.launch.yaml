@@ -7,5 +7,5 @@ launch:
     param:
     -
       name: "count"
-      value: 16
+      value: 3
 
