@@ -24,10 +24,10 @@ class MultiServoNode(Node):
         )
 
     def angle_callback(self, msg: Float64MultiArray):
-        """sets servo angles from message value
+        """sets servo angles from float array stored in message
 
         Args:
-            msg (Float64MultiArray): float array interface for servo_angles topic
+            msg (Float64MultiArray): float array interface for /servo_angles topic
         """
         for i in range(min(self.count, len(msg.data))):
             angle = msg.data[i]
