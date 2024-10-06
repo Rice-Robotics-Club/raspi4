@@ -2,12 +2,10 @@ launch:
 
 - node:
     pkg: "servobot"
-    exec: "servo_node"
-    name: "servo_node_0"
+    exec: "multi_servo_node"
+    name: "multi_servo_node_0"
     param:
     -
-      name: "pin"
-      value: 12
-
-
+      name: "count"
+      value: 3
 
