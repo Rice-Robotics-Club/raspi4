@@ -15,7 +15,7 @@ class MultiServoNode(Node):
         self.get_logger().info(f"initializing {self.get_name()}")
 
         self.pca = ServoKit(channels=16)
-        
+
         for i in range(16):
             self.pca.servo[i].set_pulse_width_range(500, 2500)
 
