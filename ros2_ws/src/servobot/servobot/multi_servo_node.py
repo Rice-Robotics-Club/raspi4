@@ -12,11 +12,9 @@ class MultiServoNode(Node):
             self.declare_parameter("count", rclpy.Parameter.Type.INTEGER).value or 1
         )
 
-        self.get_logger().info(
-            f"initializing {self.get_name()}"
-        )
+        self.get_logger().info(f"initializing {self.get_name()}")
 
-        self.pca = ServoKit(channels=self.count)
+        self.pca = ServoKit(channels=16)
 
         self.subscription = self.create_subscription(
             Float64MultiArray, "servo_angles", self.angle_callback, 10
