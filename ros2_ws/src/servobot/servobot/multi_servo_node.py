@@ -9,7 +9,7 @@ class MultiServoNode(Node):
         super().__init__("multi_servo_node")
 
         self.count = (
-            self.declare_parameter("count", rclpy.Parameter.Type.BOOL).value or 1
+            self.declare_parameter("count", rclpy.Parameter.Type.INTEGER).value or 1
         )
 
         self.get_logger().info(
