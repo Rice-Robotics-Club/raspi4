@@ -15,6 +15,9 @@ class MultiServoNode(Node):
         self.get_logger().info(f"initializing {self.get_name()}")
 
         self.pca = ServoKit(channels=16)
+        
+        for servo in self.pca.servo:
+            servo.set_pulse_width_range(500, 2500)
 
         self.subscription = self.create_subscription(
             Float64MultiArray, "servo_angles", self.angle_callback, 10
