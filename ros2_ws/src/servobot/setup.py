@@ -25,8 +25,8 @@ setup(
         'console_scripts': [
             'servo_node = servobot.servo_node:main',
             'multi_servo_node = servobot.multi_servo_node:main',
-            'leg_node = servobot.leg_node:main',
-            'control_node = servobot.control_node:main'
+            'ik_node = servobot.ik_node:main',
+            'gait_node = servobot.gait_node:main',
         ],
     },
 )
