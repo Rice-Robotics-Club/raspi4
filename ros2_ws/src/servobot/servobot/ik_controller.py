@@ -48,11 +48,11 @@ class IKController:
                 return self.solve(-x, y, -z)
 
 
-import sys
+# import sys
 
-if __name__ == "__main__":
-    x, y, z = tuple(map(lambda x: float(x), sys.argv[1:4]))
+# if __name__ == "__main__":
+#     x, y, z = tuple(map(lambda x: float(x), sys.argv[1:4]))
 
-    controller = IKController(1.6, 1.0, 0.6, 2.8, 1.8)
+#     controller = IKController(1.6, 1.0, 0.6, 2.8, 1.8)
 
-    print(tuple(map(lambda x: (180.0 / math.pi) * x, controller.solve(x, y, z))))
+#     print(tuple(map(lambda x: (180.0 / math.pi) * x, controller.solve(x, y, z))))
