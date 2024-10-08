@@ -38,10 +38,12 @@ class IKNode(Node):
         fr_pos = tuple(msg.data[3:6])
         bl_pos = tuple(msg.data[6:9])
         br_pos = tuple(msg.data[9:])
+        
         fl = self.controller.solve_leg(fl_pos, leg=0)
         fr = self.controller.solve_leg(fr_pos, leg=1)
         bl = self.controller.solve_leg(bl_pos, leg=2)
         br = self.controller.solve_leg(br_pos, leg=3)
+        
         self.publish(fl, fr, bl, br)
 
     def publish(
