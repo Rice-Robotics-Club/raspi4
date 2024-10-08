@@ -21,9 +21,11 @@ class IKController:
         f = x**2 + y**2
         p = math.sqrt(f - self.a3**2)
         th1 = math.asin(x / f) - math.asin(self.a3 / f)
+
         g = self.l1**2 + self.l2**2
         h = 2 * self.l1 * self.l2
         th3 = math.acos(((z - self.a1) ** 2 + (p - self.a2) ** 2 - g) / h)
+
         i = h * math.cos(th3) + g
         j = math.sqrt(
             (self.l1 + self.l2 * math.cos(th3)) ** 2
