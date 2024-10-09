@@ -11,6 +11,7 @@ class IKController:
         self.l1 = l1
         self.l2 = l2
 
+        # creates pre defined constants
         self.a = self.l1**2 + self.l2**2
         self.b = 2 * self.l1 * self.l2
         self.c = 2 * self.a1

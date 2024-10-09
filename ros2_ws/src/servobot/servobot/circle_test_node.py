@@ -17,8 +17,8 @@ class CircleTestNode(Node):
 
         self.leg_positions = self.create_publisher(Float64MultiArray, "/leg_positions", 10)
         
-        interval = 0.1
-        self.timer = self.create_timer(0.1, self.timer_callback)
+        interval = 0.01
+        self.timer = self.create_timer(interval, self.timer_callback)
 
         self.msg = Float64MultiArray()
         self.msg.data = []
