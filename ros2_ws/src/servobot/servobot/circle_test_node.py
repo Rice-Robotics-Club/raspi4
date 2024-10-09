@@ -26,14 +26,15 @@ class CircleTestNode(Node):
         self.delta = (math.tau * interval) / period
 
     def timer_callback(self) -> None:
-        self.msg.data = [
+        l = [
             self.radius * math.cos(self.angle),
             -self.height,
             self.radius * math.sin(self.angle),
         ]
+        self.msg.data = l
         self.angle += self.delta
         self.leg_positions.publish(self.msg)
-        self.get_logger().info(f"input position: {self.msg.data}")
+        self.get_logger().info(f"input position: {l}")
         
 
 
