@@ -3,10 +3,10 @@ from std_msgs.msg import Float64MultiArray
 from rclpy.node import Node
 
 POSITIONS = [
-    [1.6, -4.5, 1.6],
-    [0.6, -4.5, 2.6],
-    [-0.4, -4.5, 1.6],
-    [0.6, -4.5, 0.6]
+    [1.1, -4.8, 1.6],
+    [0.6, -4.8, 2.1],
+    [0.1, -4.8, 1.6],
+    [0.6, -4.8, 1.1]
 ]
 
 class TestNode(Node):
