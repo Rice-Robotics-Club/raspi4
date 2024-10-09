@@ -24,7 +24,7 @@ class TestNode(Node):
         self.angle = 0.0
         
     def timer_callback(self):
-        self.msg.data = [0.6 + 2.0 * math.cos(self.angle), -4.0, 1.6 + 2.0 * math.sin(self.angle)]
+        self.msg.data = [0.6 + 1.0 * math.cos(self.angle), -4.5, 1.6 + 1.0 * math.sin(self.angle)]
         self.angle += .1
         self.pub.publish(self.msg)
         
