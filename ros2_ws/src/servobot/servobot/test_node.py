@@ -9,8 +9,6 @@ POSITIONS = [
     [0.6, -4.5, 0.6]
 ]
 
-i = 0
-
 class TestNode(Node):
     def __init__(self):
         super.__init__("test_node")
@@ -21,10 +19,14 @@ class TestNode(Node):
         self.timer = self.create_timer(1.0, self.timer_callback)
         
         self.msg = Float64MultiArray()
+        self.msg.data = []
+        self.i = 0
         
     def timer_callback(self):
-        self.msg.data = POSITIONS[i % len(POSITIONS)]
-        i += 1
+        self.msg.data[0] = POSITIONS[self.i % len(POSITIONS)][0]
+        self.msg.data[1] = POSITIONS[self.i % len(POSITIONS)][1]
+        self.msg.data[2] = POSITIONS[self.i % len(POSITIONS)][2]
+        self.i += 1
         self.pub.publish(self.msg)
         
 def main(args):
