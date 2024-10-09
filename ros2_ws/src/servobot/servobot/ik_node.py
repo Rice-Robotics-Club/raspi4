@@ -76,7 +76,7 @@ class IKNode(Node):
         )
 
         self.msg = Float64MultiArray()
-        self.msg.data = 10.0
+        self.msg.data = []
 
     def position_callback(self, msg: Float64MultiArray):
         """uses inverse kinematics to transform cartesian coordinate position of foot to the
