@@ -23,9 +23,7 @@ class TestNode(Node):
         self.i = 0
         
     def timer_callback(self):
-        self.msg.data[0] = POSITIONS[self.i % len(POSITIONS)][0]
-        self.msg.data[1] = POSITIONS[self.i % len(POSITIONS)][1]
-        self.msg.data[2] = POSITIONS[self.i % len(POSITIONS)][2]
+        self.msg.data = POSITIONS[self.i % len(POSITIONS)]
         self.i += 1
         self.pub.publish(self.msg)
         
