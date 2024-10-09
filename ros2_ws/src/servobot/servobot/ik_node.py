@@ -35,8 +35,10 @@ class IKController:
             * (i + 2 * z * self.a1 - z**2 - self.a1**2)
         )
         th2 = math.acos((math.sin(th3) * self.l2 * (z - self.a1) + j) / i)
+        
+        mul = 180.0 / math.pi
 
-        return (th1, th2, th3)
+        return (mul * th1, mul * th2, mul * th3)
 
     def solve_leg(self, pos: tuple[float], leg: int):
         x, y, z = pos
