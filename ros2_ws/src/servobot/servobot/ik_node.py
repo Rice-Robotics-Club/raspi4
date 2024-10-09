@@ -38,16 +38,16 @@ class IKController:
 
         return (th1, th2, th3)
 
-    def solve_leg(self, pos: tuple[float], leg: Leg):
+    def solve_leg(self, pos: tuple[float], leg: int):
         x, y, z = pos
         match leg:
-            case Leg.FL:
+            case 0:
                 return self.solve(x, y, z)
-            case Leg.FR:
+            case 1:
                 return self.solve(-x, y, z)
-            case Leg.BL:
+            case 2:
                 return self.solve(x, y, -z)
-            case Leg.BR:
+            case 3:
                 return self.solve(-x, y, -z)
 
 
