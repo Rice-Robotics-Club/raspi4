@@ -11,7 +11,7 @@ POSITIONS = [
 
 class TestNode(Node):
     def __init__(self):
-        super.__init__("test_node")
+        super().__init__("test_node")
         
         self.get_logger().info(f"initializing {self.get_name()}")
         
