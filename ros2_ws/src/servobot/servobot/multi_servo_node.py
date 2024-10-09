@@ -35,7 +35,7 @@ class MultiServoNode(Node):
         """
         for i in range(min(self.count, len(msg.data))):
             angle = msg.data[i]
-            if angle >= 0 - self.angle_offsets[i] and angle <= self.angle_offsets[i]:
+            if angle >= 0.0 - self.angle_offsets[i] and angle <= 135.0 - self.angle_offsets[i]:
                 self.pca.servo[i].angle = angle + self.angle_offsets[i]
                 self.get_logger().info(f"setting servo #{i} to angle: {angle}")
             else:
