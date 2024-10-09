@@ -11,6 +11,10 @@ class MultiServoNode(Node):
         self.count = (
             self.declare_parameter("count", rclpy.Parameter.Type.INTEGER).value or 1
         )
+        
+        self.angle_offsets = (
+            self.declare_parameter("count", rclpy.Parameter.Type.DOUBLE_ARRAY).value or [67.5 * 12]
+        )
 
         self.get_logger().info(f"initializing {self.get_name()}")
 
@@ -31,8 +35,8 @@ class MultiServoNode(Node):
         """
         for i in range(min(self.count, len(msg.data))):
             angle = msg.data[i]
-            if angle >= -67.5 and angle <= 67.5:
-                self.pca.servo[i].angle = angle + 67.5
+            if angle >= 0 - self.angle_offsets[i] and angle <= self.angle_offsets[i]:
+                self.pca.servo[i].angle = angle + self.angle_offsets[i]
                 self.get_logger().info(f"setting servo #{i} to angle: {angle}")
             else:
                 self.get_logger().info(f"angle {angle} out of range for servo #{i}")
