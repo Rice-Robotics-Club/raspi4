@@ -113,7 +113,7 @@ class IKNode(Node):
             bl (tuple[float]): tuple of bl angles
             br (tuple[float]): tuple of br angles
         """
-        self.msg.data = [*fl, *fr, *bl, *br]
+        self.msg.data = list(fl)
         self.angles.publish(self.msg)
 
 
