@@ -1,66 +1,8 @@
 import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray
-import math
-from enum import Enum
-
-
-class Leg(Enum):
-    FL = 0
-    FR = 1
-    BL = 2
-    BR = 3
-
-
-class IKController:
-    def __init__(self, a1, a2, a3, l1, l2):
-        self.a1 = a1
-        self.a2 = a2
-        self.a3 = a3
-        self.l1 = l1
-        self.l2 = l2
-
-    def solve(self, x, y, z):
-        f = x**2 + y**2
-        th1 = math.asin(x / f) - math.asin(self.a3 / f)
-
-        p = math.sqrt(f - self.a3**2)
-        g = self.l1**2 + self.l2**2
-        h = 2 * self.l1 * self.l2
-        th3 = math.acos(((z - self.a1) ** 2 + (p - self.a2) ** 2 - g) / h)
-
-        i = h * math.cos(th3) + g
-        j = math.sqrt(
-            (self.l1 + self.l2 * math.cos(th3)) ** 2
-            * (i + 2 * z * self.a1 - z**2 - self.a1**2)
-        )
-        th2 = math.acos((math.sin(th3) * self.l2 * (z - self.a1) + j) / i)
-        
-        mul = 180.0 / math.pi
-
-        return (mul * th1, mul * th2, mul * th3)
-
-    def solve_leg(self, pos: tuple[float], leg: int):
-        x, y, z = pos
-        match leg:
-            case 0:
-                return self.solve(x, y, z)
-            case 1:
-                return self.solve(-x, y, z)
-            case 2:
-                return self.solve(x, y, -z)
-            case 3:
-                return self.solve(-x, y, -z)
-
-
-# import sys
-
-# if __name__ == "__main__":
-#     x, y, z = tuple(map(lambda x: float(x), sys.argv[1:4]))
-
-#     controller = IKController(1.6, 1.0, 0.6, 2.8, 1.8)
-
-#     print(tuple(map(lambda x: (180.0 / math.pi) * x, controller.solve(x, y, z))))
+from .ik_controller import IKController
+import typing
 
 
 class IKNode(Node):
@@ -68,59 +10,59 @@ class IKNode(Node):
         super().__init__("leg_node")
 
         self.get_logger().info(f"initializing {self.get_name()}")
-        
-        self.controller = IKController(1.6, 1.0, 0.6, 2.8, 1.8)
 
-        self.angles = self.create_publisher(Float64MultiArray, "servo_angles", 10)
+        a1: float = self.declare_parameter("a1", 1.6).value
+        a2: float = self.declare_parameter("a2", 1.0).value
+        a3: float = self.declare_parameter("a3", 0.6).value
+        l1: float = self.declare_parameter("l1", 2.8).value
+        l2: float = self.declare_parameter("l2", 1.8).value
 
-        self.subscription = self.create_subscription(
-            Float64MultiArray, "leg_positions", self.position_callback, 10
+        self.controller = IKController(a1, a2, a3, l1, l2)
+
+        self.servo_angles = self.create_publisher(
+            Float64MultiArray, "/servo_angles", 10
+        )
+        self.leg_positions = self.create_subscription(
+            Float64MultiArray, "/leg_positions", self.leg_positions_callback, 10
         )
 
-        self.msg = Float64MultiArray()
-        self.msg.data = []
+        self.angles_msg = Float64MultiArray()
+        self.angles_msg.data = []
 
-    def position_callback(self, msg: Float64MultiArray):
+    def leg_positions_callback(self, positions_msg: Float64MultiArray) -> None:
         """uses inverse kinematics to transform cartesian coordinate position of foot to the
             motor angles required to achieve this position
 
         Args:
             msg (Float64MultiArray): float vectors representing position of feet relative to robot
         """
-        vals = msg.data
-        
-        # if len(vals) != 12:
-        #     raise Exception("incorrect number of position arguments")
-        
-        fl_pos = tuple(msg.data[0:3])
-        
-        self.get_logger().info(f"{fl_pos}")
-        # fr_pos = tuple(msg.data[3:6])
-        # bl_pos = tuple(msg.data[6:9])
-        # br_pos = tuple(msg.data[9:])
-        
-        fl = self.controller.solve_leg(fl_pos, leg=0)
-        # fr = self.controller.solve_leg(fr_pos, leg=1)
-        # bl = self.controller.solve_leg(bl_pos, leg=2)
-        # br = self.controller.solve_leg(br_pos, leg=3)
-        
-        self.get_logger().info(f"{fl}")
-        
-        self.publish(fl)
+        array: list[float] = positions_msg.data
+        size: int = len(array)
 
-    def publish(
-        self, fl: tuple[float]
-    ):
-        """ publishes servo angles to multi_servo_node
+        fl = (
+            self.controller.solve_leg(tuple(array[0:3]), leg=0)
+            if size >= 3
+            else tuple()
+        )
+        fr = (
+            self.controller.solve_leg(tuple(array[3:6]), leg=1)
+            if size >= 6
+            else tuple()
+        )
+        bl = (
+            self.controller.solve_leg(tuple(array[6:9]), leg=2)
+            if size >= 9
+            else tuple()
+        )
+        br = (
+            self.controller.solve_leg(tuple(array[9:12]), leg=3)
+            if size >= 12
+            else tuple()
+        )
 
-        Args:
-            fl (tuple[float]): tuple of fl angles
-            fr (tuple[float]): tuple of fr angles
-            bl (tuple[float]): tuple of bl angles
-            br (tuple[float]): tuple of br angles
-        """
-        self.msg.data = list(fl)
-        self.angles.publish(self.msg)
+        self.angles_msg.data = [*fl, *fr, *bl, *br]
+
+        self.servo_angles.publish(self.angles_msg)
 
 
 def main(args=None):

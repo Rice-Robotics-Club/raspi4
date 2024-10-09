@@ -6,6 +6,9 @@ launch:
     name: "multi_servo_node_0"
     param:
     -
+      name: "test"
+      value: true
+    -
       name: "count"
       value: 12
     - 
@@ -16,8 +19,34 @@ launch:
     pkg: "servobot"
     exec: "ik_node"
     name: "ik_node_0"
+    param:
+    -
+      name: "a1"
+      value: 0.6
+    -
+      name: "a2"
+      value: 1.0
+    -
+      name: "a3"
+      value: 1.6
+    - 
+      name: "l1"
+      value: 2.8
+    -  
+      name: "l2"
+      value: 1.8
 
 - node:
     pkg: "servobot"
-    exec: "test_node"
-    name: "test_node_0"
+    exec: "circle_test_node"
+    name: "circle_test_node_0"
+    param:
+    -
+      name: "radius"
+      value: 1.0
+    - 
+      name: "height"
+      value: 4.5
+    - 
+      name: "period"
+      value: 5.0
