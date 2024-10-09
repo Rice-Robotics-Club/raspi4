@@ -1,16 +1,16 @@
 launch:
 
-# - node:
-#     pkg: "servobot"
-#     exec: "multi_servo_node"
-#     name: "multi_servo_node_0"
-#     param:
-#     -
-#       name: "count"
-#       value: 12
-#     - 
-#       name: "offsets"
-#       value: [67.5, 67.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+- node:
+    pkg: "servobot"
+    exec: "multi_servo_node"
+    name: "multi_servo_node_0"
+    param:
+    -
+      name: "count"
+      value: 12
+    - 
+      name: "offsets"
+      value: [67.5, 67.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 - node:
     pkg: "servobot"
