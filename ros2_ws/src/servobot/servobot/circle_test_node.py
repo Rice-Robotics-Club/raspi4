@@ -10,22 +10,31 @@ class CircleTestNode(Node):
         super().__init__("test_node")
 
         self.get_logger().info(f"initializing {self.get_name()}")
+        
+        self.radius: float = self.declare_parameter("radius", 1.0).value
+        self.height: float = self.declare_parameter("height", 4.5).value
+        period: float = self.declare_parameter("period", 5.0).value
 
         self.leg_positions = self.create_publisher(Float64MultiArray, "/leg_positions", 10)
+        
+        interval = 0.1
         self.timer = self.create_timer(0.1, self.timer_callback)
 
         self.msg = Float64MultiArray()
         self.msg.data = []
         self.angle = 0.0
+        self.delta = (math.tau * interval) / period
 
     def timer_callback(self) -> None:
         self.msg.data = [
-            0.6 + 1.0 * math.cos(self.angle),
-            -4.5,
-            1.6 + 1.0 * math.sin(self.angle),
+            self.radius * math.cos(self.angle),
+            -self.height,
+            self.radius * math.sin(self.angle),
         ]
-        self.angle += 0.1
+        self.angle += self.delta
         self.leg_positions.publish(self.msg)
+        self.get_logger().info(f"input position: {self.msg.data}")
+        
 
 
 def main(args=None):

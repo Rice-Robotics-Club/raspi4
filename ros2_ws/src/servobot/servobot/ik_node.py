@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray
 from .ik_controller import IKController
+from math import sin, cos, pi
 import typing
 
 
@@ -19,7 +20,9 @@ class IKNode(Node):
 
         self.controller = IKController(a1, a2, a3, l1, l2)
 
-        self.servo_angles = self.create_publisher(Float64MultiArray, "/servo_angles", 10)
+        self.servo_angles = self.create_publisher(
+            Float64MultiArray, "/servo_angles", 10
+        )
         self.leg_positions = self.create_subscription(
             Float64MultiArray, "/leg_positions", self.leg_positions_callback, 10
         )
@@ -42,6 +45,7 @@ class IKNode(Node):
             if size >= 3
             else tuple()
         )
+
         fr = (
             self.controller.solve_leg(tuple(array[3:6]), leg=1)
             if size >= 6
