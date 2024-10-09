@@ -91,6 +91,8 @@ class IKNode(Node):
         #     raise Exception("incorrect number of position arguments")
         
         fl_pos = tuple(msg.data[0:3])
+        
+        self.get_logger().info(f"{fl_pos}")
         # fr_pos = tuple(msg.data[3:6])
         # bl_pos = tuple(msg.data[6:9])
         # br_pos = tuple(msg.data[9:])
@@ -99,6 +101,8 @@ class IKNode(Node):
         # fr = self.controller.solve_leg(fr_pos, leg=1)
         # bl = self.controller.solve_leg(bl_pos, leg=2)
         # br = self.controller.solve_leg(br_pos, leg=3)
+        
+        self.get_logger().info(f"{fl}")
         
         self.publish(fl)
 
