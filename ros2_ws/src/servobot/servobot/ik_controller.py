@@ -5,12 +5,7 @@ import typing
 
 class IKController:
     def __init__(self, a1: float, a2: float, a3: float, l1: float, l2: float):
-        self.legs = [
-            (0.0, 0.0, 0.0),
-            (0.0, 0.0, 0.0),
-            (0.0, 0.0, 0.0),
-            (0.0, 0.0, 0.0)
-        ]
+        self.legs = [(0.0, 0.0, 0.0), (0.0, 0.0, 0.0), (0.0, 0.0, 0.0), (0.0, 0.0, 0.0)]
         self.a1 = a1
         self.a2 = a2
         self.a3 = a3
@@ -26,7 +21,6 @@ class IKController:
         self.mult = 180.0 / pi
 
     def solve(self, x: float, y: float, z: float) -> tuple[float, float, float]:
-        
         x2_y2 = x**2 + y**2
         dist_xy = sqrt(x2_y2)
         th1 = asin(x / dist_xy) - asin(self.a3 / dist_xy)
@@ -49,7 +43,7 @@ class IKController:
         1 -> FR
         2 -> BL
         3 -> BR
-        
+
         should account for out of workspace errors
 
         Args:
