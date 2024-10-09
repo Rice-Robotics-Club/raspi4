@@ -1,23 +1,17 @@
 import math
-from enum import Enum
-
-
-class Leg(Enum):
-    FL = 0
-    FR = 1
-    BL = 2
-    BR = 3
+import sys
+import typing
 
 
 class IKController:
-    def __init__(self, a1, a2, a3, l1, l2):
+    def __init__(self, a1: float, a2: float, a3: float, l1: float, l2: float):
         self.a1 = a1
         self.a2 = a2
         self.a3 = a3
         self.l1 = l1
         self.l2 = l2
 
-    def solve(self, x, y, z):
+    def solve(self, x: float, y: float, z: float) -> tuple[float, float, float]:
         f = x**2 + y**2
         th1 = math.asin(x / f) - math.asin(self.a3 / f)
 
@@ -33,26 +27,43 @@ class IKController:
         )
         th2 = math.acos((math.sin(th3) * self.l2 * (z - self.a1) + j) / i)
 
-        return (th1, th2, th3)
+        mult = 180.0 / math.pi
 
-    def solve_leg(self, pos: tuple[float], leg: Leg):
-        x, y, z = pos
+        return (mult * th1, mult * th2, mult * th3)
+
+    def solve_leg(
+        self, position: tuple[float, float, float], leg: int
+    ) -> tuple[float, float, float]:
+        """modifies IK calculation depending on the leg specified:
+        
+        0 -> FL
+        1 -> FR
+        2 -> BL
+        3 -> BR
+
+        Args:
+            pos (tuple[float, float, float]): position coordinate
+            leg (int): leg identifier
+
+        Returns:
+            tuple[float, float, float]: angles for servo
+        """
+        x, y, z = position
         match leg:
-            case Leg.FL:
-                return self.solve(x, y, z)
-            case Leg.FR:
-                return self.solve(-x, y, z)
-            case Leg.BL:
-                return self.solve(x, y, -z)
-            case Leg.BR:
-                return self.solve(-x, y, -z)
+            case 0:
+                th1, th2, th3 = self.solve(x, y, z)
+                return (th1, th2, th3)
+            case 1:
+                th1, th2, th3 = self.solve(-x, y, z)
+                return (th1, th2, th3)
+            case 2:
+                th1, th2, th3 = self.solve(x, y, -z)
+                return (th1, th2, th3)
+            case 3:
+                th1, th2, th3 = self.solve(-x, y, -z)
+                return (th1, th2, th3)
 
-
-# import sys
-
-# if __name__ == "__main__":
-#     x, y, z = tuple(map(lambda x: float(x), sys.argv[1:4]))
-
-#     controller = IKController(1.6, 1.0, 0.6, 2.8, 1.8)
-
-#     print(tuple(map(lambda x: (180.0 / math.pi) * x, controller.solve(x, y, z))))
+if __name__ == "__main__":
+    x, y, z = tuple(map(lambda x: float(x), sys.argv[1:4]))
+    controller = IKController(1.6, 1.0, 0.6, 2.8, 1.8)
+    print(controller.solve(x, y, z))

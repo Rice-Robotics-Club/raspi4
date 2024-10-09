@@ -1,23 +1,39 @@
 launch:
 
-- node:
-    pkg: "servobot"
-    exec: "multi_servo_node"
-    name: "multi_servo_node_0"
-    param:
-    -
-      name: "count"
-      value: 12
-    - 
-      name: "offsets"
-      value: [67.5, 67.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+# - node:
+#     pkg: "servobot"
+#     exec: "multi_servo_node"
+#     name: "multi_servo_node_0"
+#     param:
+#     -
+#       name: "count"
+#       value: 12
+#     - 
+#       name: "offsets"
+#       value: [67.5, 67.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 - node:
     pkg: "servobot"
     exec: "ik_node"
     name: "ik_node_0"
+    param:
+    -
+      name: "a1"
+      value: 0.6
+    -
+      name: "a2"
+      value: 1.0
+    -
+      name: "a3"
+      value: 1.6
+    - 
+      name: "l1"
+      value: 2.8
+    -  
+      name: "l2"
+      value: 1.8
 
 - node:
     pkg: "servobot"
-    exec: "test_node"
-    name: "test_node_0"
+    exec: "circle_test_node"
+    name: "circle_test_node_0"
