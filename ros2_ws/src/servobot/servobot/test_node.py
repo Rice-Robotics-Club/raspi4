@@ -29,7 +29,7 @@ class TestNode(Node):
         self.i += 1
         self.pub.publish(self.msg)
         
-def main(args):
+def main(args=None):
     rclpy.init(args=args)
     node = TestNode()
     rclpy.spin(node)
