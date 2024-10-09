@@ -1,4 +1,4 @@
-import math
+from math import pi, sqrt, asin, asin, acos, cos, sin
 import sys
 import typing
 
@@ -16,25 +16,19 @@ class IKController:
         self.c = 2 * self.a1
         self.d = self.a1**2
 
-        self.mult = 180.0 / math.pi
+        self.mult = 180.0 / pi
 
     def solve(self, x: float, y: float, z: float) -> tuple[float, float, float]:
         x2_y2 = x**2 + y**2
-        dist_xy = math.sqrt(x2_y2)
-        th1 = math.asin(x / dist_xy) - math.asin(self.a3 / dist_xy)
-        th3 = math.acos(
-            (
-                (z - self.a1) ** 2
-                + (math.sqrt(x2_y2 - self.a3**2) - self.a2) ** 2
-                - self.a
-            )
+        dist_xy = sqrt(x2_y2)
+        th1 = asin(x / dist_xy) - asin(self.a3 / dist_xy)
+        th3 = acos(
+            ((z - self.a1) ** 2 + (sqrt(x2_y2 - self.a3**2) - self.a2) ** 2 - self.a)
             / self.b
         )
-        a = self.b * math.cos(th3) + self.a
-        b = math.sqrt(
-            (self.l1 + self.l2 * math.cos(th3)) ** 2 * (a + z * self.c - z**2 - self.d)
-        )
-        th2 = math.acos((math.sin(th3) * self.l2 * (z - self.a1) + b) / a)
+        a = self.b * cos(th3) + self.a
+        b = sqrt((self.l1 + self.l2 * cos(th3)) ** 2 * (a + z * self.c - z**2 - self.d))
+        th2 = acos((sin(th3) * self.l2 * (z - self.a1) + b) / a)
 
         return (self.mult * th1, self.mult * th2, self.mult * th3)
 
