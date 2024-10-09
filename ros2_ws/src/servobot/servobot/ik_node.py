@@ -30,8 +30,8 @@ class IKNode(Node):
         """
         vals = msg.data
         
-        if len(vals) != 12:
-            raise Exception("incorrect number of position arguments")
+        # if len(vals) != 12:
+        #     raise Exception("incorrect number of position arguments")
         
         fl_pos = tuple(msg.data[0:3])
         # fr_pos = tuple(msg.data[3:6])

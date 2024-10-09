@@ -27,6 +27,7 @@ setup(
             'multi_servo_node = servobot.multi_servo_node:main',
             'ik_node = servobot.ik_node:main',
             'gait_node = servobot.gait_node:main',
+            'test_node = servobot.test_node:main',
         ],
     },
 )

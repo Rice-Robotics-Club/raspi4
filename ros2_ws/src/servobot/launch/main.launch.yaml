@@ -9,5 +9,12 @@ launch:
       name: "count"
       value: 12
 
+- node:
+    pkg: "servobot"
+    exec: "ik_node"
+    name: "ik_node_0"
 
-
+- node:
+    pkg: "servobot"
+    exec: "test_node"
+    name: "test_node_0"
