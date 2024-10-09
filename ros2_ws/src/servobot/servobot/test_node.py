@@ -1,6 +1,7 @@
 import rclpy
 from std_msgs.msg import Float64MultiArray
 from rclpy.node import Node
+import math
 
 POSITIONS = [
     [1.1, -4.8, 1.6],
@@ -16,15 +17,15 @@ class TestNode(Node):
         self.get_logger().info(f"initializing {self.get_name()}")
         
         self.pub = self.create_publisher(Float64MultiArray, "/leg_positions", 10)
-        self.timer = self.create_timer(1.0, self.timer_callback)
+        self.timer = self.create_timer(0.1, self.timer_callback)
         
         self.msg = Float64MultiArray()
         self.msg.data = []
-        self.i = 0
+        self.angle = 0.0
         
     def timer_callback(self):
-        self.msg.data = POSITIONS[self.i % len(POSITIONS)]
-        self.i += 1
+        self.msg.data = [0.6 + 2.0 * math.cos(self.angle), -4.0, 1.6 + 2.0 * math.sin(self.angle)]
+        self.angle += .1
         self.pub.publish(self.msg)
         
 def main(args=None):
