@@ -2,7 +2,6 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray
 from .ik_controller import IKController
-from math import sin, cos, pi
 import typing
 
 
@@ -45,7 +44,6 @@ class IKNode(Node):
             if size >= 3
             else tuple()
         )
-
         fr = (
             self.controller.solve_leg(tuple(array[3:6]), leg=1)
             if size >= 6
