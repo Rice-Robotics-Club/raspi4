@@ -100,10 +100,10 @@ class IKNode(Node):
         # bl = self.controller.solve_leg(bl_pos, leg=2)
         # br = self.controller.solve_leg(br_pos, leg=3)
         
-        self.publish(fl, tuple(), tuple(), tuple())
+        self.publish(fl)
 
     def publish(
-        self, fl: tuple[float], fr: tuple[float], bl: tuple[float], br: tuple[float]
+        self, fl: tuple[float]
     ):
         """ publishes servo angles to multi_servo_node
 
