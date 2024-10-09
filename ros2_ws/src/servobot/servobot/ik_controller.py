@@ -15,7 +15,7 @@ class IKController:
         self.b = 2 * self.l1 * self.l2
         self.c = 2 * self.a1
         self.d = self.a1**2
-        
+
         self.mult = 180.0 / math.pi
 
     def solve(self, x: float, y: float, z: float) -> tuple[float, float, float]:
@@ -30,7 +30,6 @@ class IKController:
             )
             / self.b
         )
-
         a = self.b * math.cos(th3) + self.a
         b = math.sqrt(
             (self.l1 + self.l2 * math.cos(th3)) ** 2 * (a + z * self.c - z**2 - self.d)
