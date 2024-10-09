@@ -13,7 +13,7 @@ class MultiServoNode(Node):
         )
         
         self.angle_offsets = (
-            self.declare_parameter("count", rclpy.Parameter.Type.DOUBLE_ARRAY).value or [67.5 * 12]
+            self.declare_parameter("offsets", rclpy.Parameter.Type.DOUBLE_ARRAY).value or [67.5 * 12]
         )
 
         self.get_logger().info(f"initializing {self.get_name()}")
