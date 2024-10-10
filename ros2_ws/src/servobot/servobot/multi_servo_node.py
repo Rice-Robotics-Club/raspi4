@@ -35,13 +35,13 @@ class MultiServoNode(Node):
             msg (Float64MultiArray): float array interface for /servo_angles topic
         """
         for i in range(min(self.count, len(msg.data))):
-            angle = msg.data[i]
+            angle = (msg.data[i] + self.angle_offsets[i]) * .666
             if (
-                angle >= 0.0 - self.angle_offsets[i]
-                and angle <= 135.0 - self.angle_offsets[i]
+                angle >= 0.0
+                and angle <= 135.0
             ):
                 if not self.test:
-                    self.pca.servo[i].angle = angle + self.angle_offsets[i]
+                    self.pca.servo[i].angle = angle
                     
                 self.get_logger().info(f"setting servo #{i} to angle: {angle}")
             else:

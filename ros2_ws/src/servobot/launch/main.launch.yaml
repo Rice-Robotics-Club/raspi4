@@ -7,13 +7,13 @@ launch:
     param:
     -
       name: "test"
-      value: true
+      value: false
     -
       name: "count"
       value: 12
     - 
       name: "offsets"
-      value: [67.5, 67.5, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
+      value: [67.5, 15.0, 10.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0]
 
 - node:
     pkg: "servobot"
@@ -22,19 +22,19 @@ launch:
     param:
     -
       name: "a1"
-      value: 0.6
+      value: 0.00
     -
       name: "a2"
-      value: 1.0
+      value: 0.96
     -
       name: "a3"
-      value: 1.6
+      value: 0.70
     - 
       name: "l1"
-      value: 2.8
+      value: 2.80
     -  
       name: "l2"
-      value: 1.8
+      value: 1.80
 
 - node:
     pkg: "servobot"
@@ -43,10 +43,10 @@ launch:
     param:
     -
       name: "radius"
-      value: 1.0
+      value: 2.0
     - 
       name: "height"
-      value: 4.5
+      value: 4.0
     - 
       name: "period"
-      value: 5.0
+      value: 3.0
