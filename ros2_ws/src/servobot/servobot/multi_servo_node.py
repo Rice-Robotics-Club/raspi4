@@ -17,7 +17,7 @@ class MultiServoNode(Node):
         ).value
         
         self.angle_multipliers: list[float] = self.declare_parameter(
-            "offsets", [1.0 * 12]
+            "multipliers", [1.0 * 12]
         ).value
 
         self.get_logger().info(f"initializing {self.get_name()}")
