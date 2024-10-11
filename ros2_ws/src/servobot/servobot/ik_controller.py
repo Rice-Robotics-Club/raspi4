@@ -86,6 +86,9 @@ class IKController:
 
 
 if __name__ == "__main__":
-    x, y, z = tuple(map(lambda x: float(x), sys.argv[1:4]))
-    controller = IKController(1.6, 1.0, 0.6, 2.8, 1.8)
-    print(controller.solve(x, y, z))
+    if len(sys.argv) < 4:
+        x, y, z = tuple(map(lambda x: float(x), sys.argv[1:4]))
+        controller = IKController(1.6, 1.0, 0.6, 2.8, 1.8)
+        print(controller.solve(x, y, z))
+    else:
+        print("needs 3 float arguments")
