@@ -34,8 +34,8 @@ class CircleTestNode(Node):
         ]
         """
         l = [
-        	self.radius * math.sin(self.angle),
-            -self.height,
+        	0.0,
+            -self.height + self.radius * math.sin(self.angle),
             self.radius * math.cos(self.angle),
         ]
         self.msg.data = l
