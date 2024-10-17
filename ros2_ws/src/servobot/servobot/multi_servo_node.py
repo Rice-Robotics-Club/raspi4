@@ -17,11 +17,11 @@ class MultiServoNode(Node):
         ).value
         
         self.angle_multipliers: list[float] = self.declare_parameter(
-            "multipliers", [1.0] * 12
+            "multipliers", [1.0] * 1
         ).value
         
         self.ranges: list[float] = self.declare_parameter(
-            "ranges", [135.0] * 12
+            "ranges", [135.0] * 16
         ).value
 
         self.get_logger().info(f"initializing {self.get_name()}")
@@ -31,6 +31,8 @@ class MultiServoNode(Node):
 
             for i in range(16):
                 self.pca.servo[i].set_pulse_width_range(500, 2500)
+            
+            for i in range(len(self.ranges)):
                 self.pca.servo[i].actuation_range = self.ranges[i]
 
         self.servo_angles = self.create_subscription(
