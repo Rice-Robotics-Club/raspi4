@@ -18,3 +18,22 @@ launch:
       name: "multipliers"
       value: [0.963, 0.666, 0.666, 0.963, 0.666, 0.666, 0.963, 0.666, 0.666, 0.963, 0.666, 0.666]
 
+- node:
+    pkg: "servobot"
+    exec: "ik_node"
+    name: "ik_node_0"
+
+- node:
+    pkg: "servobot"
+    exec: "circle_test_node"
+    name: "circle_test_node_0"
+    - 
+      name: "height"
+      value: 4.8
+    - 
+      name: "radius"
+      value: 1.0
+    - 
+      name: "period"
+      value: 5.0
+    	
