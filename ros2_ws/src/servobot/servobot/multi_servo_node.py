@@ -33,6 +33,7 @@ class MultiServoNode(Node):
                 self.pca.servo[i].set_pulse_width_range(500, 2500)
             
             for i in range(len(self.ranges)):
+                self.get_logger().info(f"{i}: {self.ranges[i]}")
                 self.pca.servo[i].actuation_range = self.ranges[i]
 
         self.servo_angles = self.create_subscription(
