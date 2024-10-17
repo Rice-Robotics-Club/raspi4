@@ -50,7 +50,7 @@ class MultiServoNode(Node):
             angle = (msg.data[i] + self.angle_offsets[i]) * self.angle_multipliers[i]
             if (
                 angle >= 0.0
-                and angle <= 135.0
+                and angle <= self.pca.servo[i].actuation_range
             ):
                 if not self.test:
                     self.pca.servo[i].angle = angle
