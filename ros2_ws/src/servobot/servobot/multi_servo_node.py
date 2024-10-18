@@ -13,11 +13,7 @@ class MultiServoNode(Node):
         self.test: bool = self.declare_parameter("test", False).value
 
         self.angle_offsets: list[float] = self.declare_parameter(
-            "offsets", [67.5] * 12
-        ).value
-        
-        self.angle_multipliers: list[float] = self.declare_parameter(
-            "multipliers", [1.0] * 1
+            "offsets", [67.5] * 16
         ).value
         
         self.ranges: list[float] = self.declare_parameter(
@@ -47,7 +43,7 @@ class MultiServoNode(Node):
             msg (Float64MultiArray): float array interface for /servo_angles topic
         """
         for i in range(min(self.count, len(msg.data))):
-            angle = (msg.data[i] + self.angle_offsets[i]) * self.angle_multipliers[i]
+            angle = msg.data[i] + self.angle_offsets[i]
             if (
                 angle >= 0.0
                 and angle <= self.pca.servo[i].actuation_range
