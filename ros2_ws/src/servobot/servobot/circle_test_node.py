@@ -29,7 +29,7 @@ class CircleTestNode(Node):
 
     def timer_callback(self) -> None:
         l = [
-        	0.0,
+            0.0,
             -self.height + self.radius * math.sin(self.angle),
             self.radius * math.cos(self.angle),
         ]

@@ -5,7 +5,7 @@ import math
 import typing
 
 
-class CircleTestNode(Node):
+class WalkTestNode(Node):
     def __init__(self):
         super().__init__("test_node")
 
@@ -29,7 +29,7 @@ class CircleTestNode(Node):
 
     def timer_callback(self) -> None:
         l = [
-        	0.0,
+            0.0,
             -self.height + self.radius * math.sin(self.angle),
             self.radius * math.cos(self.angle),
         ]
@@ -41,7 +41,7 @@ class CircleTestNode(Node):
 
 def main(args=None) -> None:
     rclpy.init(args=args)
-    node = CircleTestNode()
+    node = WalkTestNode()
     rclpy.spin(node)
     node.destroy_node()
     rclpy.shutdown()
