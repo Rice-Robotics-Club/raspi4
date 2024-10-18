@@ -17,6 +17,9 @@ launch:
     - 
       name: "multipliers"
       value: [0.963, 0.666, 0.666, 0.963, 0.666, 0.666, 0.963, 0.666, 0.666, 0.963, 0.666, 0.666]
+    - 
+      name: "ranges"
+      value: [135.0, 135.0, 135.0, 135.0, 135.0, 135.0, 135.0, 135.0, 135.0, 135.0, 135.0, 180.0]
 
 - node:
     pkg: "servobot"
@@ -43,13 +46,14 @@ launch:
     pkg: "servobot"
     exec: "circle_test_node"
     name: "circle_test_node_0"
+    param:
     - 
       name: "height"
-      value: 4.8
+      value: 4.9
     - 
       name: "radius"
-      value: 1.0
+      value: 0.5
     - 
       name: "period"
       value: 5.0
-    	
+
