@@ -46,10 +46,10 @@ launch:
     param:
     - 
       name: "height"
-      value: 4.9
+      value: 4.3
     - 
       name: "radius"
-      value: 0.5
+      value: 1.2
     - 
       name: "period"
       value: 5.0
