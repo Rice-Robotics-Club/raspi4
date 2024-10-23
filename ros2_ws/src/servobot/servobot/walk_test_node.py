@@ -38,18 +38,19 @@ class WalkTestNode(Node):
         self.delta = (math.tau * interval) / period
 
     def timer_callback(self) -> None: # super inefficient rn but we'll fix that later
-        l = []
+        positions = []
         for angle in self.angles:
             # increment angle
-            l += [
+            positions += [
                 0.7, # x --- 0.7 is the offset to make hip motors 100% straight since origin of point is base of hip servo
                 -self.heightOffset + max(self.stepHeight * math.sin(angle), 0), # y
                 self.stepLength * math.cos(angle), # z 
             ]            
     
-        self.msg.data = l
+        self.msg.data = positions
         self.leg_positions.publish(self.msg)
-        self.get_logger().info(f"input position: {l}")
+        self.get_logger().info(f"input position: {positions}")
+        
         # update new angle
         for j in range(0, 4):
             self.angles[j] += self.delta

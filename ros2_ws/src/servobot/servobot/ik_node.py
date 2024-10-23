@@ -40,8 +40,8 @@ class IKNode(Node):
         
         output: list[float] = []
         
-        for leg in range(len(positions) // 4):
-            output.extend(self.controller.solve_leg(list(positions[leg * 3:3 + leg * 3]), leg))
+        for leg in range(len(positions) // 3):
+            output.extend(self.controller.solve_leg(list(positions[(leg * 3):(3 + leg * 3)]), leg=leg))
 
         self.angles_msg.data = output
 
