@@ -3,6 +3,7 @@ from std_msgs.msg import Float64MultiArray
 from rclpy.node import Node
 import math
 import typing
+import numpy as np
 
 
 class WalkTestNode(Node):
@@ -11,32 +12,48 @@ class WalkTestNode(Node):
 
         self.get_logger().info(f"initializing {self.get_name()}")
 
-        self.radius: float = self.declare_parameter("radius", 1.0).value
-        self.height: float = self.declare_parameter("height", 4.5).value
+        self.stepHeight: float = self.declare_parameter("stepHeight", 1.0).value
+        self.stepLength: float = self.declare_parameter("stepLength", 1.0).value
+        self.heightOffset: float = self.declare_parameter("heightOffset", 4.5).value
         period: float = self.declare_parameter("period", 5.0).value
 
         self.leg_positions = self.create_publisher(
             Float64MultiArray, "/leg_positions", 10
         )
 
+        # not sending constant positions, just edges of rectangle
         interval = 0.01
         self.timer = self.create_timer(interval, self.timer_callback)
 
         self.msg = Float64MultiArray()
         self.msg.data = []
+        self.angles = [
+            0.0, 
+            math.pi / 2, 
+            math.pi,
+            3 * math.pi / 2
+        ] # radians
+        
         self.angle = 0.0
         self.delta = (math.tau * interval) / period
 
-    def timer_callback(self) -> None:
-        l = [
-            0.0,
-            -self.height + self.radius * math.sin(self.angle),
-            self.radius * math.cos(self.angle),
-        ]
+    def timer_callback(self) -> None: # super inefficient rn but we'll fix that later
+        l = []
+        for angle in self.angles:
+            # increment angle
+            l += [
+                0.7, # x --- 0.7 is the offset to make hip motors 100% straight since origin of point is base of hip servo
+                -self.heightOffset + max(self.stepHeight * math.sin(angle), 0), # y
+                self.stepLength * math.cos(angle), # z 
+            ]            
+    
         self.msg.data = l
-        self.angle += self.delta
         self.leg_positions.publish(self.msg)
         self.get_logger().info(f"input position: {l}")
+        # update new angle
+        for j in range(0, 4):
+            self.angles[j] += self.delta
+
 
 
 def main(args=None) -> None:
