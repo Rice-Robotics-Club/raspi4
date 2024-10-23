@@ -57,7 +57,7 @@ class IKController:
         match leg:
             case 0:
                 try:
-                    th1, th2, th3 = self.solve(x, y, z)
+                    th1, th2, th3 = self.solve(x, y, -z)
                     self.legs[0] = (th1, -th2, -th3)
                     return self.legs[0]
                 except:
