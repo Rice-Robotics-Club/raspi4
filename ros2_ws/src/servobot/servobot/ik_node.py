@@ -36,31 +36,14 @@ class IKNode(Node):
         Args:
             msg (Float64MultiArray): float vectors representing position of feet relative to robot
         """
-        array: list[float] = positions_msg.data
-        size: int = len(array)
+        positions: list[float] = positions_msg.data
+        
+        output: list[float] = []
+        
+        for leg in range(len(positions) // 4):
+            output.extend(self.controller.solve_leg(list(positions[leg * 3:3 + leg * 3]), leg))
 
-        fl = (
-            self.controller.solve_leg(tuple(array[0:3]), leg=0)
-            if size >= 3
-            else tuple()
-        )
-        fr = (
-            self.controller.solve_leg(tuple(array[3:6]), leg=1)
-            if size >= 6
-            else tuple()
-        )
-        bl = (
-            self.controller.solve_leg(tuple(array[6:9]), leg=2)
-            if size >= 9
-            else tuple()
-        )
-        br = (
-            self.controller.solve_leg(tuple(array[9:12]), leg=3)
-            if size >= 12
-            else tuple()
-        )
-
-        self.angles_msg.data = [*fl, *fr, *bl, *br]
+        self.angles_msg.data = output
 
         self.servo_angles.publish(self.angles_msg)
 

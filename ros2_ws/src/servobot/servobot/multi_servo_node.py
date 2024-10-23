@@ -2,6 +2,7 @@ import rclpy
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray
 from adafruit_servokit import ServoKit
+import math
 import typing
 
 
@@ -44,7 +45,7 @@ class MultiServoNode(Node):
         for i in range(min(self.count, len(msg.data))):
             angle = msg.data[i] + self.angle_offsets[i]
             if angle >= 0.0 and angle <= self.pca.servo[i].actuation_range:
-                if not self.test:
+                if not self.test and abs(self.pca.servo[i].angle - angle) > 10:
                     self.pca.servo[i].angle = angle
 
                 self.get_logger().info(f"setting servo #{i} to angle: {angle}")

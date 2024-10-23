@@ -1,11 +1,12 @@
 from math import pi, sqrt, asin, asin, acos, cos, sin
 import sys
 import typing
-
+import numpy as np
+from numpy.typing import NDArray
 
 class IKController:
     def __init__(self, a1: float, a2: float, a3: float, l1: float, l2: float):
-        self.legs = [(0.0, 0.0, 0.0), (0.0, 0.0, 0.0), (0.0, 0.0, 0.0), (0.0, 0.0, 0.0)]
+        self.legs = [[0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0], [0.0, 0.0, 0.0]]
         self.a1 = a1
         self.a2 = a2
         self.a3 = a3
@@ -19,8 +20,24 @@ class IKController:
         self.d = self.a1**2
 
         self.mult = 180.0 / pi
+        
+        self.input_trs = np.array([
+            [1, 1, 1], 
+            [1, 1, 1], 
+            [1, 1, -1], 
+            [1, 1, -1]
+        ])
+        
+        self.output_trs = np.array([
+            [1, -1, -1],
+            [1, 1, 1],
+            [1, 1, -1],
+            [1, -1, 1]
+        ])
 
-    def solve(self, x: float, y: float, z: float) -> tuple[float, float, float]:
+    def solve(self, vec: NDArray) -> NDArray:
+        x, y, z = tuple(vec.tolist())
+        
         x2_y2 = x**2 + y**2
         dist_xy = sqrt(x2_y2)
         th1 = asin(x / dist_xy) - asin(self.a3 / dist_xy)
@@ -32,11 +49,11 @@ class IKController:
         b = sqrt((self.l1 + self.l2 * cos(th3)) ** 2 * (a + z * self.c - z**2 - self.d))
         th2 = acos((sin(th3) * self.l2 * (z - self.a1) + b) / a)
 
-        return (self.mult * th1, self.mult * th2, self.mult * th3)
+        return np.array([self.mult * th1, self.mult * th2, self.mult * th3])
 
     def solve_leg(
-        self, position: tuple[float, float, float], leg: int
-    ) -> tuple[float, float, float]:
+        self, position: list[float, float, float], leg: int
+    ) -> list[float, float, float]:
         """modifies IK calculation depending on the leg specified:
 
         0 -> FL
@@ -53,42 +70,17 @@ class IKController:
         Returns:
             tuple[float, float, float]: angles for servo
         """
-        x, y, z = position
-        match leg:
-            case 0:
-                try:
-                    th1, th2, th3 = self.solve(x, y, -z)
-                    self.legs[0] = (th1, -th2, -th3)
-                    return self.legs[0]
-                except:
-                    return self.legs[0]
-            case 1:
-                try:
-                    th1, th2, th3 = self.solve(-x, y, z)
-                    self.legs[1] = (th1, th2, th3)
-                    return self.legs[1]
-                except:
-                    return self.legs[1]
-            case 2:
-                try:
-                    th1, th2, th3 = self.solve(x, y, -z)
-                    self.legs[2] = (th1, th2, th3)
-                    return self.legs[2]
-                except:
-                    return self.legs[2]
-            case 3:
-                try:
-                    th1, th2, th3 = self.solve(-x, y, -z)
-                    self.legs[3] = (th1, -th2, -th3)
-                    return self.legs[3]
-                except:
-                    return self.legs[3]
+        input_tr: NDArray = self.input_trs[leg]
+        output_tr: NDArray = self.output_trs[leg]
+        
+        return (self.solve(np.array(position) * input_tr) * output_tr).tolist()
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 4:
+    print(len(sys.argv))
+    if len(sys.argv) >= 4:
         x, y, z = tuple(map(lambda x: float(x), sys.argv[1:4]))
         controller = IKController(1.6, 1.0, 0.6, 2.8, 1.8)
-        print(controller.solve(x, y, z))
+        print(controller.solve([x, y, z]))
     else:
-        print("needs 3 float arguments")
+        print("needs 3 arguments")

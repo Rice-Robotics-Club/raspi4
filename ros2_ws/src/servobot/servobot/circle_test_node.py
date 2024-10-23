@@ -32,11 +32,11 @@ class CircleTestNode(Node):
         	0.7,
             -self.height + self.radius * math.sin(self.angle),
             self.radius * math.cos(self.angle),
-        ]
+        ] * 4
         self.msg.data = l
         self.angle += self.delta
         self.leg_positions.publish(self.msg)
-        self.get_logger().info(f"input position: {l}")
+        # self.get_logger().info(f"input position: {l}")
 
 
 def main(args=None) -> None:
