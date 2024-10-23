@@ -46,11 +46,13 @@ launch:
     param:
     - 
       name: "stepHeight"
-      value: 1.0
+      value: 0.5
     - 
       name: "stepLength"
       value: 1.0
     - 
       name: "heightOffset"
-      value: 4.5
-
+      value: 4.8
+    - 
+      name: "period"
+      value: 1.0

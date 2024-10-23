@@ -29,8 +29,8 @@ class WalkTestNode(Node):
         self.msg.data = []
         self.angles = [
             0.0, 
-            math.pi / 2, 
-            math.pi,
+            math.pi, 
+            math.pi / 2,
             3 * math.pi / 2
         ] # radians
         
