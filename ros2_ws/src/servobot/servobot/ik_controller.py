@@ -66,21 +66,21 @@ class IKController:
                 try:
                     th1, th2, th3 = self.solve(-x, y, z)
                     self.legs[1] = (th1, th2, th3)
-                    return (th1, th2, th3)
+                    return self.legs[1]
                 except:
                     return self.legs[1]
             case 2:
                 try:
                     th1, th2, th3 = self.solve(x, y, -z)
                     self.legs[2] = (th1, th2, th3)
-                    return (th1, th2, th3)
+                    return self.legs[2]
                 except:
                     return self.legs[2]
             case 3:
                 try:
                     th1, th2, th3 = self.solve(-x, y, -z)
                     self.legs[3] = (th1, -th2, -th3)
-                    return (th1, -th2, -th3)
+                    return self.legs[3]
                 except:
                     return self.legs[3]
 
