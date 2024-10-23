@@ -4,6 +4,7 @@ from std_msgs.msg import Float64MultiArray
 from adafruit_servokit import ServoKit
 import typing
 
+
 class MultiServoNode(Node):
     def __init__(self):
         super().__init__("multi_servo_node")
@@ -15,10 +16,8 @@ class MultiServoNode(Node):
         self.angle_offsets: list[float] = self.declare_parameter(
             "offsets", [67.5] * 16
         ).value
-        
-        self.ranges: list[float] = self.declare_parameter(
-            "ranges", [135.0] * 16
-        ).value
+
+        self.ranges: list[float] = self.declare_parameter("ranges", [135.0] * 16).value
 
         self.get_logger().info(f"initializing {self.get_name()}")
 
@@ -27,7 +26,7 @@ class MultiServoNode(Node):
 
             for i in range(16):
                 self.pca.servo[i].set_pulse_width_range(500, 2500)
-            
+
             for i in range(len(self.ranges)):
                 self.get_logger().info(f"{i}: {self.ranges[i]}")
                 self.pca.servo[i].actuation_range = self.ranges[i]
@@ -44,13 +43,10 @@ class MultiServoNode(Node):
         """
         for i in range(min(self.count, len(msg.data))):
             angle = msg.data[i] + self.angle_offsets[i]
-            if (
-                angle >= 0.0
-                and angle <= self.pca.servo[i].actuation_range
-            ):
+            if angle >= 0.0 and angle <= self.pca.servo[i].actuation_range:
                 if not self.test:
                     self.pca.servo[i].angle = angle
-                    
+
                 self.get_logger().info(f"setting servo #{i} to angle: {angle}")
             else:
                 self.get_logger().info(f"angle {angle} out of range for servo #{i}")
