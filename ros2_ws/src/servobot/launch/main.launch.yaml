@@ -1,6 +1,11 @@
 launch:
 
 - node:
+    pkg: "testgui"
+    exec: "gui_node"
+    name: "gui_node_0"
+
+- node:
     pkg: "servobot"
     exec: "multi_servo_node"
     name: "multi_servo_node_0"
@@ -49,7 +54,7 @@ launch:
       value: 4.6
     - 
       name: "radius"
-      value: 1.7
+      value: 1.0
     - 
       name: "period"
       value: 5.0

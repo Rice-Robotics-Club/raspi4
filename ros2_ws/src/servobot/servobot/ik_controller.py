@@ -31,8 +31,8 @@ class IKController:
         self.output_trs = np.array([
             [1, -1, -1],
             [1, 1, 1],
-            [1, -1, -1],
-            [1, 1, 1]
+            [-1, -1, -1],
+            [-1, 1, 1]
         ])
 
     def solve(self, vec: NDArray) -> NDArray:
