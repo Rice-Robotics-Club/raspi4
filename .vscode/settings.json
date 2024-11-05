@@ -1,4 +1,7 @@
 {
   "ros.distro": "humble",
   "cmake.ignoreCMakeListsMissing": true,
+  "[python]": {
+    "editor.tabSize": 4
+  },
 }

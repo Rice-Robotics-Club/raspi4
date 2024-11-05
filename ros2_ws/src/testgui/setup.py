@@ -3,8 +3,8 @@ import os
 from glob import glob
 
 package_name = "testgui"
-launch_files = glob(os.path.join("launch", "*.launch.[yaml,py]"))
-executables = glob(f"{package_name}*/*/*_node.py")
+launch_files = glob(os.path.join("launch", "*.launch.yaml"))
+executables = glob(os.path.join(package_name, "*_node.py"))
 
 
 def console_script(filename: str) -> str:
