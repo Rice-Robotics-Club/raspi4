@@ -1,0 +1,9 @@
+launch:
+  - node:
+      pkg: testgui
+      exec: example_node
+
+  - node:
+      pkg: testgui
+      exec: gui_node
+      name: gui_node

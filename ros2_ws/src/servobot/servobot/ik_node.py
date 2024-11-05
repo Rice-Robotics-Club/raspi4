@@ -1,4 +1,5 @@
 import rclpy
+from rclpy.parameter import Parameter
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray
 from .ik_controller import IKController
@@ -11,13 +12,13 @@ class IKNode(Node):
 
         self.get_logger().info(f"initializing {self.get_name()}")
 
-        a1: float = self.declare_parameter("a1", 1.6).value
-        a2: float = self.declare_parameter("a2", 1.0).value
-        a3: float = self.declare_parameter("a3", 0.6).value
-        l1: float = self.declare_parameter("l1", 2.8).value
-        l2: float = self.declare_parameter("l2", 1.8).value
+        a1 = self.declare_parameter("a1", 1.6)
+        a2 = self.declare_parameter("a2", 1.0)
+        a3 = self.declare_parameter("a3", 0.6)
+        l1 = self.declare_parameter("l1", 2.8)
+        l2 = self.declare_parameter("l2", 1.8)
 
-        self.controller = IKController(a1, a2, a3, l1, l2)
+        self.controller = IKController(a1.value, a2.value, a3.value, l1.value, l2.value)
 
         self.servo_angles = self.create_publisher(
             Float64MultiArray, "/servo_angles", 10
