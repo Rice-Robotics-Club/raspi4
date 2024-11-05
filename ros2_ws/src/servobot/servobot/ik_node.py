@@ -10,8 +10,6 @@ class IKNode(Node):
     def __init__(self):
         super().__init__("leg_node")
 
-        self.get_logger().info(f"initializing {self.get_name()}")
-
         a1 = self.declare_parameter("a1", 1.6)
         a2 = self.declare_parameter("a2", 1.0)
         a3 = self.declare_parameter("a3", 0.6)
