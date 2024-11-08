@@ -1,9 +1,9 @@
 launch:
 
-- node:
-    pkg: "testgui"
-    exec: "gui_node"
-    name: "gui_node_0"
+# - node:
+#     pkg: "testgui"
+#     exec: "gui_node"
+#     name: "gui_node_0"
 
 - node:
     pkg: "servobot"
@@ -12,7 +12,7 @@ launch:
     param:
     -
       name: "test"
-      value: false
+      value: true
     -
       name: "count"
       value: 12

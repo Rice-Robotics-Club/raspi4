@@ -15,9 +15,9 @@ class GUINode(Node):
         self.node_views: list[NodeView] = []
 
         self.window.title(self.get_name())
-        tk.Button(self.window, text="REFRESH", command=self.refresh).pack(side="left")
-        tk.Button(self.window, text="JUMP", command=self.jump).pack(side="left")
-        tk.Button(self.window, text="STOP", command=self.stop).pack(side="left")
+        tk.Button(self.window, text="REFRESH", command=self.refresh).pack(side=tk.LEFT)
+        tk.Button(self.window, text="JUMP", command=self.jump).pack(side=tk.LEFT)
+        tk.Button(self.window, text="STOP", command=self.stop).pack(side=tk.TOP)
 
         self.refresh()
 
@@ -49,12 +49,11 @@ class GUINode(Node):
         )
 
         for node_view in self.node_views:
-            node_view.pack()
+            node_view.pack(side=tk.TOP)
 
     def close(self):
         self.window.destroy()
         self.destroy_node()
-        rclpy.shutdown()
 
 
 def main(args=None):

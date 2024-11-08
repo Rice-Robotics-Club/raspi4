@@ -3,7 +3,7 @@ import os
 from glob import glob
 
 package_name = "servobot"
-launch_files = glob(os.path.join("launch", "*.launch.yaml"))
+launch_files = glob(os.path.join('launch', '*launch.[pxy][yma]*'))
 executables = glob(os.path.join(package_name, "*_node.py"))
 
 
