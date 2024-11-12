@@ -9,7 +9,10 @@ class ExampleNode(Node):
         self.parameter = self.declare_parameter("parameter", 0.1)
         self.publisher = self.create_publisher(Float64, "/topic", 10)
         self.create_timer(
-            1, lambda: self.get_logger().info(f"parameter {self.get_parameter('parameter').get_parameter_value().double_value}")
+            1,
+            lambda: self.get_logger().info(
+                f"parameter {self.get_parameter('parameter').get_parameter_value().double_value}"
+            ),
         )
 
 
