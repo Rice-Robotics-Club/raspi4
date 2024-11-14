@@ -1,6 +1,8 @@
 import rclpy
 from rclpy.node import Node
 import threading
+from odrive_can.srv import AxisState
+from odrive_can.msg import ControlMessage, ControllerStatus
 
 class JumpNode(Node):
     def __init__(self):
@@ -14,9 +16,11 @@ class JumpNode(Node):
         # AxisState service clients for both axes
         self.state_client_axis0 = self.create_client(AxisState, '/odrive_axis0/request_axis_state')
         self.state_client_axis1 = self.create_client(AxisState, '/odrive_axis1/request_axis_state')
+        
         while not self.state_client_axis0.wait_for_service(timeout_sec=1.0) or \
               not self.state_client_axis1.wait_for_service(timeout_sec=1.0):
             self.get_logger().info('Waiting for AxisState services...')
+            
         self.axis_request_axis0 = AxisState.Request()
         self.axis_request_axis1 = AxisState.Request()
 
