@@ -6,5 +6,5 @@ Repository containing ROS2 workspace. Built packages are not stored in this repo
 
 - Install Ubuntu 22.04 on Raspberry Pi
 - Install ROS2 Humble
-- Add `can0` to the file /etc/network/interfaces
+- Add `can` to the file /etc/modules
 
