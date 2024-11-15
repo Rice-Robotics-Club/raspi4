@@ -28,14 +28,5 @@ launch:
 
 - node:
     pkg: "catbot"
-    exec: "servo_control_node"
-    name: "servo_control_node"
-    param:
-    -
-      name: "pin"
-      value: 12
-
-- node:
-    pkg: "catbot"
-    exec: "jump"
-    name: "jump"
+    exec: "jump_node"
+    name: "jump_node"
