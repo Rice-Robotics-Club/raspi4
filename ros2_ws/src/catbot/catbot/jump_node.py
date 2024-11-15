@@ -23,41 +23,27 @@ class JumpNode(Node):
         self.motor0.wait_for_axis_state()
         # self.motor1.wait_for_axis_state()
 
-        self.zero_angle1 = 0.0 # Reference angle for the top motor
+        self.zero_angle1 = 0.0  # Reference angle for the top motor
         self.zero_angle2 = 0.0  # Reference angle for the bottom motor
 
-        self.start_positions_phase()
-        
+        self.positions_phase()
+        self.winding_phase()
+        self.pouncing_bracing_phase()
+        self.landing_phase()
+
     def wait_seconds(self, seconds: float):
         self.get_clock().sleep_for(Duration(seconds=seconds))
-
-    def start_positions_phase(self):
-        self.phase = "Positions"
-        self.get_logger().info("Starting positions phase")
-        self.positions_phase()
 
     def positions_phase(self):
         self.motor0.set_position(self.standard_angle - self.zero_angle1)
         # self.motor1.set_position(self.standard_angle - self.zero_angle2)
         self.get_logger().info("positions phase: motors set to standard angles")
         self.wait_seconds(2)
-        self.transition_to_winding()
-
-    def transition_to_winding(self):
-        self.phase = "Winding"
-        self.get_logger().info("Transitioning to winding phase")
-        self.winding_phase()
 
     def winding_phase(self):
         # self.motor1.set_torque(self.poising_torque)
         self.get_logger().info("Winding phase: bottom motor winding the spring")
         self.wait_seconds(3)
-        self.transition_to_pouncing_bracing()
-
-    def transition_to_pouncing_bracing(self):
-        self.phase = "Pouncing/Bracing"
-        self.get_logger().info("switching to pouncing/bracing phase")
-        self.pouncing_bracing_phase()
 
     def pouncing_bracing_phase(self):
         self.motor0.set_torque(self.max_torque)
@@ -66,12 +52,6 @@ class JumpNode(Node):
             "pouncing/bracing phase: motors fully extend the spring"
         )
         self.wait_seconds(3)
-        self.transition_to_landing()
-
-    def transition_to_landing(self):
-        self.phase = "Landing"
-        self.get_logger().info("transition to landing phase")
-        self.landing_phase()
 
     def landing_phase(self):
         self.motor0.set_position(self.standard_angle - self.zero_angle1)
