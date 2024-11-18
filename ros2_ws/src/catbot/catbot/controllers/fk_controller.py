@@ -4,7 +4,7 @@ import typing
 import numpy as np
 from numpy.typing import NDArray
 
-
+# TODO: not finished
 class FKController:
     def __init__(self, a1: float, a2: float, a3: float, l1: float, l2: float):
         self.legs = [
