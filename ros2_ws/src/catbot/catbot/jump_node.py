@@ -18,10 +18,10 @@ class JumpNode(Node):
         )  # Convert standard angle to radians
 
         self.motor0 = ODriveController(self, namespace="odrive_axis0")
-        self.motor1 = ODriveController(self, namespace="odrive_axis1")
+        # self.motor1 = ODriveController(self, namespace="odrive_axis1")
 
         self.motor0.wait_for_axis_state()
-        self.motor1.wait_for_axis_state()
+        # self.motor1.wait_for_axis_state()
 
         self.zero_angle1 = 0.0  # Reference angle for the top motor
         self.zero_angle2 = 0.0  # Reference angle for the bottom motor
@@ -36,26 +36,26 @@ class JumpNode(Node):
 
     def positions_phase(self):
         self.motor0.set_position(self.standard_angle - self.zero_angle1)
-        self.motor1.set_position(self.standard_angle - self.zero_angle2)
+        # self.motor1.set_position(self.standard_angle - self.zero_angle2)
         self.get_logger().info("positions phase: motors set to standard angles")
         self.wait_seconds(2)
 
     def winding_phase(self):
-        self.motor1.set_torque(self.poising_torque)
+        # self.motor1.set_torque(self.poising_torque)
         self.get_logger().info("Winding phase: bottom motor winding the spring")
         self.wait_seconds(3)
 
     def pouncing_bracing_phase(self):
         self.motor0.set_torque(self.max_torque)
-        self.motor1.set_torque(self.max_torque)
+        # self.motor1.set_torque(self.max_torque)
         self.get_logger().info(
             "pouncing/bracing phase: motors fully extend the spring"
         )
-        self.wait_seconds(3)
+        self.wait_seconds(0.3)
 
     def landing_phase(self):
         self.motor0.set_position(self.standard_angle - self.zero_angle1)
-        self.motor1.set_position(self.standard_angle - self.zero_angle2)
+        # self.motor1.set_position(self.standard_angle - self.zero_angle2)
         self.get_logger().info("landing phase: Motors set to standard angle")
         self.phase = "Positions"
         self.get_logger().info(

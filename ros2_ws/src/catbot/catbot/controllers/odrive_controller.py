@@ -69,7 +69,7 @@ class ODriveController:
     def request_axis_state(self, state: AxisStates):
         self.axis_state_request.axis_requested_state = int(state)
         future = self.axis_state_client.call_async(self.axis_state_request)
-        rclpy.spin_until_future_complete(future=future)
+        rclpy.spin_until_future_complete(self.parent, future=future)
 
     def set_torque(self, torque: float):
         """Publishes a torque control message to the ODrive
@@ -79,6 +79,17 @@ class ODriveController:
         """
         self.control_message.control_mode = ControlMode.TORQUE_CONTROL
         self.control_message.input_mode = InputMode.PASSTHROUGH
+        self.control_message.input_torque = torque
+        self.control_message_publisher.publish(self.control_message)
+        
+    def ramp_torque(self, torque: float):
+        """Publishes a torque control message to the ODrive
+
+        Args:
+            torque (float): value
+        """
+        self.control_message.control_mode = ControlMode.TORQUE_CONTROL
+        self.control_message.input_mode = InputMode.TORQUE_RAMP
         self.control_message.input_torque = torque
         self.control_message_publisher.publish(self.control_message)
 
@@ -92,6 +103,17 @@ class ODriveController:
         self.control_message.input_mode = InputMode.PASSTHROUGH
         self.control_message.input_vel = velocity
         self.control_message_publisher.publish(self.control_message)
+        
+    def ramp_velocity(self, velocity: float):
+        """Publishes a velocity control message to the ODrive
+
+        Args:
+            velocity (float): value
+        """
+        self.control_message.control_mode = ControlMode.VELOCITY_CONTROL
+        self.control_message.input_mode = InputMode.VEL_RAMP
+        self.control_message.input_vel = velocity
+        self.control_message_publisher.publish(self.control_message)
 
     def set_position(self, position: float):
         """Publishes a position control message to the ODrive
@@ -100,6 +122,6 @@ class ODriveController:
             position (float): value
         """
         self.control_message.control_mode = ControlMode.POSITION_CONTROL
-        self.control_message.input_mode = InputMode.PASSTHROUGH
+        self.control_message.input_mode = InputMode.POS_FILTER
         self.control_message.input_pos = position
         self.control_message_publisher.publish(self.control_message)
