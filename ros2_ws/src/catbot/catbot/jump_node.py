@@ -13,10 +13,10 @@ class JumpNode(Node):
         self.poising_torque = 0.24  # Poising torque [Nm]
         self.brace_torque = self.declare_parameter("brace_torque", 2.0).value
         self.bracing_angle = 70 * (
-            1 / 360
+            self.gear_ratio / 360
         )  # Convert bracing angle to rotations
         self.standard_angle = 45 * (
-            1 / 360
+            self.gear_ratio / 360
         )  # Convert standard angle to rotations
 
         self.motor0 = ODriveController(self, namespace="odrive_axis0")
@@ -30,7 +30,9 @@ class JumpNode(Node):
         self.zero_angle1 = 0.0  # Reference angle for the top motor
         self.zero_angle2 = 0.0  # Reference angle for the bottom motor
         
-        self.extended_angle1 = 1.0
+        self.extended_angle1 = 360 * (
+            self.gear_ratio / 360
+        ) 
 
     def jump(self, goal_handle):
         self.positions_phase()
