@@ -11,7 +11,7 @@ class ODriveController:
         parent: Node,
         namespace: str,
         min_position=-1.0,
-        max_position=361.0,
+        max_position=1.0,
     ):
         self.parent = parent
         self.namespace = namespace
