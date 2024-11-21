@@ -3,6 +3,7 @@ from rclpy.node import Node
 from rclpy.action import ActionServer
 from rclpy.duration import Duration
 from .controllers.odrive_controller import ODriveController
+from catbot_msg.action import Jump
 
 class JumpNode(Node):
     def __init__(self):
@@ -21,7 +22,7 @@ class JumpNode(Node):
         self.motor0 = ODriveController(self, namespace="odrive_axis0")
         # self.motor1 = ODriveController(self, namespace="odrive_axis1")
 
-        self.jump_action = ActionServer(self, None, "jump", self.jump)
+        self.jump_action = ActionServer(self, Jump, "jump", self.jump)
 
         self.motor0.wait_for_axis_state()
         # self.motor1.wait_for_axis_state()
@@ -36,6 +37,7 @@ class JumpNode(Node):
         # self.winding_phase()
         self.pouncing_bracing_phase()
         self.landing_phase()
+        return Jump.Result()
 
     def wait_seconds(self, seconds: float):
         self.get_clock().sleep_for(Duration(seconds=seconds))
