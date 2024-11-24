@@ -8,7 +8,7 @@ from catbot_msg.action import Jump
 
 class JumpNode(Node):
     def __init__(self):
-        super().__init__("control_node")
+        super().__init__("jump_node")
         self.declare_parameter("gear_ratio", 8.0)
         self.declare_parameter("max_torque", 12.4)
         self.declare_parameter("winding_torque", 2.0)
@@ -31,6 +31,14 @@ class JumpNode(Node):
         self.motor0.wait_for_axis_state()
         self.motor1.wait_for_axis_state()
 
+        self.phases = [
+            self.positions_phase,
+            self.poising_phase,
+            # self.winding_phase,
+            self.jumping_phase,
+            self.landing_phase,
+        ]
+
     def update_parameters(self):
         self.gear_ratio = self.get_parameter("gear_ratio").value
         self.max_torque = self.get_parameter("max_torque").value
@@ -49,13 +57,14 @@ class JumpNode(Node):
     def wait_seconds(self, seconds: float):
         self.get_clock().sleep_for(Duration(seconds=seconds))
 
-    def jump(self, goal_handle):
+    def jump(self, goal_handle) -> Jump.Result:
         self.update_parameters()
-        self.positions_phase()
-        self.poising_phase()
-        # self.winding_phase()
-        self.jumping_phase()
-        self.landing_phase()
+        for phase in self.phases:
+            if not goal_handle.is_cancel_requested:
+                phase()
+            else:
+                goal_handle.abort()
+                return Jump.Result()
         goal_handle.succeed()
         return Jump.Result()
 
@@ -63,7 +72,7 @@ class JumpNode(Node):
         self.motor0.set_position(self.normal_pos0)
         self.motor1.set_position(self.normal_pos1)
         self.wait_seconds(1)
-        
+
     def poising_phase(self):
         self.motor0.set_position(self.min_pos0)
         self.motor1.set_position(self.min_pos1)
