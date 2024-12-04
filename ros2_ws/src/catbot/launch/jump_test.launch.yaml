@@ -30,8 +30,3 @@ launch:
     pkg: "catbot"
     exec: "jump_node"
     name: "jump_node"
-
-- node:
-    pkg: "testgui"
-    exec: "gui_node"
-    name: "gui_node"
