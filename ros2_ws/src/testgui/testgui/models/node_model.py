@@ -9,7 +9,7 @@ from .param_model import ParameterModel
 
 class NodeModel:
     def __init__(self, parent: Node, node_name: NodeName):
-        """_summary_
+        """
 
         Args:
             parent (Node): the rclpy Node object used to create service clients on,
