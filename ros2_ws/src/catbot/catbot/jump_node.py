@@ -27,10 +27,6 @@ class JumpNode(Node):
         self.motor1 = ODriveController(self, namespace="odrive_axis1")
 
         # makes jump callable
-        self.jump_action = ActionServer(self, Jump, "jump", self.jump)
-
-        self.motor0.wait_for_axis_state()
-        self.motor1.wait_for_axis_state()
 
         self.phases = [
             self.update_parameters,
@@ -40,6 +36,11 @@ class JumpNode(Node):
             self.jumping_phase,
             self.landing_phase,
         ]
+        
+        self.motor0.wait_for_axis_state()
+        self.motor1.wait_for_axis_state()
+        
+        self.jump_action = ActionServer(self, Jump, "jump", self.jump)
 
     def update_parameters(self):
         self.gear_ratio = self.get_parameter("gear_ratio").value
