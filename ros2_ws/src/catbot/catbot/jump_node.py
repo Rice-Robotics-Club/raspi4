@@ -26,8 +26,6 @@ class JumpNode(Node):
         self.motor0 = ODriveController(self, namespace="odrive_axis0")
         self.motor1 = ODriveController(self, namespace="odrive_axis1")
 
-        # makes jump callable
-
         self.phases = [
             self.update_parameters,
             self.positions_phase,
