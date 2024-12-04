@@ -15,6 +15,7 @@
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
   <depend>odrive_can</depend>
+  <depend>testgui</depend>
 
   <export>
     <build_type>ament_python</build_type>

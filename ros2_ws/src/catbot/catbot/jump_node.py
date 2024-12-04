@@ -1,78 +1,102 @@
 import rclpy
+import rclpy.action
 from rclpy.node import Node
 from rclpy.action import ActionServer
 from rclpy.duration import Duration
 from .controllers.odrive_controller import ODriveController
 from catbot_msg.action import Jump
+import typing
 
 class JumpNode(Node):
     def __init__(self):
-        super().__init__("control_node")
-        self.gear_ratio = self.declare_parameter("gear_ratio", 8.0).value
-        self.max_torque = self.declare_parameter("max_torque", 12.4).value
-        self.poising_torque = 0.24  # Poising torque [Nm]
-        self.brace_torque = self.declare_parameter("brace_torque", 2.0).value
-        self.bracing_angle = 70 * (
-            1 / 360
-        )  # Convert bracing angle to rotations
-        self.standard_angle = 45 * (
-            1 / 360
-        )  # Convert standard angle to rotations
+        super().__init__("jump_node")
+        self.declare_parameter("gear_ratio", 8.0)
+        self.declare_parameter("max_torque", 12.4)
+        self.declare_parameter("winding_torque", 2.0)
+        self.declare_parameter("brace_torque", 2.0)
+        self.declare_parameter("normal_pos0", -1.0)
+        self.declare_parameter("normal_pos1", 0.5)
+        self.declare_parameter("min_pos0", 0.0)
+        self.declare_parameter("min_pos1", 0.0)
+        self.declare_parameter("max_pos0", -2.0)
+        self.declare_parameter("max_pos1", 1.0)
+
+        self.update_parameters()
 
         self.motor0 = ODriveController(self, namespace="odrive_axis0")
-        # self.motor1 = ODriveController(self, namespace="odrive_axis1")
+        self.motor1 = ODriveController(self, namespace="odrive_axis1")
 
+        # makes jump callable
         self.jump_action = ActionServer(self, Jump, "jump", self.jump)
 
         self.motor0.wait_for_axis_state()
-        # self.motor1.wait_for_axis_state()
+        self.motor1.wait_for_axis_state()
 
-        self.zero_angle1 = 0.0  # Reference angle for the top motor
-        self.zero_angle2 = 0.0  # Reference angle for the bottom motor
-        
-        self.extended_angle1 = 1.0
+        self.phases = [
+            self.update_parameters,
+            self.positions_phase,
+            self.poising_phase,
+            # self.winding_phase,
+            self.jumping_phase,
+            self.landing_phase,
+        ]
 
-    def jump(self, goal_handle):
-        self.positions_phase()
-        # self.winding_phase()
-        self.pouncing_bracing_phase()
-        self.landing_phase()
-        return Jump.Result()
+    def update_parameters(self):
+        self.gear_ratio = self.get_parameter("gear_ratio").value
+        self.max_torque = self.get_parameter("max_torque").value
+        self.winding_torque = self.get_parameter("winding_torque").value
+        self.brace_torque = self.get_parameter("brace_torque").value
+        self.normal_pos0 = self.get_parameter("normal_pos0").value
+        self.min_pos0 = self.get_parameter("min_pos0").value
+        self.max_pos0 = self.get_parameter("max_pos0").value
+        self.normal_pos1 = self.get_parameter("normal_pos1").value
+        self.min_pos1 = self.get_parameter("min_pos1").value
+        self.max_pos1 = self.get_parameter("max_pos1").value
+
+    def angle_to_position(self, angle: float) -> float:
+        return angle / (self.gear_ratio * 360)
 
     def wait_seconds(self, seconds: float):
         self.get_clock().sleep_for(Duration(seconds=seconds))
 
+    def jump(self, goal_handle: rclpy.action.server.ServerGoalHandle) -> Jump.Result:
+        for phase in self.phases:
+            if not goal_handle.is_cancel_requested:
+                phase()
+                goal_handle.publish_feedback(Jump.Feedback(phase=f"{phase.__name__} completed"))
+            else:
+                goal_handle.abort()
+                return Jump.Result()
+        goal_handle.succeed()
+        return Jump.Result()
+
     def positions_phase(self):
-        self.motor0.set_position(self.standard_angle + self.zero_angle1)
-        # self.motor1.set_position(self.standard_angle + self.zero_angle2)
-        self.get_logger().info("positions phase: motors set to standard angles")
+        self.motor0.set_position(self.normal_pos0)
+        self.motor1.set_position(self.normal_pos1)
+        self.wait_seconds(1)
+
+    def poising_phase(self):
+        self.motor0.set_position(self.min_pos0)
+        self.motor1.set_position(self.min_pos1)
         self.wait_seconds(2)
 
     def winding_phase(self):
-        # self.motor1.set_torque(self.poising_torque)
-        self.get_logger().info("Winding phase: bottom motor winding the spring")
+        self.motor1.set_torque(self.winding_torque)
         self.wait_seconds(3)
-        
-    def jumping_phase(self):
-        self.motor0.set_position(self.extended_angle1 + self.zero_angle1)
-        # self.motor1.set_position(self.extended_angle2 + self.zero_angle2)
 
-    def pouncing_bracing_phase(self):
-        self.motor0.set_torque(self.brace_torque)
-        # self.motor1.set_torque(self.brace_torque)
-        self.get_logger().info(
-            "pouncing/bracing phase: motors fully extend the spring"
-        )
+    def jumping_phase(self):
+        self.motor0.set_position(self.max_pos0)
+        self.motor1.set_position(self.max_pos1)
         self.wait_seconds(0.3)
 
+    def bracing_phase(self):
+        self.motor0.set_torque(self.brace_torque)
+        self.motor1.set_torque(self.brace_torque)
+        self.wait_seconds(1.0)
+
     def landing_phase(self):
-        self.motor0.set_position(self.standard_angle - self.zero_angle1)
-        # self.motor1.set_position(self.standard_angle - self.zero_angle2)
-        self.get_logger().info("landing phase: Motors set to standard angle")
-        self.phase = "Positions"
-        self.get_logger().info(
-            "landing completed. Resetting to Positions phase for next cycle"
-        )
+        self.motor0.set_position(self.normal_pos0)
+        self.motor1.set_position(self.normal_pos1)
 
 
 def main(args=None):
