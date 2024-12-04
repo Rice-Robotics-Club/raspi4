@@ -102,7 +102,7 @@ class GUINode(Node):
 
     def cancel_jump(self):
         threading.Thread(target=self._cancel_jump).start()
-            
+
     def _cancel_jump(self):
         if self.goal_handle:
             self.status.insert("1.0", f"Request: Jump Cancelled\n")
@@ -114,7 +114,7 @@ class GUINode(Node):
         if self.goal_handle:
             return
         threading.Thread(target=self._refresh).start()
-        
+
     def _refresh(self):
         for node_view in self.node_views:
             node_view.destroy()
