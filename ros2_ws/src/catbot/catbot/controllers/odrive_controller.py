@@ -60,11 +60,11 @@ class ODriveController:
         self.velocity = msg.vel_estimate
         self.torque = msg.torque_estimate
 
-        if (
-            self.position < self.min_position
-            or self.position > self.max_position
-        ):
-            self.request_axis_state(AxisStates.IDLE)
+        # if (
+        #     self.position < self.min_position
+        #     or self.position > self.max_position
+        # ):
+        #     self.request_axis_state(AxisStates.IDLE)
 
     def request_axis_state(self, state: AxisStates):
         self.axis_state_request.axis_requested_state = int(state)
