@@ -2,10 +2,10 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>catbot_msg</name>
-  <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="nicholasl23638@gmail.com">robotics</maintainer>
-  <license>TODO: License declaration</license>
+  <version>0.0.1</version>
+  <description>A package containing all interfaces for the catbot package.</description>
+  <maintainer email="riceroboticsclub@gmail.com">Rice Robotics Club</maintainer>
+  <license>MIT</license>
 
   <buildtool_depend>ament_cmake</buildtool_depend>
 

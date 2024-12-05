@@ -3,22 +3,15 @@ import rclpy.action
 import rclpy.duration
 import rclpy.executors
 from rclpy.node import Node
-from std_msgs.msg import Float64
 from catbot_msg.action import Jump
-from rclpy.action import ActionServer, GoalResponse, CancelResponse
+from rclpy.action import ActionServer, CancelResponse
 
 
 class ExampleNode(Node):
     def __init__(self):
         super().__init__("example_node")
-        self.parameter = self.declare_parameter("parameter", 0.1)
-        ActionServer(
-            self,
-            Jump,
-            "/jump",
-            execute_callback=self.jump,
-            cancel_callback=lambda goal_handle: CancelResponse.ACCEPT,
-        )
+        self.declare_parameter("parameter", 0.1)
+
         self.create_timer(
             1,
             lambda: self.get_logger().info(
@@ -31,19 +24,35 @@ class ExampleNode(Node):
             lambda: self.get_logger().info("Phase 2"),
             lambda: self.get_logger().info("Phase 3"),
         ]
+        
+        ActionServer(
+            self,
+            Jump,
+            "/jump",
+            execute_callback=self.execute_callback,
+            cancel_callback=lambda goal_handle: CancelResponse.ACCEPT,
+        )
 
-    def jump(self, goal_handle: rclpy.action.server.ServerGoalHandle) -> Jump.Result:
+    def jump_execute_callback(
+        self, goal_handle: rclpy.action.server.ServerGoalHandle
+    ) -> Jump.Result:
+        """Executes the jump action, phase by phase.
+
+        Args:
+            goal_handle (rclpy.action.server.ServerGoalHandle): Goal handle for the jump action
+
+        Returns:
+            Jump.Result: Result of the jump action, indicating whether it was completed
+        """
         for phase in self.phases:
             if goal_handle.is_cancel_requested:
                 goal_handle.canceled()
                 return Jump.Result(complete=False)
-            
+
             phase()
-            goal_handle.publish_feedback(
-                Jump.Feedback(phase="Phase completed")
-            )
+            goal_handle.publish_feedback(Jump.Feedback(phase="Phase completed"))
             self.get_clock().sleep_for(rclpy.duration.Duration(seconds=1))
-                
+
         goal_handle.succeed()
         return Jump.Result(complete=True)
 
@@ -51,7 +60,7 @@ class ExampleNode(Node):
 def main(args=None):
     rclpy.init(args=args)
     node = ExampleNode()
-    rclpy.spin(node, rclpy.executors.MultiThreadedExecutor())
+    rclpy.spin(node, rclpy.executors.MultiThreadedExecutor()) # Needed to handle cancellation callbacks alongside execute callback
     node.destroy_node()
     rclpy.shutdown()
 

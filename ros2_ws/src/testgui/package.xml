@@ -2,13 +2,13 @@
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
   <name>testgui</name>
-  <version>0.0.0</version>
-  <description>TODO: Package description</description>
-  <maintainer email="justin@lopato.org">lopatoj</maintainer>
-  <license>TODO: License declaration</license>
+  <version>1.0.0</version>
+  <description>A package that provides a GUI application for controlling jump tests.</description>
+  <maintainer email="riceroboticsclub@gmail.com">Rice Robotics Club</maintainer>
+  <license>MIT</license>
 
   <depend>rclpy</depend>
-  <depend>odrive_can</depend>
+  <depend>catbot_msg</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>

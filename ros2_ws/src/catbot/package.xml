@@ -3,9 +3,9 @@
 <package format="3">
   <name>catbot</name>
   <version>0.0.1</version>
-  <description>TODO: Package description</description>
-  <maintainer email="justin@lopato.org">lopatoj</maintainer>
-  <license>TODO: License declaration</license>
+  <description>A package containing code for all Catbot jump tests</description>
+  <maintainer email="riceroboticsclub@gmail.com">Rice Robotics Club</maintainer>
+  <license>MIT</license>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
@@ -15,7 +15,7 @@
   <depend>rclpy</depend>
   <depend>std_msgs</depend>
   <depend>odrive_can</depend>
-  <depend>testgui</depend>
+  <depend>catbot_msg</depend>
 
   <export>
     <build_type>ament_python</build_type>
