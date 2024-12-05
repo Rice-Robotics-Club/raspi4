@@ -1,6 +1,0 @@
-launch:
-
-- node:
-    pkg: "catbot"
-    exec: "stop"
-    name: "stop"
