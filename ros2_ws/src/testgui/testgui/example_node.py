@@ -1,6 +1,7 @@
 import rclpy
 import rclpy.action
 import rclpy.duration
+import rclpy.executors
 from rclpy.node import Node
 from std_msgs.msg import Float64
 from catbot_msg.action import Jump
@@ -33,15 +34,16 @@ class ExampleNode(Node):
 
     def jump(self, goal_handle: rclpy.action.server.ServerGoalHandle) -> Jump.Result:
         for phase in self.phases:
-            if not goal_handle.is_cancel_requested:
-                phase()
-                goal_handle.publish_feedback(
-                    Jump.Feedback(phase="Phase completed")
-                )
-                self.get_clock().sleep_for(rclpy.duration.Duration(seconds=1))
-            else:
-                goal_handle.abort()
+            if goal_handle.is_cancel_requested:
+                goal_handle.canceled()
                 return Jump.Result(complete=False)
+            
+            phase()
+            goal_handle.publish_feedback(
+                Jump.Feedback(phase="Phase completed")
+            )
+            self.get_clock().sleep_for(rclpy.duration.Duration(seconds=1))
+                
         goal_handle.succeed()
         return Jump.Result(complete=True)
 
@@ -49,7 +51,7 @@ class ExampleNode(Node):
 def main(args=None):
     rclpy.init(args=args)
     node = ExampleNode()
-    rclpy.spin(node)
+    rclpy.spin(node, rclpy.executors.MultiThreadedExecutor())
     node.destroy_node()
     rclpy.shutdown()
 

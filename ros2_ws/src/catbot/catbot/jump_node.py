@@ -5,7 +5,10 @@ from rclpy.action import ActionServer
 from rclpy.duration import Duration
 from .controllers.odrive_controller import ODriveController
 from catbot_msg.action import Jump
+from odrive.enums import AxisState as AxisStates
+from rclpy.action import CancelResponse
 import typing
+
 
 class JumpNode(Node):
     def __init__(self):
@@ -28,17 +31,24 @@ class JumpNode(Node):
 
         self.phases = [
             self.update_parameters,
+            self.set_axis_closed_loop_control,
             self.positions_phase,
             self.poising_phase,
             # self.winding_phase,
             self.jumping_phase,
             self.landing_phase,
         ]
-        
+
         self.motor0.wait_for_axis_state()
         self.motor1.wait_for_axis_state()
-        
-        self.jump_action = ActionServer(self, Jump, "jump", self.jump)
+
+        self.jump_action = ActionServer(
+            self,
+            Jump,
+            "jump",
+            self.jump,
+            cancel_callback=lambda goal_handle: CancelResponse.ACCEPT,
+        )
 
     def update_parameters(self):
         self.gear_ratio = self.get_parameter("gear_ratio").value
@@ -58,16 +68,30 @@ class JumpNode(Node):
     def wait_seconds(self, seconds: float):
         self.get_clock().sleep_for(Duration(seconds=seconds))
 
-    def jump(self, goal_handle: rclpy.action.server.ServerGoalHandle) -> Jump.Result:
+    def jump(
+        self, goal_handle: rclpy.action.server.ServerGoalHandle
+    ) -> Jump.Result:
         for phase in self.phases:
-            if not goal_handle.is_cancel_requested:
-                phase()
-                goal_handle.publish_feedback(Jump.Feedback(phase=f"{phase.__name__} completed"))
-            else:
-                goal_handle.abort()
-                return Jump.Result()
+            if goal_handle.is_cancel_requested:
+                goal_handle.canceled()
+                self.set_axis_idle()
+                return Jump.Result(complete=False)
+
+            phase()
+            goal_handle.publish_feedback(
+                Jump.Feedback(phase=f"{phase.__name__} completed")
+            )
+
         goal_handle.succeed()
-        return Jump.Result()
+        return Jump.Result(complete=True)
+
+    def set_axis_idle(self):
+        self.motor0.request_axis_state(AxisStates.IDLE)
+        self.motor1.request_axis_state(AxisStates.IDLE)
+
+    def set_axis_closed_loop_control(self):
+        self.motor0.request_axis_state(AxisStates.CLOSED_LOOP_CONTROL)
+        self.motor1.request_axis_state(AxisStates.CLOSED_LOOP_CONTROL)
 
     def positions_phase(self):
         self.motor0.set_position(self.normal_pos0)
@@ -101,7 +125,7 @@ class JumpNode(Node):
 def main(args=None):
     rclpy.init(args=args)
     jump_node = JumpNode()
-    rclpy.spin(jump_node)
+    rclpy.spin(jump_node, executor=rclpy.executors.MultiThreadedExecutor())
     jump_node.destroy_node()
     rclpy.shutdown()
 

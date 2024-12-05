@@ -105,10 +105,7 @@ class GUINode(Node):
 
     def _cancel_jump(self):
         if self.goal_handle:
-            self.status.insert("1.0", f"Request: Jump Cancelled\n")
-            self.jump["state"] = tk.NORMAL
-            self.window.update()
-            future = self.goal_handle.cancel_goal_async()
+            self.goal_handle.cancel_goal_async()
 
     def refresh(self):
         if self.goal_handle:
