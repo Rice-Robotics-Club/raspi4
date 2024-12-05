@@ -23,9 +23,13 @@ class NodeView(tk.LabelFrame):
             
         container.pack(fill=tk.X)
 
-        tk.Button(self, text="update", command=self.update).pack(fill=tk.X)
+        tk.Button(self, text="Update Parameters", command=self.update).pack(fill=tk.X)
 
     def update(self):
         self.node_model.set_parameters(
             {name: entry.get() for name, entry, in self.entries.items()}
         )
+        
+        for name, data in self.node_model.parameters.items():
+            self.entries[name].delete(0, tk.END)
+            self.entries[name].insert(0, str(data.get_value()))

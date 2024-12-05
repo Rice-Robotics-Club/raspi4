@@ -1,6 +1,7 @@
 import tkinter as tk
 import rclpy
 import rclpy.action
+import rclpy.executors
 from rclpy.node import Node
 from rclpy.action import ActionClient
 from catbot_msg.action import Jump
@@ -143,7 +144,7 @@ def main():
     root = tk.Tk()
     node = GUINode(root)
     root.mainloop()
-    rclpy.spin(node)
+    rclpy.spin(node, rclpy.executors.MultiThreadedExecutor())
     node.destroy_node()
     rclpy.shutdown()
 

@@ -29,7 +29,7 @@ class ExampleNode(Node):
             self,
             Jump,
             "/jump",
-            execute_callback=self.execute_callback,
+            execute_callback=self.jump_execute_callback,
             cancel_callback=lambda goal_handle: CancelResponse.ACCEPT,
         )
 

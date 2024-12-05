@@ -82,25 +82,28 @@ class ParameterModel:
                 self.value.string_array_value = data
 
     def set_value_from_string(self, value: str) -> None:
-        match self.type:
-            case ParamType.BOOL:
-                self.set_value(bool(value))
-            case ParamType.INT:
-                self.set_value(int(value))
-            case ParamType.DOUBLE:
-                self.set_value(float(value))
-            case ParamType.STRING:
-                self.set_value(str(value))
-            case ParamType.BYTE_ARRAY:
-                self.set_value(bytes(value))
-            case ParamType.BOOL_ARRAY:
-                self.set_value(list(bool(v) for v in value.split("\\s*,\\s*")))
-            case ParamType.INT_ARRAY:
-                self.set_value(list(int(v) for v in value.split("\\s*,\\s*")))
-            case ParamType.DOUBLE_ARRAY:
-                self.set_value(list(float(v) for v in value.split("\\s*,\\s*")))
-            case ParamType.STRING_ARRAY:
-                self.set_value(list(str(v) for v in value.split("\\s*,\\s*")))
+        try:
+            match self.type:
+                case ParamType.BOOL:
+                    self.set_value(bool(value))
+                case ParamType.INT:
+                    self.set_value(int(value))
+                case ParamType.DOUBLE:
+                    self.set_value(float(value))
+                case ParamType.STRING:
+                    self.set_value(str(value))
+                case ParamType.BYTE_ARRAY:
+                    self.set_value(bytes(value))
+                case ParamType.BOOL_ARRAY:
+                    self.set_value(list(bool(v) for v in value.split("\\s*,\\s*")))
+                case ParamType.INT_ARRAY:
+                    self.set_value(list(int(v) for v in value.split("\\s*,\\s*")))
+                case ParamType.DOUBLE_ARRAY:
+                    self.set_value(list(float(v) for v in value.split("\\s*,\\s*")))
+                case ParamType.STRING_ARRAY:
+                    self.set_value(list(str(v) for v in value.split("\\s*,\\s*")))
+        except ValueError:
+            pass
 
     def get_parameter(self) -> Parameter:
         return Parameter(name=self.name, value=self.value)
