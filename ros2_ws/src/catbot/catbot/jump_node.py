@@ -19,10 +19,16 @@ class JumpNode(Node):
         self.declare_parameter("max_torque", 12.4)
         self.declare_parameter("winding_torque", 2.0)
         self.declare_parameter("brace_torque", 2.0)
+        
         self.declare_parameter("normal_pos0", -1.0)
         self.declare_parameter("normal_pos1", 0.5)
+        
         self.declare_parameter("min_pos0", 0.0)
         self.declare_parameter("min_pos1", 0.0)
+        
+        self.declare_parameter("torque_pos0", -0.5)
+        self.declare_parameter("torque_pos1", 0.2)
+        
         self.declare_parameter("max_pos0", -2.0)
         self.declare_parameter("max_pos1", 1.0)
 
@@ -40,6 +46,7 @@ class JumpNode(Node):
             # jump phases
             self.positions_phase,
             self.poising_phase,
+            self.torque_phase,
             # self.winding_phase, # not needed for now, since we don't have a spring
             self.jumping_phase,
             self.landing_phase,
@@ -70,6 +77,9 @@ class JumpNode(Node):
         self.normal_pos1 = self.get_parameter("normal_pos1").value
         self.min_pos1 = self.get_parameter("min_pos1").value
         self.max_pos1 = self.get_parameter("max_pos1").value
+        
+        self.torque_pos0 = self.get_parameter("torque_pos0").value
+        self.torque_pos1 = self.get_parameter("torque_pos1").value
 
     def angle_to_position(self, angle: float) -> float:
         """Converts an angle in degrees to a motor position in rotations.
@@ -136,6 +146,13 @@ class JumpNode(Node):
         self.motor0.set_position(self.min_pos0)
         self.motor1.set_position(self.min_pos1)
         self.wait_seconds(2)
+        
+    def torque_phase(self):
+        self.motor0.set_torque(self.max_torque)
+        self.motor1.set_torque(self.max_torque)
+        
+        while self.motor0.position > self.torque_pos0 and self.motor1.position < self.torque_pos1:
+            self.wait_seconds(0.05)
 
     def winding_phase(self):
         """Winds up the spring for the jump. Not needed for now, since we don't have a spring."""
