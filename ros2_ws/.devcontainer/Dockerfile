@@ -19,6 +19,8 @@ RUN apt-get update && apt-get upgrade -y
 RUN apt-get install -y python3-pip
 ENV SHELL /bin/bash
 
+ENV FASTRTPS_DEFAULT_PROFILES_FILE /home/ws/fastdds.xml
+
 # ********************************************************
 # * Anything else you want to do like clean up goes here *
 # ********************************************************
