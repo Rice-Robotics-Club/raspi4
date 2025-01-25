@@ -13,8 +13,8 @@ class IKNode(Node):
         a1 = self.declare_parameter("a1", 1.6)
         a2 = self.declare_parameter("a2", 1.0)
         a3 = self.declare_parameter("a3", 0.6)
-        l1 = self.declare_parameter("l1", 2.8)
-        l2 = self.declare_parameter("l2", 1.8)
+        l1 = self.declare_parameter("l1", 4.325)
+        l2 = self.declare_parameter("l2", 3.0)
 
         self.controller = IKController(a1.value, a2.value, a3.value, l1.value, l2.value)
 

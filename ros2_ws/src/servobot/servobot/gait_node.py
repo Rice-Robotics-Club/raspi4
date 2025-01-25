@@ -1,5 +1,6 @@
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray
+from geometry_msgs.msg import Twist
 import rclpy
 from geometry_msgs.msg import Twist
 import math
@@ -60,6 +61,7 @@ class GaitNode(Node):
         y = l * self.swing_length * amplitude * math.sin(angle + (-1 ** leg * ang))
         
         return origin[0] + x, origin[1] + y, origin[2] + z
+        return origin[0] + x, origin[1] + y, origin[2] + z
         
 
     def timer_callback(self) -> None:
@@ -70,8 +72,15 @@ class GaitNode(Node):
     
         self.msg.data = positions
         self.leg_positions.publish(self.msg)
-        self.get_logger().info(f"input position: {positions}")
+        self.get_logger().info(f"Published: {self.msg.data}")
         
-        # update new angle
-        for j in range(0, 4):
-            self.angles[j] += self.delta
+        self.t += self.timer_interval
+        
+def main(args=None):
+    rclpy.init(args=args)
+    node = GaitNode()
+    rclpy.spin(node)
+    rclpy.shutdown()
+    
+if __name__ == "__main__":
+    main()

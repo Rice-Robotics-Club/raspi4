@@ -28,11 +28,11 @@ class IKController:
         self.mult = 180.0 / pi
 
         self.input_trs = np.array(
-            [[1, 1, 1], [1, 1, 1], [1, 1, -1], [1, 1, -1]]
+            [[1, 1, -1], [1, 1, -1], [1, 1, -1], [1, 1, -1]]
         )
 
         self.output_trs = np.array(
-            [[1, -1, -1], [1, 1, 1], [-1, -1, -1], [-1, 1, 1]]
+            [[1, 1, 1], [1, -1, -1], [-1, 1, 1], [-1, -1, -1]]
         )
 
     def solve(self, vec: NDArray) -> NDArray:
