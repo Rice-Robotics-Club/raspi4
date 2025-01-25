@@ -61,7 +61,6 @@ class GaitNode(Node):
         y = l * self.swing_length * amplitude * math.sin(angle + (-1 ** leg * ang))
         
         return origin[0] + x, origin[1] + y, origin[2] + z
-        return origin[0] + x, origin[1] + y, origin[2] + z
         
 
     def timer_callback(self) -> None:
