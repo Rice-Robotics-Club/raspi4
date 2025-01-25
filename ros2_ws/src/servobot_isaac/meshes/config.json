@@ -1,0 +1,7 @@
+{
+    "documentId": "d60ddd2ac8171198147ce3de", 
+    "outputFormat": "urdf",                                                                                                      
+    "packageName": "catbot_sim/meshes",
+    "robotName": "catbot",
+    "assemblyName": "ServoBot"
+  }

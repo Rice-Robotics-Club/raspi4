@@ -1,0 +1,14 @@
+{
+    "configuration": "default",
+    "documentId": "ab6b9378919e257e06b5fb64",
+    "documentMicroversion": "9ff874a8ba23f87c6e9209b8",
+    "documentVersion": "d8aec9e50e3a47ad9929ea1c",
+    "elementId": "320b66b8a27915bf40504f8c",
+    "fullConfiguration": "default",
+    "id": "MJ1bakBAGJipDvM24",
+    "isStandardContent": false,
+    "name": "MirrorHipJoint <1>",
+    "partId": "JyD",
+    "suppressed": false,
+    "type": "Part"
+}
