@@ -28,7 +28,7 @@ class IKController:
         self.mult = 180.0 / pi
 
         self.input_trs = np.array(
-            [[1, 1, -1], [1, 1, -1], [1, 1, -1], [1, 1, -1]]
+            [[-1, 1, 1], [-1, 1, 1], [-1, 1, 1], [-1, 1, 1]]
         )
 
         self.output_trs = np.array(
@@ -36,7 +36,7 @@ class IKController:
         )
 
     def solve(self, vec: NDArray) -> NDArray:
-        x, y, z = tuple(vec.tolist())
+        x, z, y = tuple(vec.tolist())
 
         x2_y2 = x**2 + y**2
         dist_xy = sqrt(x2_y2)
@@ -79,8 +79,17 @@ class IKController:
         """
         input_tr: NDArray = self.input_trs[leg]
         output_tr: NDArray = self.output_trs[leg]
+        
+        input = np.array(position) * input_tr
+        
+        try:
+            output = (self.solve(input) * output_tr).tolist()
+            self.legs[leg] = output
+            return output
+        except:
+            return self.legs[leg]
 
-        return (self.solve(np.array(position) * input_tr) * output_tr).tolist()
+            
 
 
 if __name__ == "__main__":

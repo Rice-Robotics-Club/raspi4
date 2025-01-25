@@ -44,7 +44,7 @@ class MultiServoNode(Node):
             if angle >= 0.0 and angle <= self.pca.servo[i].actuation_range:
                 self.pca.servo[i].angle = angle
 
-                self.get_logger().info(f"setting servo #{i} to angle: {angle}")
+                self.get_logger().debug(f"setting servo #{i} to angle: {angle}")
             else:
                 self.get_logger().info(f"angle {angle} out of range for servo #{i}")
 
