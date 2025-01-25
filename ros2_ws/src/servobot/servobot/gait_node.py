@@ -30,8 +30,10 @@ class GaitNode(Node):
         self.msg = Float64MultiArray()
         self.msg.data = []
         
+        self.t = 0.0
         self.angular = 0.0
         self.velocity = (0.0, 0.0)
+        self.origin = (0.0, 0.0, -6.0)
         
     def joy_vel_callback(self, msg: Twist) -> None:
         self.angular = msg.angular.z
@@ -40,7 +42,8 @@ class GaitNode(Node):
     def gait_pos(self, leg: int, t: float, vel: tuple[float, float], ang: float, origin: tuple[float, float, float]) -> tuple[float, float, float]:
         t_leg = (t + self.leg_phase_offsets[leg] * self.gait_period) % self.gait_period
         swing_time = self.gait_period * self.swing_duty
-        amplitude = math.sqrt(vel[0] ** 2 + vel[1] ** 2)
+        amplitude = math.sqrt(vel[0] ** 2 + vel[1] ** 2) + ang
+        amplitude = 1 if amplitude > 1 else amplitude
         angle = math.atan2(vel[1], vel[0])
         
         if t_leg < swing_time / 2:
@@ -67,7 +70,7 @@ class GaitNode(Node):
         positions = []
         
         for i in range(4):
-            positions += list(self.gait_pos(i, self.get_clock().now().seconds_nanoseconds[0], (1, 0))) 
+            positions += list(self.gait_pos(i, self.t, self.velocity, self.angular, self.origin)) 
     
         self.msg.data = positions
         self.leg_positions.publish(self.msg)

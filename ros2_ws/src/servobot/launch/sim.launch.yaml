@@ -1,28 +1,5 @@
 launch:
 
-# - node:
-#     pkg: "testgui"
-#     exec: "gui_node"
-#     name: "gui_node_0"
-
-- node:
-    pkg: "servobot"
-    exec: "multi_servo_node"
-    name: "multi_servo_node_0"
-    param:
-    -
-      name: "test"
-      value: true
-    -
-      name: "count"
-      value: 12
-    - 
-      name: "offsets"
-      value: [57.5, 135.0, 135.0, 55.0, 135.0, 135.0, 57.5, 135.0, 135.0, 65.0, 135.0, 135.0]
-    - 
-      name: "ranges"
-      value: [120.0, 270.0, 270.0, 120.0, 270.0, 270.0, 120.0, 270.0, 270.0, 120.0, 270.0, 270.0]
-
 - node:
     pkg: "servobot"
     exec: "ik_node"
@@ -39,22 +16,17 @@ launch:
       value: 0.70
     - 
       name: "l1"
-      value: 2.80
+      value: 4.375
     -  
       name: "l2"
-      value: 1.80
+      value: 3.0
 
 - node:
     pkg: "servobot"
-    exec: "circle_test_node"
-    name: "circle_test_node_0"
-    param:
-    - 
-      name: "height"
-      value: 4.6
-    - 
-      name: "radius"
-      value: 1.0
-    - 
-      name: "period"
-      value: 5.0
+    exec: "gait_node"
+    name: "gait_node_0"
+
+- node:
+    pkg: "joystick"
+    exec: "joystick_node"
+    name: "joystick_node_0"
