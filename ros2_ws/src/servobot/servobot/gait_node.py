@@ -74,7 +74,6 @@ class GaitNode(Node):
     
         self.msg.data = positions
         self.leg_positions.publish(self.msg)
-        self.get_logger().info(f"Published: {self.msg.data}")
         
         self.t += self.timer_interval
         
