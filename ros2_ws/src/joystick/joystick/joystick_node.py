@@ -8,23 +8,32 @@ class JoystickNode(Node):
         super().__init__('joystick_node')
         
         self.declare_parameter('device_name', '8BitDo Pro 2')
-        
-        devices = [evdev.InputDevice(fn) for fn in evdev.list_devices()]
-        
-        devices = list(filter(lambda d: self.get_parameter('device_name').value == d.name, devices))
-        
-        if len(devices) == 0:
-            self.get_logger().error(f"No device found with name {self.get_parameter('device_name').value}")
-            return
-        
-        self.device = devices[0]
-        
-        self.get_logger().info(f"Found device {self.device.name}")
+        self.add_on_set_parameters_callback(self.parameter_callback)
         
         self.joystick_publisher = self.create_publisher(Twist, '/joy_vel', 10)
-        
         self.joy_msg = Twist()
         
+        self.set_device(self.get_parameter('device_name').value)
+            
+    def parameter_callback(self, params: list[rclpy.parameter.Parameter]) -> None:
+        for param in params:
+            if param.name == 'device_name':
+                self.set_device(param.value)
+        
+    def set_device(self, name: str) -> None:
+        devices = [evdev.InputDevice(fn) for fn in evdev.list_devices()]
+        
+        devices = list(filter(lambda d: name == d.name, devices))
+        
+        if len(devices) == 0:
+            self.get_logger().error(f"No device found with name {name}")
+            return
+        
+        self.get_logger().info(f"Found device {name}")
+        self.device = devices[0]
+        self.joystick_loop()
+        
+    def joystick_loop(self) -> None:
         for event in self.device.read_loop():
             if event.type == evdev.ecodes.EV_ABS:
                 match event.code:
