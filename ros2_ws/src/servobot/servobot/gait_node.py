@@ -1,5 +1,6 @@
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray
+from geometry_msgs.msg import Twist
 import rclpy
 import math
 import typing
@@ -19,9 +20,9 @@ class GaitNode(Node):
             Float64MultiArray, "/leg_positions", 10
         )
         
-        # self.motion_cmd = self.create_subscription(
-        #     Float64MultiArray, "/motion_cmd", self.motion_cmd_callback, 10
-        # )
+        self.motion_cmd = self.create_subscription(
+            Twist, "/joy_vel", self.motion_cmd_callback, 10
+        )
 
         self.timer = self.create_timer(self.timer_interval, self.timer_callback)
 

@@ -12,16 +12,16 @@ launch:
     param:
     -
       name: "test"
-      value: true
+      value: false
     -
       name: "count"
       value: 12
     - 
       name: "offsets"
-      value: [57.5, 135.0, 135.0, 55.0, 135.0, 135.0, 57.5, 135.0, 135.0, 65.0, 135.0, 135.0]
+      value: [138.0, 135.0, 135.0, 138.0, 135.0, 135.0, 140.0, 140.0, 135.0, 135.0, 135.0, 130.0]
     - 
       name: "ranges"
-      value: [120.0, 270.0, 270.0, 120.0, 270.0, 270.0, 120.0, 270.0, 270.0, 120.0, 270.0, 270.0]
+      value: [270.0, 270.0, 270.0, 270.0, 270.0, 270.0, 270.0, 270.0, 270.0, 270.0, 270.0, 270.0]
 
 - node:
     pkg: "servobot"
@@ -39,10 +39,10 @@ launch:
       value: 0.70
     - 
       name: "l1"
-      value: 2.80
+      value: 4.375
     -  
       name: "l2"
-      value: 1.80
+      value: 3.0
 
 - node:
     pkg: "servobot"
@@ -51,11 +51,11 @@ launch:
     param:
     - 
       name: "height"
-      value: 4.6
+      value: 6.0
     - 
       name: "radius"
       value: 1.0
     - 
       name: "period"
-      value: 5.0
+      value: 2.0
 
