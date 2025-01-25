@@ -19,16 +19,17 @@ class GaitNode(Node):
             Float64MultiArray, "/leg_positions", 10
         )
         
-        self.motion_cmd = self.create_subscription(
-            Float64MultiArray, "/motion_cmd", self.motion_cmd_callback, 10
-        )
+        # self.motion_cmd = self.create_subscription(
+        #     Float64MultiArray, "/motion_cmd", self.motion_cmd_callback, 10
+        # )
 
         self.timer = self.create_timer(self.timer_interval, self.timer_callback)
 
         self.msg = Float64MultiArray()
         self.msg.data = []
+        self.t = 0
         
-    def f(self, leg: int, t: float, vel: tuple[float, float]) -> tuple[float, float, float]:
+    def f(self, leg: int, t: float, vel: tuple[float, float], origin: tuple[float, float, float]) -> tuple[float, float, float]:
         t_leg = (t + self.leg_phase_offsets[leg] * self.gait_period) % self.gait_period
         swing_time = self.gait_period * self.swing_duty
         
@@ -51,18 +52,25 @@ class GaitNode(Node):
         x = l * self.swing_length * vel[0] / amplitude
         y = l * self.swing_length * vel[1] / amplitude
         
-        return x, y, z
+        return origin[0] + x, origin[1] + y, origin[2] + z
         
 
     def timer_callback(self) -> None:
         positions = []
         for i in range(4):
-            positions += list(self.f(i, self.get_clock().now().seconds_nanoseconds[0], (1, 0))) 
+            positions += list(self.f(i, self.t, (0, 1), (0, 0, -5.0))) 
     
         self.msg.data = positions
         self.leg_positions.publish(self.msg)
-        self.get_logger().info(f"input position: {positions}")
+        self.get_logger().info(f"Published: {self.msg.data}")
         
-        # update new angle
-        for j in range(0, 4):
-            self.angles[j] += self.delta
+        self.t += self.timer_interval
+        
+def main(args=None):
+    rclpy.init(args=args)
+    node = GaitNode()
+    rclpy.spin(node)
+    rclpy.shutdown()
+    
+if __name__ == "__main__":
+    main()
