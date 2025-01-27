@@ -10,7 +10,7 @@ from rclpy.action import ActionServer, CancelResponse
 class ExampleNode(Node):
     def __init__(self):
         super().__init__("example_node")
-        self.declare_parameter("parameter", 0.1)
+        self.declare_parameter("parameter", 50)
 
         self.create_timer(
             1,
