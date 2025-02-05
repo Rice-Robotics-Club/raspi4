@@ -46,7 +46,7 @@ class JumpNode(Node):
             # jump phases
             self.positions_phase,
             self.poising_phase,
-            self.torque_phase,
+            # self.torque_phase,
             # self.winding_phase, # not needed for now, since we don't have a spring
             self.jumping_phase,
             self.landing_phase,
@@ -152,7 +152,10 @@ class JumpNode(Node):
         self.motor1.set_torque(self.max_torque)
         
         while self.motor0.position > self.torque_pos0 and self.motor1.position < self.torque_pos1:
-            self.wait_seconds(0.05)
+            self.wait_seconds(0.01)
+            
+        self.motor0.set_torque(self.max_torque)
+        self.motor1.set_torque(self.max_torque)
 
     def winding_phase(self):
         """Winds up the spring for the jump. Not needed for now, since we don't have a spring."""
