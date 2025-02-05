@@ -52,7 +52,7 @@ class JumpNode(Node):
             self.landing_phase,
         ]
 
-        # waits for the motors to be ready, and also sets them to closed loop control initally
+        # waits for the motors to be ready, and also sets them to closed loop control initially
         self.motor0.wait_for_axis_state()
         self.motor1.wait_for_axis_state()
 
@@ -62,8 +62,20 @@ class JumpNode(Node):
             Jump,
             "jump",
             self.jump_execute_callback,
-            cancel_callback=lambda goal_handle: CancelResponse.ACCEPT,
+            cancel_callback=self.cancel_callback,
         )
+        
+    def cancel_callback(self, goal_handle: rclpy.action.server.ServerGoalHandle):
+        """Automatically accepts cancel requests for the jump action, and sets both odrives to idle.
+
+        Args:
+            goal_handle (rclpy.action.server.ServerGoalHandle): unused parameter, since this accepts all cancel requests.
+
+        Returns:
+            CancelResponse: CancelResponse.ACCEPT
+        """
+        self.set_axis_idle()
+        return CancelResponse.ACCEPT
 
     def update_parameters(self):
         """Updates all parameters for this node. Should be called at the beginning of each jump."""
@@ -77,7 +89,6 @@ class JumpNode(Node):
         self.normal_pos1 = self.get_parameter("normal_pos1").value
         self.min_pos1 = self.get_parameter("min_pos1").value
         self.max_pos1 = self.get_parameter("max_pos1").value
-        
         self.torque_pos0 = self.get_parameter("torque_pos0").value
         self.torque_pos1 = self.get_parameter("torque_pos1").value
 
