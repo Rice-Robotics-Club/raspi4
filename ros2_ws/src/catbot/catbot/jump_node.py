@@ -46,7 +46,7 @@ class JumpNode(Node):
             # jump phases
             self.positions_phase,
             self.poising_phase,
-            self.torque_phase,
+            # self.torque_phase,
             # self.winding_phase, # not needed for now, since we don't have a spring
             self.jumping_phase,
             self.landing_phase,

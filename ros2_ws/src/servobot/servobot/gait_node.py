@@ -39,7 +39,7 @@ class GaitNode(Node):
             0: math.pi/4,
             1: 3 * math.pi/4,
             2: 7 * math.pi/4,
-            3: 5 * math.pi/4
+            3: math.pi/4
         }
         
     def joy_vel_callback(self, msg: Twist) -> None:
@@ -49,9 +49,9 @@ class GaitNode(Node):
     def gait_pos(self, leg: int, t: float, vel: tuple[float, float], ang: float, origin: tuple[float, float, float]) -> tuple[float, float, float]:
         t_leg = (t + self.leg_phase_offsets[leg] * self.gait_period) % self.gait_period
         swing_time = self.gait_period * self.swing_duty
-        amplitude = math.sqrt(vel[0] ** 2 + vel[1] ** 2) # + ang 
+        amplitude = math.sqrt(vel[0] ** 2 + vel[1] ** 2) + abs(ang) 
         amplitude = 1 if amplitude > 1 else amplitude
-        angle = math.atan2(vel[1], vel[0]) # + (self.turn_angles[leg] if ang > 0.1 else 0)
+        angle = math.atan2(vel[1], vel[0]) + (self.turn_angles[leg] if abs(ang) > 0.1 else 0)
         
         if t_leg < swing_time / 2:
             h = t_leg / (swing_time / 2)
