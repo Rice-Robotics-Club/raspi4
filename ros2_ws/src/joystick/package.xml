@@ -1,19 +1,19 @@
 <?xml version="1.0"?>
 <?xml-model href="http://download.ros.org/schema/package_format3.xsd" schematypens="http://www.w3.org/2001/XMLSchema"?>
 <package format="3">
-  <name>servobot</name>
-  <version>0.0.1</version>
-  <description>A package containing all code for the servobot.</description>
-  <maintainer email="riceroboticsclub@gmail.com">Rice Robotics Club</maintainer>
-  <license>MIT</license>
+  <name>joystick</name>
+  <version>0.0.0</version>
+  <description>TODO: Package description</description>
+  <maintainer email="justin@lopato.org">lopatoj</maintainer>
+  <license>TODO: License declaration</license>
+
+  <depend>rclpy</depend>
+  <depend>evdev</depend>
 
   <test_depend>ament_copyright</test_depend>
   <test_depend>ament_flake8</test_depend>
   <test_depend>ament_pep257</test_depend>
   <test_depend>python3-pytest</test_depend>
-
-  <depend>testgui</depend>
-  <depend>joystick</depend>
 
   <export>
     <build_type>ament_python</build_type>

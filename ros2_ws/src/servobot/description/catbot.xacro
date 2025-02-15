@@ -1,0 +1,941 @@
+<?xml version="1.0"?>
+<robot xmlns:xacro="http://www.ros.org/wiki/xacro" name="catbot">
+    <link name="mainbody">
+        <visual>
+            <origin xyz="-0.039050405919551792189 -0.1803153499960899464 0.25655598676204682818" rpy="3.141592653589793116 -8.3266726846886728206e-17 3.141592653589793116" />
+            <geometry>
+                <mesh filename="package://servobot/description/base.stl"/>
+            </geometry>
+            <material name="base_material">
+                <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="-0.039050405919551792189 -0.1803153499960899464 0.25655598676204682818" rpy="3.141592653589793116 -8.3266726846886728206e-17 3.141592653589793116" />
+            <geometry>
+                <mesh filename="package://servobot/description/base.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="-0.16405040591955188933 -0.1405903499960899361 0.23555598676204680952" rpy="0 8.3266726846886728206e-17 0" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+            <material name="servo_material">
+                <color rgba="0.30196078431372547213 0.30196078431372547213 0.30196078431372547213 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="-0.16405040591955188933 -0.1405903499960899361 0.23555598676204680952" rpy="0 8.3266726846886728206e-17 0" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="-0.16405040591955183382 -0.070040349996089934503 0.23555598676204680952" rpy="3.141592653589793116 8.326672684688671588e-17 1.2325951644078224615e-32" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+            <material name="servo_material">
+                <color rgba="0.30196078431372547213 0.30196078431372547213 0.30196078431372547213 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="-0.16405040591955183382 -0.070040349996089934503 0.23555598676204680952" rpy="3.141592653589793116 8.326672684688671588e-17 1.2325951644078224615e-32" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="-0.074050405919551823275 -0.070040349996089962259 0.23555598676204683728" rpy="8.5528470722950151288e-48 -8.3266726846886691228e-17 -3.141592653589793116" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+            <material name="servo_material">
+                <color rgba="0.30196078431372547213 0.30196078431372547213 0.30196078431372547213 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="-0.074050405919551823275 -0.070040349996089962259 0.23555598676204683728" rpy="8.5528470722950151288e-48 -8.3266726846886691228e-17 -3.141592653589793116" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="-0.074050405919551823275 -0.1405903499960899361 0.23555598676204680952" rpy="3.141592653589793116 -8.3266726846886728206e-17 3.141592653589793116" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+            <material name="servo_material">
+                <color rgba="0.30196078431372547213 0.30196078431372547213 0.30196078431372547213 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="-0.074050405919551823275 -0.1405903499960899361 0.23555598676204680952" rpy="3.141592653589793116 -8.3266726846886728206e-17 3.141592653589793116" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="-0.11905040591955190488 -0.10531534999608997694 0.24437579780986765088" rpy="0 0 0"/>
+            <mass value="0.49394823622559713705" />
+            <inertia ixx="0.0013840746330419674819" ixy="-1.084202172485504434e-19" ixz="7.7927031147395631194e-20" iyy="0.0011298530871705141868" iyz="-6.7762635780344027125e-21" izz="0.0024313774487411490312" />
+        </inertial>
+    </link>
+
+    <link name="hipsubasm">
+        <visual>
+            <origin xyz="0.009999999999999995004 -0.017290000000000027569 -0.016249999999999986677" rpy="-1.570796326794896558 -1.570796326794896336 0" />
+            <geometry>
+                <mesh filename="package://servobot/description/hipjoint.stl"/>
+            </geometry>
+            <material name="hipjoint_material">
+                <color rgba="0.2313725490196078538 0.38039215686274507888 0.7058823529411765163 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.009999999999999995004 -0.017290000000000027569 -0.016249999999999986677" rpy="-1.570796326794896558 -1.570796326794896336 0" />
+            <geometry>
+                <mesh filename="package://servobot/description/hipjoint.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="0.018199999999999022515 -0.018114999999999603641 -0.019999999999999962252" rpy="3.1415926535897926719 -1.4578757702189871054e-16 1.5707963267948981123" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+            <material name="servo_material">
+                <color rgba="0.30196078431372547213 0.30196078431372547213 0.30196078431372547213 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.018199999999999022515 -0.018114999999999603641 -0.019999999999999962252" rpy="3.1415926535897926719 -1.4578757702189871054e-16 1.5707963267948981123" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="-1.3877787807814456755e-17 -2.7755575615628913511e-17 0.0010000000000000008882" rpy="3.141592653589793116 -1.4578757702189525927e-16 1.5707963267948976682" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+            <material name="servohornreplacement_material">
+                <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="-1.3877787807814456755e-17 -2.7755575615628913511e-17 0.0010000000000000008882" rpy="3.141592653589793116 -1.4578757702189525927e-16 1.5707963267948976682" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="-0.0044848749450654163545 -0.0179728161393723114 -0.016098061730134432396" rpy="0 0 0"/>
+            <mass value="0.066123103332140956145" />
+            <inertia ixx="1.8384618926580121391e-05" ixy="9.1018315654018470232e-08" ixz="5.6546937137399404566e-07" iyy="1.4043653005047446121e-05" iyz="-8.5254427329847590665e-08" izz="2.2086490787454833752e-05" />
+        </inertial>
+    </link>
+
+    <link name="toplegasm">
+        <visual>
+            <origin xyz="2.7755575615628913511e-17 2.7755575615628913511e-17 -0.0057999999999999926614" rpy="6.4535680925625176344e-18 1.1053377210876282197e-19 -1.1334232708083540627e-18" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+            <material name="servohornreplacement_material">
+                <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="2.7755575615628913511e-17 2.7755575615628913511e-17 -0.0057999999999999926614" rpy="6.4535680925625176344e-18 1.1053377210876282197e-19 -1.1334232708083540627e-18" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="-2.7755575615628913511e-17 0.055999999999999994227 -0.0078999999999999695466" rpy="1.5707963267949027752 9.7283936021392146528e-17 4.2901527244577466862e-16" />
+            <geometry>
+                <mesh filename="package://servobot/description/toplegcover.stl"/>
+            </geometry>
+            <material name="toplegcover_material">
+                <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="-2.7755575615628913511e-17 0.055999999999999994227 -0.0078999999999999695466" rpy="1.5707963267949027752 9.7283936021392146528e-17 4.2901527244577466862e-16" />
+            <geometry>
+                <mesh filename="package://servobot/description/toplegcover.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="-2.7755575615628913511e-17 0.11199999999999990519 -0.0057999999999999371503" rpy="-2.8269602114824775556e-16 -1.0911851513935710802e-15 -7.0458042872546368885e-16" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+            <material name="servohornreplacement_material">
+                <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="-2.7755575615628913511e-17 0.11199999999999990519 -0.0057999999999999371503" rpy="-2.8269602114824775556e-16 -1.0911851513935710802e-15 -7.0458042872546368885e-16" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="2.7755575615628913511e-17 0.055999999999999966471 -0.0078999999999999695466" rpy="4.7127242992031974377e-16 9.8319183968485824968e-17 4.3206131669943434475e-16" />
+            <geometry>
+                <mesh filename="package://servobot/description/topleg.stl"/>
+            </geometry>
+            <material name="topleg_material">
+                <color rgba="0.2313725490196078538 0.38039215686274507888 0.7058823529411765163 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="2.7755575615628913511e-17 0.055999999999999966471 -0.0078999999999999695466" rpy="4.7127242992031974377e-16 9.8319183968485824968e-17 4.3206131669943434475e-16" />
+            <geometry>
+                <mesh filename="package://servobot/description/topleg.stl"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="1.3736162901867244619e-17 0.05599999999999997341 -0.0036685463244520771439" rpy="0 0 0"/>
+            <mass value="0.025684018857765292254" />
+            <inertia ixx="3.3957308422224581862e-05" ixy="1.4605197478834002945e-20" ixz="-1.4471443186448996313e-20" iyy="1.2113689959083558375e-06" iyz="-2.2765166865918425964e-20" izz="3.4913600077066402234e-05" />
+        </inertial>
+    </link>
+
+    <link name="botlegasm">
+        <visual>
+            <origin xyz="0.010149999999999992362 1.3877787807814456755e-17 -0.040450000000000006783" rpy="-1.570796326794896558 1.8065148292601759323e-18 3.2327904654336294772e-17" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+            <material name="servo_material">
+                <color rgba="0.30196078431372547213 0.30196078431372547213 0.30196078431372547213 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.010149999999999992362 1.3877787807814456755e-17 -0.040450000000000006783" rpy="-1.570796326794896558 1.8065148292601759323e-18 3.2327904654336294772e-17" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="0.031674480000000004853 -6.9388939039072283776e-18 2.5000000000004185541e-05" rpy="1.5707963267948972241 6.736598363117247075e-18 -1.570796326794896558" />
+            <geometry>
+                <mesh filename="package://servobot/description/botleg.stl"/>
+            </geometry>
+            <material name="botleg_material">
+                <color rgba="0.87450980392156862919 0.44705882352941178626 0.31764705882352939348 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.031674480000000004853 -6.9388939039072283776e-18 2.5000000000004185541e-05" rpy="1.5707963267948972241 6.736598363117247075e-18 -1.570796326794896558" />
+            <geometry>
+                <mesh filename="package://servobot/description/botleg.stl"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0.014355235822870536511 3.4914390159032126384e-12 -0.017241727750089003157" rpy="0 0 0"/>
+            <mass value="0.054645620986758416948" />
+            <inertia ixx="1.0916296677110458714e-05" ixy="7.8802063165292541799e-16" ixz="-3.3092987108633480716e-06" iyy="3.0288527521158881335e-05" iyz="-3.1738908324763525493e-15" izz="2.4422062954015746769e-05" />
+        </inertial>
+    </link>
+
+    <joint name="BR_BotLeg" type="revolute">
+        <origin xyz="-2.7755575615628913511e-17 0.11199999999999990519 5.5511151231257827021e-17" rpy="-3.1415926535897886751 -7.0938256185667662878e-15 0.58170270124798439948" />
+        <parent link="toplegasm" />
+        <child link="botlegasm" />
+        <axis xyz="0 0 1"/>
+        <limit effort="1" velocity="20" />
+        <joint_properties friction="0.0"/>
+    </joint>
+
+    <joint name="BR_TopLeg" type="revolute">
+        <origin xyz="-0.022249999999999943434 -0.028264999999999401714 -0.019999999999999990008" rpy="-1.5707963267948958919 -1.5476780753609129526 -1.5707963267949160979" />
+        <parent link="hipsubasm" />
+        <child link="toplegasm" />
+        <axis xyz="0 0 1"/>
+        <limit effort="1" velocity="20" lower="-1.570796326794896558" upper="1.570796326794896558"/>
+        <joint_properties friction="0.0"/>
+    </joint>
+
+    <joint name="BR_Hip" type="revolute">
+        <origin xyz="-0.063900405919551844791 -0.18684034999608994942 0.23555598676204686504" rpy="1.570796326794896558 -0.041547970194335065441 3.141592653589793116" />
+        <parent link="mainbody" />
+        <child link="hipsubasm" />
+        <axis xyz="0 0 1"/>
+        <limit effort="1" velocity="20" lower="-0.785398163397448279" upper="0.785398163397448279"/>
+        <joint_properties friction="0.0"/>
+    </joint>
+
+    <link name="mirroredhipsubasm">
+        <visual>
+            <origin xyz="0.018199999999999966205 0.018114999999999936708 -0.020000000000000017764" rpy="-2.6082961837183532655e-16 -1.7701259958948961988e-16 -1.5707963267948961139" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+            <material name="servo_material">
+                <color rgba="0.30196078431372547213 0.30196078431372547213 0.30196078431372547213 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.018199999999999966205 0.018114999999999936708 -0.020000000000000017764" rpy="-2.6082961837183532655e-16 -1.7701259958948961988e-16 -1.5707963267948961139" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="0.0099999999999999811262 0.017289999999999972058 -0.023749999999999993339" rpy="1.570796326794896558 1.570796326794896336 0" />
+            <geometry>
+                <mesh filename="package://servobot/description/mirrorhipjoint.stl"/>
+            </geometry>
+            <material name="mirrorhipjoint_material">
+                <color rgba="0.2313725490196078538 0.38039215686274507888 0.7058823529411765163 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.0099999999999999811262 0.017289999999999972058 -0.023749999999999993339" rpy="1.570796326794896558 1.570796326794896336 0" />
+            <geometry>
+                <mesh filename="package://servobot/description/mirrorhipjoint.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="0 -2.7755575615628913511e-17 0.0010000000000000286438" rpy="-3.1415926535897926719 9.9992864631340462803e-17 3.141592653589793116" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+            <material name="servohornreplacement_material">
+                <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 -2.7755575615628913511e-17 0.0010000000000000286438" rpy="-3.1415926535897926719 9.9992864631340462803e-17 3.141592653589793116" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="-0.0044848749450651335946 0.017972816139372491812 -0.016098061730134460151" rpy="0 0 0"/>
+            <mass value="0.066123103332140956145" />
+            <inertia ixx="1.8384618926580538131e-05" ixy="-9.101831565405955133e-08" ixz="5.654693713740800195e-07" iyy="1.4043653005047930624e-05" iyz="8.5254427329908709386e-08" izz="2.2086490787454935396e-05" />
+        </inertial>
+    </link>
+
+    <link name="toplegasm_2">
+        <visual>
+            <origin xyz="0 2.7755575615628913511e-17 -0.0057999999999999996003" rpy="-8.7266791005281888125e-19 3.0532008149613898383e-32 2.0260783014953721174e-31" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+            <material name="servohornreplacement_material">
+                <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 2.7755575615628913511e-17 -0.0057999999999999996003" rpy="-8.7266791005281888125e-19 3.0532008149613898383e-32 2.0260783014953721174e-31" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="8.3266726846886740532e-17 0.056000000000000382805 -0.0078999999999998515854" rpy="1.5707963267948996666 -5.4942891350651959144e-18 1.8059105904150631138e-18" />
+            <geometry>
+                <mesh filename="package://servobot/description/toplegcover.stl"/>
+            </geometry>
+            <material name="toplegcover_material">
+                <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="8.3266726846886740532e-17 0.056000000000000382805 -0.0078999999999998515854" rpy="1.5707963267948996666 -5.4942891350651959144e-18 1.8059105904150631138e-18" />
+            <geometry>
+                <mesh filename="package://servobot/description/toplegcover.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="1.9428902930940239457e-16 0.11200000000000062683 -0.0057999999999996110223" rpy="3.5133189178907857781e-15 7.0556949157424066037e-21 3.469768556812397091e-18" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+            <material name="servohornreplacement_material">
+                <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="1.9428902930940239457e-16 0.11200000000000062683 -0.0057999999999996110223" rpy="3.5133189178907857781e-15 7.0556949157424066037e-21 3.469768556812397091e-18" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="8.3266726846886740532e-17 0.056000000000000327294 -0.0078999999999998238298" rpy="3.5098494709388321639e-15 1.2747625593706508062e-21 1.7348578419795400101e-18" />
+            <geometry>
+                <mesh filename="package://servobot/description/topleg.stl"/>
+            </geometry>
+            <material name="topleg_material">
+                <color rgba="0.2313725490196078538 0.38039215686274507888 0.7058823529411765163 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="8.3266726846886740532e-17 0.056000000000000327294 -0.0078999999999998238298" rpy="3.5098494709388321639e-15 1.2747625593706508062e-21 1.7348578419795400101e-18" />
+            <geometry>
+                <mesh filename="package://servobot/description/topleg.stl"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="7.8537835927160718487e-17 0.056000000000000341172 -0.0036685463244519214525" rpy="0 0 0"/>
+            <mass value="0.025684018857765292254" />
+            <inertia ixx="3.3957308422224920675e-05" ixy="-2.0629561261755546244e-21" ixz="5.2531036313452856353e-20" iyy="1.2113689959083712958e-06" iyz="-3.7847965899051524873e-21" izz="3.4913600077066578417e-05" />
+        </inertial>
+    </link>
+
+    <link name="botlegasm_2">
+        <visual>
+            <origin xyz="0.010149999999999992362 1.3877787807814456755e-17 -0.040449999999999985967" rpy="-1.570796326794896558 8.055100413464512593e-22 1.7056915740222492149e-18" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+            <material name="servo_material">
+                <color rgba="0.30196078431372547213 0.30196078431372547213 0.30196078431372547213 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.010149999999999992362 1.3877787807814456755e-17 -0.040449999999999985967" rpy="-1.570796326794896558 8.055100413464512593e-22 1.7056915740222492149e-18" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="0.031674480000000032609 0 2.4999999999997246647e-05" rpy="1.570796326794896558 3.1787495007411310963e-16 -1.570796326794896336" />
+            <geometry>
+                <mesh filename="package://servobot/description/botleg.stl"/>
+            </geometry>
+            <material name="botleg_material">
+                <color rgba="0.87450980392156862919 0.44705882352941178626 0.31764705882352939348 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.031674480000000032609 0 2.4999999999997246647e-05" rpy="1.570796326794896558 3.1787495007411310963e-16 -1.570796326794896336" />
+            <geometry>
+                <mesh filename="package://servobot/description/botleg.stl"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0.01435523582287053998 3.4914399578262060761e-12 -0.017241727750088992749" rpy="0 0 0"/>
+            <mass value="0.054645620986758416948" />
+            <inertia ixx="1.091629667711044855e-05" ixy="7.8801665499142670343e-16" ixz="-3.3092987108633302839e-06" iyy="3.0288527521159030412e-05" iyz="-3.1738829266149533627e-15" izz="2.4422062954015750157e-05" />
+        </inertial>
+    </link>
+
+    <joint name="BL_BotLeg" type="revolute">
+        <origin xyz="1.9428902930940239457e-16 0.11200000000000062683 3.8857805861880478915e-16" rpy="3.1415926535897926719 -1.0243549092722601103e-15 3.1262445307774839875" />
+        <parent link="toplegasm_2" />
+        <child link="botlegasm_2" />
+        <axis xyz="0 0 1"/>
+        <limit effort="1" velocity="20" />
+        <joint_properties friction="0.0"/>
+    </joint>
+
+    <joint name="BL_TopLeg" type="revolute">
+        <origin xyz="-0.022250000000000019762 0.02826499999999992907 -0.020000000000000017764" rpy="1.0152967728242205898e-15 1.5707963267948952257 0" />
+        <parent link="mirroredhipsubasm" />
+        <child link="toplegasm_2" />
+        <axis xyz="0 0 1"/>
+        <limit effort="1" velocity="20" lower="-1.570796326794896558" upper="1.570796326794896558"/>
+        <joint_properties friction="0.0"/>
+    </joint>
+
+    <joint name="BL_Hip" type="revolute">
+        <origin xyz="-0.17420040591955210374 -0.18684034999608997718 0.23555598676204667075" rpy="-1.57079632679489678 0.0117328984293165791 1.2601170739682348073e-15" />
+        <parent link="mainbody" />
+        <child link="mirroredhipsubasm" />
+        <axis xyz="0 0 1"/>
+        <limit effort="1" velocity="20" lower="-0.785398163397448279" upper="0.785398163397448279"/>
+        <joint_properties friction="0.0"/>
+    </joint>
+
+    <link name="mirroredhipsubasm_2">
+        <visual>
+            <origin xyz="0.018199999999999896816 0.018115000000000103242 -0.020000000000000014294" rpy="-2.6082961837181299193e-16 -1.7701259958947004627e-16 -1.570796326794896336" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+            <material name="servo_material">
+                <color rgba="0.30196078431372547213 0.30196078431372547213 0.30196078431372547213 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.018199999999999896816 0.018115000000000103242 -0.020000000000000014294" rpy="-2.6082961837181299193e-16 -1.7701259958947004627e-16 -1.570796326794896336" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="0.009999999999999995004 0.017289999999999999813 -0.023750000000000003747" rpy="1.570796326794896558 1.570796326794896336 0" />
+            <geometry>
+                <mesh filename="package://servobot/description/mirrorhipjoint.stl"/>
+            </geometry>
+            <material name="mirrorhipjoint_material">
+                <color rgba="0.2313725490196078538 0.38039215686274507888 0.7058823529411765163 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.009999999999999995004 0.017289999999999999813 -0.023750000000000003747" rpy="1.570796326794896558 1.570796326794896336 0" />
+            <geometry>
+                <mesh filename="package://servobot/description/mirrorhipjoint.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="-1.3877787807814456755e-17 0 0.00099999999999999741873" rpy="-3.141592653589793116 -8.5063560020394949213e-16 -3.141592653589793116" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+            <material name="servohornreplacement_material">
+                <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="-1.3877787807814456755e-17 0 0.00099999999999999741873" rpy="-3.141592653589793116 -8.5063560020394949213e-16 -3.141592653589793116" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="-0.0044848749450651778301 0.017972816139372616712 -0.016098061730134460151" rpy="0 0 0"/>
+            <mass value="0.066123103332140956145" />
+            <inertia ixx="1.8384618926580541519e-05" ixy="-9.1018315654073249441e-08" ixz="5.6546937137406360824e-07" iyy="1.4043653005047911989e-05" iyz="8.5254427329935179166e-08" izz="2.2086490787454918455e-05" />
+        </inertial>
+    </link>
+
+    <link name="toplegasm_3">
+        <visual>
+            <origin xyz="0 0 -0.0057999999999999926614" rpy="6.7942467602186101967e-19 8.0579397599774070036e-32 -1.2664528845269139064e-32" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+            <material name="servohornreplacement_material">
+                <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 -0.0057999999999999926614" rpy="6.7942467602186101967e-19 8.0579397599774070036e-32 -1.2664528845269139064e-32" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="2.4286128663675299322e-17 0.056000000000001437517 -0.0079000000000000458744" rpy="1.5707963267948978903 -1.1134776791955550731e-15 9.2917581050318985147e-17" />
+            <geometry>
+                <mesh filename="package://servobot/description/toplegcover.stl"/>
+            </geometry>
+            <material name="toplegcover_material">
+                <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="2.4286128663675299322e-17 0.056000000000001437517 -0.0079000000000000458744" rpy="1.5707963267948978903 -1.1134776791955550731e-15 9.2917581050318985147e-17" />
+            <geometry>
+                <mesh filename="package://servobot/description/toplegcover.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="9.5843472047718591966e-17 0.11200000000000286116 -0.0058000000000000065392" rpy="3.4267672224138618857e-15 -3.9512971347930942641e-15 7.9037649853328943305e-17" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+            <material name="servohornreplacement_material">
+                <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="9.5843472047718591966e-17 0.11200000000000286116 -0.0058000000000000065392" rpy="3.4267672224138618857e-15 -3.9512971347930942641e-15 7.9037649853328943305e-17" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="6.8521577301083880229e-17 0.056000000000001437517 -0.0079000000000000528133" rpy="1.2726230873573110323e-15 -1.1134776791955550731e-15 9.2917581050318972821e-17" />
+            <geometry>
+                <mesh filename="package://servobot/description/topleg.stl"/>
+            </geometry>
+            <material name="topleg_material">
+                <color rgba="0.2313725490196078538 0.38039215686274507888 0.7058823529411765163 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="6.8521577301083880229e-17 0.056000000000001437517 -0.0079000000000000528133" rpy="1.2726230873573110323e-15 -1.1134776791955550731e-15 9.2917581050318972821e-17" />
+            <geometry>
+                <mesh filename="package://servobot/description/topleg.stl"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="5.4815080311377476443e-17 0.056000000000001451395 -0.0036685463244520480873" rpy="0 0 0"/>
+            <mass value="0.025684018857765292254" />
+            <inertia ixx="3.3957308422224663177e-05" ixy="2.0666754946936252272e-21" ixz="2.4445301591710026212e-20" iyy="1.2113689959084200002e-06" iyz="3.3627625392044776383e-20" izz="3.4913600077068258931e-05" />
+        </inertial>
+    </link>
+
+    <link name="botlegasm_3">
+        <visual>
+            <origin xyz="0.010150000000000001035 0 -0.040450000000000006783" rpy="-1.570796326794896558 7.6524612521867894126e-19 3.9767968679596653297e-18" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+            <material name="servo_material">
+                <color rgba="0.30196078431372547213 0.30196078431372547213 0.30196078431372547213 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.010150000000000001035 0 -0.040450000000000006783" rpy="-1.570796326794896558 7.6524612521867894126e-19 3.9767968679596653297e-18" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="0.031674480000000011792 -1.3877787807814456755e-17 2.5000000000004185541e-05" rpy="1.570796326794896558 -6.7338341974110647865e-18 -1.570796326794896558" />
+            <geometry>
+                <mesh filename="package://servobot/description/botleg.stl"/>
+            </geometry>
+            <material name="botleg_material">
+                <color rgba="0.87450980392156862919 0.44705882352941178626 0.31764705882352939348 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.031674480000000011792 -1.3877787807814456755e-17 2.5000000000004185541e-05" rpy="1.570796326794896558 -6.7338341974110647865e-18 -1.570796326794896558" />
+            <geometry>
+                <mesh filename="package://servobot/description/botleg.stl"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0.014355235822870545184 3.4914256349853136889e-12 -0.017241727750089006627" rpy="0 0 0"/>
+            <mass value="0.054645620986758416948" />
+            <inertia ixx="1.091629667711045702e-05" ixy="7.8802065449818725101e-16" ixz="-3.3092987108633463775e-06" iyy="3.0288527521158888111e-05" iyz="-3.1738840311530187002e-15" izz="2.4422062954015739993e-05" />
+        </inertial>
+    </link>
+
+    <joint name="FR_BotLeg" type="revolute">
+        <origin xyz="9.4108748571741784872e-17 0.11200000000000287503 3.0531133177191804862e-16" rpy="-3.1415926535897922278 -4.3401406628148288015e-16 -0.14343495739683284618" />
+        <parent link="toplegasm_3" />
+        <child link="botlegasm_3" />
+        <axis xyz="0 0 1"/>
+        <limit effort="1" velocity="20" />
+        <joint_properties friction="0.0"/>
+    </joint>
+
+    <joint name="FR_TopLeg" type="revolute">
+        <origin xyz="-0.022250000000000103029 0.028265000000000067848 -0.020000000000000007355" rpy="-2.696149045489602097e-16 1.5707963267948956698 0" />
+        <parent link="mirroredhipsubasm_2" />
+        <child link="toplegasm_3" />
+        <axis xyz="0 0 1"/>
+        <limit effort="1" velocity="20" lower="-1.570796326794896558" upper="1.570796326794896558"/>
+        <joint_properties friction="0.0"/>
+    </joint>
+
+    <joint name="FR_Hip" type="revolute">
+        <origin xyz="-0.063900405919551941936 -0.023790349996089938528 0.23555598676204683728" rpy="-1.570796326794896558 -0.082892067804055696856 -3.141592653589793116" />
+        <parent link="mainbody" />
+        <child link="mirroredhipsubasm_2" />
+        <axis xyz="0 0 1"/>
+        <limit effort="1" velocity="20" lower="-0.785398163397448279" upper="0.785398163397448279"/>
+        <joint_properties friction="0.0"/>
+    </joint>
+
+    <link name="hipsubasm_2">
+        <visual>
+            <origin xyz="0.010000000000000008882 -0.017289999999999999813 -0.016250000000000004025" rpy="-1.570796326794896558 -1.570796326794896336 0" />
+            <geometry>
+                <mesh filename="package://servobot/description/hipjoint.stl"/>
+            </geometry>
+            <material name="hipjoint_material">
+                <color rgba="0.2313725490196078538 0.38039215686274507888 0.7058823529411765163 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.010000000000000008882 -0.017289999999999999813 -0.016250000000000004025" rpy="-1.570796326794896558 -1.570796326794896336 0" />
+            <geometry>
+                <mesh filename="package://servobot/description/hipjoint.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="0.018199999999999771916 -0.018114999999999853442 -0.020000000000000000416" rpy="3.141592653589793116 -1.7701259958947012023e-16 1.5707963267949021091" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+            <material name="servo_material">
+                <color rgba="0.30196078431372547213 0.30196078431372547213 0.30196078431372547213 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.018199999999999771916 -0.018114999999999853442 -0.020000000000000000416" rpy="3.141592653589793116 -1.7701259958947012023e-16 1.5707963267949021091" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="8.3266726846886740532e-17 -8.3266726846886740532e-17 0.00099999999999999741873" rpy="-3.141592653589793116 -2.8675843948170604383e-16 1.5707963267948974462" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+            <material name="servohornreplacement_material">
+                <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="8.3266726846886740532e-17 -8.3266726846886740532e-17 0.00099999999999999741873" rpy="-3.141592653589793116 -2.8675843948170604383e-16 1.5707963267948974462" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="-0.0044848749450651734932 -0.017972816139372453648 -0.016098061730134456682" rpy="0 0 0"/>
+            <mass value="0.066123103332140956145" />
+            <inertia ixx="1.8384618926580439875e-05" ixy="9.1018315654003991263e-08" ixz="5.6546937137399923374e-07" iyy="1.4043653005047835756e-05" iyz="-8.5254427329923003067e-08" izz="2.2086490787454908291e-05" />
+        </inertial>
+    </link>
+
+    <link name="toplegasm_4">
+        <visual>
+            <origin xyz="0 0 -0.0057999999999999996003" rpy="7.5160013437390121629e-18 -7.6387646900497724963e-20 -1.5053115700625736801e-17" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+            <material name="servohornreplacement_material">
+                <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0 0 -0.0057999999999999996003" rpy="7.5160013437390121629e-18 -7.6387646900497724963e-20 -1.5053115700625736801e-17" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="2.0816681711721685133e-17 0.055999999999999022782 -0.0079000000000006287415" rpy="1.5707963267948821251 -1.6729811401829660442e-15 -2.6266809264166584501e-16" />
+            <geometry>
+                <mesh filename="package://servobot/description/toplegcover.stl"/>
+            </geometry>
+            <material name="toplegcover_material">
+                <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="2.0816681711721685133e-17 0.055999999999999022782 -0.0079000000000006287415" rpy="1.5707963267948821251 -1.6729811401829660442e-15 -2.6266809264166584501e-16" />
+            <geometry>
+                <mesh filename="package://servobot/description/toplegcover.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="2.0816681711721685133e-17 0.11199999999999782352 -0.0058000000000013596235" rpy="-3.8631057178554569328e-15 -1.5108548980867523676e-15 -1.5627294902063848932e-15" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+            <material name="servohornreplacement_material">
+                <color rgba="0.61568627450980395466 0.81176470588235294379 0.92941176470588238168 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="2.0816681711721685133e-17 0.11199999999999782352 -0.0058000000000013596235" rpy="-3.8631057178554569328e-15 -1.5108548980867523676e-15 -1.5627294902063848932e-15" />
+            <geometry>
+                <mesh filename="package://servobot/description/servohornreplacement.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="2.7755575615628913511e-17 0.055999999999998939515 -0.0079000000000006564971" rpy="-1.2142976704490132923e-14 -1.6867908295571865296e-15 -2.0149246966698327638e-16" />
+            <geometry>
+                <mesh filename="package://servobot/description/topleg.stl"/>
+            </geometry>
+            <material name="topleg_material">
+                <color rgba="0.2313725490196078538 0.38039215686274507888 0.7058823529411765163 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="2.7755575615628913511e-17 0.055999999999998939515 -0.0079000000000006564971" rpy="-1.2142976704490132923e-14 -1.6867908295571865296e-15 -2.0149246966698327638e-16" />
+            <geometry>
+                <mesh filename="package://servobot/description/topleg.stl"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="2.0832920427240510942e-17 0.055999999999998946454 -0.003668546324452771467" rpy="0 0 0"/>
+            <mass value="0.025684018857765292254" />
+            <inertia ixx="3.3957308422225435671e-05" ixy="-6.5115555069448644326e-21" ixz="9.5339284384694466486e-20" iyy="1.2113689959083113683e-06" iyz="1.9107590002115889317e-20" izz="3.4913600077066226052e-05" />
+        </inertial>
+    </link>
+
+    <link name="botlegasm_4">
+        <visual>
+            <origin xyz="0.010149999999999999301 -1.3877787807814456755e-17 -0.040449999999999985967" rpy="-1.570796326794896558 2.4506026367203964676e-18 1.3197822279268751318e-17" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+            <material name="servo_material">
+                <color rgba="0.30196078431372547213 0.30196078431372547213 0.30196078431372547213 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.010149999999999999301 -1.3877787807814456755e-17 -0.040449999999999985967" rpy="-1.570796326794896558 2.4506026367203964676e-18 1.3197822279268751318e-17" />
+            <geometry>
+                <mesh filename="package://servobot/description/servo.stl"/>
+            </geometry>
+        </collision>
+        <visual>
+            <origin xyz="0.031674480000000004853 -4.1633363423443370266e-17 2.4999999999997246647e-05" rpy="1.570796326794896558 4.9951935681386821951e-18 -1.570796326794896558" />
+            <geometry>
+                <mesh filename="package://servobot/description/botleg.stl"/>
+            </geometry>
+            <material name="botleg_material">
+                <color rgba="0.87450980392156862919 0.44705882352941178626 0.31764705882352939348 1.0"/>
+            </material>
+        </visual>
+        <collision>
+            <origin xyz="0.031674480000000004853 -4.1633363423443370266e-17 2.4999999999997246647e-05" rpy="1.570796326794896558 4.9951935681386821951e-18 -1.570796326794896558" />
+            <geometry>
+                <mesh filename="package://servobot/description/botleg.stl"/>
+            </geometry>
+        </collision>
+        <inertial>
+            <origin xyz="0.01435523582287054345 3.491409584334777763e-12 -0.017241727750088992749" rpy="0 0 0"/>
+            <mass value="0.054645620986758416948" />
+            <inertia ixx="1.0916296677110445162e-05" ixy="7.8802240644793594371e-16" ixz="-3.3092987108633387542e-06" iyy="3.0288527521158867782e-05" iyz="-3.173887956368437763e-15" izz="2.4422062954015821308e-05" />
+        </inertial>
+    </link>
+
+    <joint name="FL_BotLeg" type="revolute">
+        <origin xyz="4.1633363423443370266e-17 0.11199999999999782352 -1.3322676295501878485e-15" rpy="-3.1415926535897784611 4.6425528594852074692e-15 2.9239169939649158891" />
+        <parent link="toplegasm_4" />
+        <child link="botlegasm_4" />
+        <axis xyz="0 0 1"/>
+        <limit effort="1" velocity="20" />
+        <joint_properties friction="0.0"/>
+    </joint>
+
+    <joint name="FL_TopLeg" type="revolute">
+        <origin xyz="-0.022249999999999825473 -0.028264999999999845803 -0.020000000000000003886" rpy="1.570796326794896558 -1.4084388595620607187 1.5707963267949249797" />
+        <parent link="hipsubasm_2" />
+        <child link="toplegasm_4" />
+        <axis xyz="0 0 1"/>
+        <limit effort="1" velocity="20" lower="-1.570796326794896558" upper="1.570796326794896558"/>
+        <joint_properties friction="0.0"/>
+    </joint>
+
+    <joint name="FL_Hip" type="revolute">
+        <origin xyz="-0.17420040591955185394 -0.023790349996089921181 0.23555598676204680952" rpy="1.570796326794896558 0.053772588985834847419 2.2234000273411940108e-16" />
+        <parent link="mainbody" />
+        <child link="hipsubasm_2" />
+        <axis xyz="0 0 1"/>
+        <limit effort="1" velocity="20" lower="-0.785398163397448279" upper="0.785398163397448279"/>
+        <joint_properties friction="0.0"/>
+    </joint>
+
+
+    <ros2_control name="CatbotIgnition" type="system">
+        <hardware>
+            <plugin>ign_ros2_control/IgnitionSystem</plugin>
+        </hardware>
+        <joint name="BR_BotLeg">
+            <command_interface name="position"/>
+            <state_interface name="position">
+                <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+        <joint name="BR_TopLeg">
+            <command_interface name="position"/>
+            <state_interface name="position">
+                <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+        <joint name="BR_Hip">
+            <command_interface name="position"/>
+            <state_interface name="position">
+                <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+
+        <joint name="BL_BotLeg">
+            <command_interface name="position"/>
+            <state_interface name="position">
+                <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+        <joint name="BL_TopLeg">
+            <command_interface name="position"/>
+            <state_interface name="position">
+                <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+        <joint name="BL_Hip">
+            <command_interface name="position"/>
+            <state_interface name="position">
+                <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+
+        <joint name="FR_BotLeg">
+            <command_interface name="position"/>
+            <state_interface name="position">
+                <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+        <joint name="FR_TopLeg">
+            <command_interface name="position"/>
+            <state_interface name="position">
+                <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+        <joint name="FR_Hip">
+            <command_interface name="position"/>
+            <state_interface name="position">
+                <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+
+        <joint name="FL_BotLeg">
+            <command_interface name="position"/>
+            <state_interface name="position">
+                <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+        <joint name="FL_TopLeg">
+            <command_interface name="position"/>
+            <state_interface name="position">
+                <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+        <joint name="FL_Hip">
+            <command_interface name="position"/>
+            <state_interface name="position">
+                <param name="initial_value">0.0</param>
+            </state_interface>
+            <state_interface name="velocity"/>
+            <state_interface name="effort"/>
+        </joint>
+    </ros2_control>
+
+    <gazebo>
+        <plugin filename="ign_ros2_control-system" name="ign_ros2_control::IgnitionROS2ControlPlugin">
+            <parameters>$(find servobot)/config/catbot_controller.yaml</parameters>
+        </plugin>
+    </gazebo>
+</robot>
