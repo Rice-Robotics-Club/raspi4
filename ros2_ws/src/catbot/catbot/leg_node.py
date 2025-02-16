@@ -26,6 +26,9 @@ class LegNode(Node):
         self.l1 = 0.225
         self.l2 = 0.159
 
+        self.p = 2.0
+        self.target = np.array([[-0.03528624], [-0.05729014]])
+
         # initializes the ODriveController objects for each motor
         self.motor0 = ODriveController(
             self,
@@ -47,28 +50,109 @@ class LegNode(Node):
         self.create_timer(self.get_parameter("dt").value, self._timer_callback)
 
     def _timer_callback(self):
-        torques = (
-            self.jacobian(self.motor0.angle, self.motor1.angle).T
-            @ np.array([0, -1])
-        ).T.tolist()
+        """Finds difference between target position and current position, and uses this
+        foot force input to leg jacobian to calculate torques to move foot towards target.
+        """
 
-        self.get_logger().info(f"torques: {torques}")
+        end_force = self.target - self.forward()
+        torques = (self.jacobian().T @ end_force).T.tolist()
 
-        if self.motor0.angle < 4.0: 
-            self.motor0.set_torque(-(torques[0]))
-            self.motor1.set_torque(-(torques[1]))
-        else:
-            self.motor0.set_torque(0.0)
-            self.motor1.set_torque(0.0)
+        self.motor0.set_torque(-(torques[0]))
+        self.motor1.set_torque(-(torques[1]))
 
-    def jacobian(self, th1, th2):
+    def forward(self) -> np.ndarray:
+        """Calculates the foot position based on the current angles of the motors.
+
+        Returns:
+            np.ndarray: 2D column vector of the foot position
+        """
         a1 = self.a1
         a2 = self.a2
         a3 = self.a3
         a4 = self.a4
         l1 = self.l1
         l2 = self.l2
-        
+        th1 = self.motor0.angle
+        th2 = self.motor1.angle
+
+        return np.array(
+            [
+                [
+                    -l1
+                    * math.cos(
+                        math.acos(
+                            -(
+                                -(a1**2)
+                                + 2 * a1 * a2 * math.cos(th1)
+                                - a2**2
+                                + a3**2
+                                - a4**2
+                            )
+                            / (
+                                2
+                                * a4
+                                * math.sqrt(
+                                    a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2
+                                )
+                            )
+                        )
+                        - math.asin(
+                            a2
+                            * math.sin(th1)
+                            / math.sqrt(
+                                a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2
+                            )
+                        )
+                    )
+                    + l2 * math.cos(th2)
+                ],
+                [
+                    -l1
+                    * math.sin(
+                        math.acos(
+                            -(
+                                -(a1**2)
+                                + 2 * a1 * a2 * math.cos(th1)
+                                - a2**2
+                                + a3**2
+                                - a4**2
+                            )
+                            / (
+                                2
+                                * a4
+                                * math.sqrt(
+                                    a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2
+                                )
+                            )
+                        )
+                        - math.asin(
+                            a2
+                            * math.sin(th1)
+                            / math.sqrt(
+                                a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2
+                            )
+                        )
+                    )
+                    + l2 * math.sin(th2)
+                ],
+            ]
+        )
+
+    def jacobian(self) -> np.ndarray:
+        """Calculates the Jacobian matrix of the leg based on the current angles of the motors.
+
+        Returns:
+            np.ndarray: 2x2 Jacobian matrix
+        """
+        a1 = self.a1
+        a2 = self.a2
+        a3 = self.a3
+        a4 = self.a4
+        l1 = self.l1
+        l2 = self.l2
+        th1 = self.motor0.angle
+        th2 = self.motor1.angle
+
         # it works, and faster than the previous way
         return np.array(
             [
