@@ -1,4 +1,4 @@
-from math import pi, sqrt, asin, asin, acos, cos, sin, atan
+from math import sqrt, asin, asin, acos, cos, sin
 import sys
 import typing
 import numpy as np
@@ -31,12 +31,12 @@ class FKController:
     def solve(self, vec: NDArray) -> NDArray:
         m0, m1 = tuple(vec.tolist())
 
-        b1 = self.a1s + self.a2s - 2 * self.a1 * self.a2 * cos(m0)
-        sqrt_b1 = sqrt(b1)
+        b1s = self.a1s + self.a2s - 2 * self.a1 * self.a2 * cos(m0)
+        b1 = sqrt(b1)
 
-        phi = acos(
-            (self.a3**2 - self.a4s - b1) / (2 * self.a4 * sqrt_b1)
-        ) + asin((self.a2 * sin(m0)) / sqrt_b1)
+        phi = acos((self.a3s - self.a4s - b1s) / (2 * self.a4 * b1)) + asin(
+            (self.a2 * sin(m0)) / b1
+        )
 
         e_x = -self.l1 * cos(phi) + self.l2 * cos(m1)
         e_y = -self.l1 * sin(phi) - self.l2 * sin(m1)
