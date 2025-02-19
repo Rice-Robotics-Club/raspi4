@@ -50,3 +50,4 @@ for r in results:
 # show the output image after AprilTag detection
 cv2.imshow("Image", image)
 cv2.waitKey(0)
+cv2.destroyAllWindows()
