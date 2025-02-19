@@ -14,12 +14,20 @@ ret, frame = cam.read()
 # If frame is captured without errors
 if ret:
     #frame contains image
-    image = cv2.imread(frame)
+    image = frame
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
 
-    ptions = apriltag.DetectorOptions(families="tag36h11")
+    cv2.imshow("Image", image)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    options = apriltag.DetectorOptions(families="tag36h11")
     detector = apriltag.Detector(options)
     results = detector.detect(gray)
+
+    camera_params = [633.40, 631.73, 318.52, 247.11]
+    print(detector.detection_pose(results[0],camera_params, 0.173))
+    print("[INFO] {} total AprilTags detected".format(len(results)))
 
     for r in results:
         # extract the bounding box (x, y)-coordinates for the AprilTag
