@@ -3,6 +3,7 @@ from rclpy.node import Node
 from odrive_can.srv import AxisState
 from odrive_can.msg import ControlMessage, ControllerStatus
 from odrive.enums import AxisState as AxisStates, InputMode, ControlMode
+import math
 
 
 class ODriveController:
@@ -10,18 +11,18 @@ class ODriveController:
         self,
         parent: Node,
         namespace: str,
-        min_position=-1.0,
-        max_position=1.0,
+        gear_ratio: float,
+        angle_offset: float,  # in radians
     ):
         self.parent = parent
         self.namespace = namespace
 
-        self.min_position = min_position
-        self.max_position = max_position
+        self.gear_ratio = gear_ratio
+        self.angle_offset = angle_offset
 
-        self.position = 0.0
-        self.velocity = 0.0
-        self.torque = 0.0
+        self.angle = angle_offset  # in radians
+        self.velocity = 0.0  # in radians / second
+        self.torque = 0.0  # in Nm
 
         self.axis_state_client = self.parent.create_client(
             AxisState, f"/{self.namespace}/request_axis_state"
@@ -56,15 +57,13 @@ class ODriveController:
         Args:
             msg (ControllerStatus): interface provided by ODrive containing motor values
         """
-        self.position = msg.pos_estimate
+        self.angle = (
+            (-msg.pos_estimate / self.gear_ratio) * math.tau
+        ) + self.angle_offset
         self.velocity = msg.vel_estimate
         self.torque = msg.torque_estimate
 
-        # if (
-        #     self.position < self.min_position
-        #     or self.position > self.max_position
-        # ):
-        #     self.request_axis_state(AxisStates.IDLE)
+        # self.parent.get_logger().info(f"{self.namespace} angle: {self.angle}")
 
     def request_axis_state(self, state: AxisStates):
         self.axis_state_request.axis_requested_state = int(state)
@@ -81,7 +80,7 @@ class ODriveController:
         self.control_message.input_mode = InputMode.PASSTHROUGH
         self.control_message.input_torque = torque
         self.control_message_publisher.publish(self.control_message)
-        
+
     def ramp_torque(self, torque: float):
         """Publishes a torque control message to the ODrive
 
@@ -103,7 +102,7 @@ class ODriveController:
         self.control_message.input_mode = InputMode.PASSTHROUGH
         self.control_message.input_vel = velocity
         self.control_message_publisher.publish(self.control_message)
-        
+
     def ramp_velocity(self, velocity: float):
         """Publishes a velocity control message to the ODrive
 

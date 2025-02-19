@@ -26,12 +26,8 @@ class IKController:
         self.d = self.a1**2
 
         self.mult = 180.0 / pi
-
-        self.input_trs = np.array(
-            [[1, 1, 1], [-1, 1, 1], [1, 1, 1], [-1, 1, 1]]
-        )
         
-        self.input_trans = np.array([self.a3, self.a1, 0])
+        self.input_tr = np.array([self.a3, self.a1, 0])
 
         self.output_trs = np.array(
             [[1, 1, 1], [1, -1, -1], [-1, 1, 1], [-1, -1, -1]]
@@ -79,10 +75,9 @@ class IKController:
         Returns:
             tuple[float, float, float]: angles for servo
         """
-        input_tr: NDArray = self.input_trs[leg]
         output_tr: NDArray = self.output_trs[leg]
         
-        input = (np.array(position) * input_tr) + self.input_trans
+        input = (np.array(position) + self.input_tr)
         
         try:
             output = (self.solve(input) * output_tr).tolist()
