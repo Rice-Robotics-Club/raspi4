@@ -17,7 +17,8 @@ class LegNode(Node):
     def __init__(self):
         super().__init__("jump_node")
 
-        self.declare_parameter("dt", 0.03)
+        self.declare_parameter("dt", 0.01)
+        self.max_torque = self.declare_parameter("max_torque", 5.0).value
 
         self.a1 = 0.129
         self.a2 = 0.080
@@ -25,6 +26,8 @@ class LegNode(Node):
         self.a4 = 0.180
         self.l1 = 0.225
         self.l2 = 0.159
+        
+        self.motor0_max_angle = 3 * math.pi / 2
 
         self.p = 2.0
         self.target = np.array([[-0.03528624], [-0.05729014]])
@@ -53,12 +56,20 @@ class LegNode(Node):
         """Finds difference between target position and current position, and uses this
         foot force input to leg jacobian to calculate torques to move foot towards target.
         """
+        
+        torques = (self.jacobian().T @ np.array([[0], [-1]])).T.tolist()
+        
+        ratio = self.max_torque / max(abs(t) for t in torques)
+        
+        torques = [t * ratio for t in torques]
 
-        end_force = self.target - self.forward()
-        torques = (self.jacobian().T @ end_force).T.tolist()
+        if self.motor0.angle < self.motor0_max_angle:
+            self.motor0.set_torque(-(torques[0]))
+            self.motor1.set_torque(-(torques[1]))
+        else:
+            self.motor0.set_torque(0.0)
+            self.motor1.set_torque(0.0)
 
-        self.motor0.set_torque(-(torques[0]))
-        self.motor1.set_torque(-(torques[1]))
 
     def forward(self) -> np.ndarray:
         """Calculates the foot position based on the current angles of the motors.
