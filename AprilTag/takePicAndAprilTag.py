@@ -1,5 +1,6 @@
 import cv2
 import apriltag
+# import time
 
 # Initialize the camera (0 is usually the default camera)
 cam = cv2.VideoCapture(0)
@@ -8,8 +9,13 @@ cam = cv2.VideoCapture(0)
 if not cam.isOpened():
     raise IOError("Cannot open webcam")
 
+# time.sleep(.25)
+for i in range(5):
+    ret, frame = cam.read()
+
+
 # Capture a frame
-ret, frame = cam.read()
+# ret, frame = cam.read()
 
 # If frame is captured without errors
 if ret:
@@ -21,12 +27,23 @@ if ret:
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
+
+
     options = apriltag.DetectorOptions(families="tag36h11")
+    #options = apriltag.DetectorOptions(refine_edges=False, quad_contours=False) #to address to many contours
     detector = apriltag.Detector(options)
     results = detector.detect(gray)
 
+
+    if (len(results) == 0):
+        print("No AprilTag")
+        exit(1)
+
     camera_params = [633.40, 631.73, 318.52, 247.11]
-    print(detector.detection_pose(results[0],camera_params, 0.173))
+    matrix, error1, error2 = detector.detection_pose(results[0],camera_params, 0.173)
+    print(matrix)
+    Tx, Ty, Tz = matrix[0, 3], matrix[1, 3], matrix[2, 3] 
+    print(f"Position right {Tx:.3f}m, up {Ty:.3f}m, forward {Tz:.3f}m")     
     print("[INFO] {} total AprilTags detected".format(len(results)))
 
     for r in results:
@@ -57,6 +74,7 @@ if ret:
     cv2.destroyAllWindows()
 else:
     print("Failed to capture image")
+
 
 # Release the camera
 cam.release()
