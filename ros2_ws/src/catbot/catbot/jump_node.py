@@ -157,7 +157,7 @@ class JumpNode(Node):
         self.wait_seconds(2)
 
     def jumping_phase(self):
-        rate = rclpy.timer.Rate(self.create_timer(0.01, None))
+        rate = rclpy.timer.Rate(self.create_timer(0.01, None), self.context)
         
         while self.motor0.angle < 3 * math.pi / 2:
             torques = (self.jacobianT() @ np.array([[0], [-1]])).T
