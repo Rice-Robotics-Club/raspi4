@@ -24,8 +24,6 @@ class IKController:
         self.b = 2 * self.l1 * self.l2
         self.c = 2 * self.a1
         self.d = self.a1**2
-
-        self.mult = 180.0 / pi
         
         self.input_tr = np.array([self.a3, self.a1, 0])
 
@@ -54,7 +52,7 @@ class IKController:
         )
         th2 = acos((sin(th3) * self.l2 * (y - self.a1) + b) / a)
 
-        return np.array([self.mult * th1, self.mult * th2, self.mult * th3])
+        return np.array([th1, th2, th3])
 
     def solve_leg(
         self, position: list[float, float, float], leg: int

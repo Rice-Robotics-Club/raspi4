@@ -9,11 +9,11 @@ class GaitNode(Node):
     def __init__(self):
         super().__init__("gait_node")
 
-        self.swing_height = self.declare_parameter("swing_height", 2.0).value # inches
-        self.swing_length = self.declare_parameter("swing_length", 1.0).value # inches
-        self.swing_duty = self.declare_parameter("swing_duty", 0.1).value # 0.5 is 50% duty cycle
-        self.gait_period = self.declare_parameter("gait_period", 1.0).value # seconds
-        self.leg_phase_offsets = self.declare_parameter("leg_phase_offsets", [0.0, 0.5, 0.7, 0.2]).value # [0.0, 1.0]
+        self.swing_height = self.declare_parameter("swing_height", 5.0).value # inches
+        self.swing_length = self.declare_parameter("swing_length", 3.0).value # inches
+        self.swing_duty = self.declare_parameter("swing_duty", 0.2).value # 0.5 is 50% duty cycle
+        self.gait_period = self.declare_parameter("gait_period", 0.5).value # seconds
+        self.leg_phase_offsets = self.declare_parameter("leg_phase_offsets", [0.0, 0.5, 0.75, 0.25]).value # [0.0, 1.0]
         self.timer_interval = self.declare_parameter("timer_interval", 0.01).value # seconds
 
         self.leg_positions = self.create_publisher(
@@ -32,7 +32,7 @@ class GaitNode(Node):
         self.t = 0.0
         self.angular = 0.0
         self.velocity = (0.0, 0.0)
-        self.origin = (0.0, 0.0, -6.5)
+        self.origin = (0.0, 0.0, -6.7)
         
         self.turn_angles = {
             0: 7 * math.pi/4,
