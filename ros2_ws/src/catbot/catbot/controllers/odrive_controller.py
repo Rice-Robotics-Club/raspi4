@@ -1,4 +1,5 @@
 import rclpy
+import rclpy.callback_groups
 from rclpy.node import Node
 from odrive_can.srv import AxisState
 from odrive_can.msg import ControlMessage, ControllerStatus
@@ -13,6 +14,7 @@ class ODriveController:
         namespace: str,
         gear_ratio: float,
         angle_offset: float,  # in radians
+        callback_group: rclpy.callback_groups.CallbackGroup,
     ):
         self.parent = parent
         self.namespace = namespace
@@ -25,7 +27,9 @@ class ODriveController:
         self.torque = 0.0  # in Nm
 
         self.axis_state_client = self.parent.create_client(
-            AxisState, f"/{self.namespace}/request_axis_state"
+            AxisState,
+            f"/{self.namespace}/request_axis_state",
+            callback_group=callback_group,
         )
         self.axis_state_request = AxisState.Request()
 
@@ -34,10 +38,14 @@ class ODriveController:
             f"/{self.namespace}/controller_status",
             self._controller_status_callback,
             10,
+            callback_group=callback_group,
         )
 
         self.control_message_publisher = self.parent.create_publisher(
-            ControlMessage, f"/{self.namespace}/control_message", 10
+            ControlMessage,
+            f"/{self.namespace}/control_message",
+            10,
+            callback_group=callback_group,
         )
         self.control_message = ControlMessage()
         self.control_message.input_mode = InputMode.PASSTHROUGH

@@ -1,5 +1,6 @@
 import rclpy
 import rclpy.action
+import rclpy.callback_groups
 from rclpy.node import Node
 from rclpy.action import ActionServer
 from rclpy.duration import Duration
@@ -43,12 +44,14 @@ class JumpNode(Node):
             namespace="odrive_axis0",
             gear_ratio=self.gear_ratio,
             angle_offset=2.70526030718,
+            callback_group=rclpy.callback_groups.MutuallyExclusiveCallbackGroup()
         )
         self.motor1 = ODriveController(
             self,
             namespace="odrive_axis1",
             gear_ratio=self.gear_ratio,
             angle_offset=5.84685330718,
+            callback_group=rclpy.callback_groups.MutuallyExclusiveCallbackGroup()
         )
 
         # defines the sequence of phases for a jump
@@ -71,20 +74,9 @@ class JumpNode(Node):
             Jump,
             "jump",
             self.jump_execute_callback,
-            cancel_callback=self.cancel_callback,
+            cancel_callback= lambda _: CancelResponse.ACCEPT,
+            callback_group=rclpy.callback_groups.MutuallyExclusiveCallbackGroup()
         )
-        
-    def cancel_callback(self, goal_handle: rclpy.action.server.ServerGoalHandle):
-        """Automatically accepts cancel requests for the jump action, and sets both odrives to idle.
-
-        Args:
-            goal_handle (rclpy.action.server.ServerGoalHandle): unused parameter, since this accepts all cancel requests.
-
-        Returns:
-            CancelResponse: CancelResponse.ACCEPT
-        """
-        self.set_axis_idle()
-        return CancelResponse.ACCEPT
 
     def update_parameters(self):
         """Updates all parameters for this node. Should be called at the beginning of each jump."""
@@ -142,6 +134,7 @@ class JumpNode(Node):
 
     def set_axis_idle(self):
         """Sets both ODrives to idle."""
+        self.get_logger().info("setting ODrives to IDLE")
         self.motor0.request_axis_state(AxisStates.IDLE)
         self.motor1.request_axis_state(AxisStates.IDLE)
 
@@ -157,21 +150,19 @@ class JumpNode(Node):
         self.wait_seconds(2)
 
     def jumping_phase(self):
-        rate = rclpy.timer.Rate(self.create_timer(0.01, None), self.context)
-        
-        while self.motor0.angle < 3 * math.pi / 2:
-            torques = (self.jacobianT() @ np.array([[0], [-1]])).T
+        for _ in range(20):
+            torques = (self.jacobianT() @ np.array([[0], [-1]])).flatten()
         
             ratio = self.max_torque / torques.max()
             
-            torques *= ratio
+            # torques *= ratio
             
-            self.get_logger().info(f"{torques[0]} {torques[1]}")
+            self.get_logger().info(f"{self.motor0.angle}")
 
-            # self.motor0.set_torque(-(torques[0]))
-            # self.motor1.set_torque(-(torques[1]))
+            self.motor0.set_torque(-(torques[0]))
+            self.motor1.set_torque(-(torques[1]))
             
-            rate.sleep()
+            self.wait_seconds(0.01)
         
     def forward(self) -> np.ndarray:
         """Calculates the foot position based on the current angles of the motors.
@@ -460,12 +451,14 @@ class JumpNode(Node):
         """Moves both linkages back to their default positions."""
         self.motor0.set_position(self.normal_pos0)
         self.motor1.set_position(self.normal_pos1)
+        self.wait_seconds(10)
 
 
 def main(args=None):
     rclpy.init(args=args)
     jump_node = JumpNode()
-    rclpy.spin(jump_node, executor=rclpy.executors.MultiThreadedExecutor())
+    executor=rclpy.executors.MultiThreadedExecutor()
+    rclpy.spin(jump_node, executor=executor)
     jump_node.destroy_node()
     rclpy.shutdown()
 
