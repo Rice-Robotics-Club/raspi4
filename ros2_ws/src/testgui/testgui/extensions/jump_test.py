@@ -3,6 +3,7 @@ from rclpy.action import ActionClient
 from catbot_msg.action import Jump
 import threading
 import rclpy
+import rclpy.callback_groups
 from rclpy.node import Node
 
 
@@ -12,10 +13,20 @@ class JumpTest(tk.LabelFrame):
         self.window = master
         self.parent = parent
 
+        callback_group = rclpy.callback_groups.ReentrantCallbackGroup()
+
         self.goal_handle: rclpy.action.client.ClientGoalHandle = None
-        self.jump_client = ActionClient(self.parent, Jump, "/jump")
+        self.jump_client = ActionClient(
+            self.parent, Jump, "/jump", callback_group=callback_group
+        )
 
         buttons = tk.Frame(self)
+
+        self.torque_label = tk.Label(buttons, text="Torque")
+        self.torque_label.pack(side=tk.LEFT, padx=10, pady=0)
+
+        self.torque = tk.Entry(buttons)
+        self.torque.pack(side=tk.LEFT, padx=10, pady=0)
 
         self.jump = tk.Button(
             buttons,
@@ -59,7 +70,8 @@ class JumpTest(tk.LabelFrame):
 
         self.jump_client.wait_for_server()
         future = self.jump_client.send_goal_async(
-            Jump.Goal(), feedback_callback=self._jump_feedback
+            Jump.Goal(max_torque=float(self.torque.get())),
+            feedback_callback=self._jump_feedback,
         )
         rclpy.spin_until_future_complete(self.parent, future)
 

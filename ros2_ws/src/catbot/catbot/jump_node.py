@@ -44,20 +44,20 @@ class JumpNode(Node):
         self.fk = FKController(a1, a2, a3, a4, l1, l2)
 
         # initializes the ODriveController objects for each motor
-        self.motor0 = ODriveController(
-            self,
-            namespace="odrive_axis0",
-            gear_ratio=self.gear_ratio,
-            angle_offset=2.70526030718,
-            callback_group=rclpy.callback_groups.ReentrantCallbackGroup(),
-        )
-        self.motor1 = ODriveController(
-            self,
-            namespace="odrive_axis1",
-            gear_ratio=self.gear_ratio,
-            angle_offset=5.84685330718,
-            callback_group=rclpy.callback_groups.ReentrantCallbackGroup(),
-        )
+        # self.motor0 = ODriveController(
+        #     self,
+        #     namespace="odrive_axis0",
+        #     gear_ratio=self.gear_ratio,
+        #     angle_offset=2.70526030718,
+        #     callback_group=rclpy.callback_groups.ReentrantCallbackGroup(),
+        # )
+        # self.motor1 = ODriveController(
+        #     self,
+        #     namespace="odrive_axis1",
+        #     gear_ratio=self.gear_ratio,
+        #     angle_offset=5.84685330718,
+        #     callback_group=rclpy.callback_groups.ReentrantCallbackGroup(),
+        # )
 
         # defines the sequence of phases for a jump
         self.phases: list[Callable[[Jump.Goal], None]] = [
@@ -70,8 +70,8 @@ class JumpNode(Node):
         ]
 
         # waits for the motors to be ready, and also sets them to closed loop control initially
-        self.motor0.wait_for_axis_state()
-        self.motor1.wait_for_axis_state()
+        # self.motor0.wait_for_axis_state()
+        # self.motor1.wait_for_axis_state()
 
         # initializes the action server for the jump action, which always accepts cancel requests
         self.jump_action = ActionServer(
@@ -83,7 +83,7 @@ class JumpNode(Node):
             callback_group=rclpy.callback_groups.ReentrantCallbackGroup(),
         )
 
-    def update_parameters(self):
+    def update_parameters(self, result: Jump.Goal = None):
         """Updates all parameters for this node. Should be called at the beginning of each jump."""
         self.gear_ratio = self.get_parameter("gear_ratio").value
         self.max_torque = self.get_parameter("max_torque").value
@@ -129,50 +129,53 @@ class JumpNode(Node):
     def set_axis_idle(self, request: Jump.Goal):
         """Sets both ODrives to idle."""
         self.get_logger().info("setting ODrives to IDLE")
-        self.motor0.request_axis_state(AxisStates.IDLE)
-        self.motor1.request_axis_state(AxisStates.IDLE)
+        # self.motor0.request_axis_state(AxisStates.IDLE)
+        # self.motor1.request_axis_state(AxisStates.IDLE)
 
     def set_axis_closed_loop_control(self, request: Jump.Goal):
         """Sets both ODrives to closed loop control."""
         self.get_logger().info("setting ODrives to CLOSED_LOOP_CONTROL")
-        self.motor0.request_axis_state(AxisStates.CLOSED_LOOP_CONTROL)
-        self.motor1.request_axis_state(AxisStates.CLOSED_LOOP_CONTROL)
+        # self.motor0.request_axis_state(AxisStates.CLOSED_LOOP_CONTROL)
+        # self.motor1.request_axis_state(AxisStates.CLOSED_LOOP_CONTROL)
 
     def poising_phase(self, request: Jump.Goal):
         """Moves both linkages to their minimum positions, in preparation for the jump."""
-        self.motor0.set_position(self.min_pos0)
-        self.motor1.set_position(self.min_pos1)
+        # self.motor0.set_position(self.min_pos0)
+        # self.motor1.set_position(self.min_pos1)
         self.wait_seconds(2)
 
     def jumping_phase(self, request: Jump.Goal):
-        """Calculates leg jacobian based on current motor angles, and uses transpose of 
+        """Calculates leg jacobian based on current motor angles, and uses transpose of
         jacobian to calculate torques required to exert downward force at the foot. Then
         scales up this torque vector to maximum torque limits.
         """
         max_torque = min(self.max_torque, request.max_torque)
-        
-        while self.motor0.angle < 3 * np.pi / 2:
-            th1 = self.motor0.angle
-            th2 = self.motor1.angle
 
-            try:
-                torques = (
-                    self.fk.jacobian(th1, th2).T @ np.array([[0], [-1]])
-                ).flatten()
+        i = 0.0
+        while i < 3 * np.pi / 2:
+            # th1 = self.motor0.angle
+            # th2 = self.motor1.angle
 
-                torques *= max_torque / torques.max()
+            # try:
+            #     torques = (
+            #         self.fk.jacobian(th1, th2).T @ np.array([[0], [-1]])
+            #     ).flatten()
 
-                self.motor0.set_torque(-(torques[0]))
-                self.motor1.set_torque(-(torques[1]))
-            except:
-                break
+            #     torques *= max_torque / torques.max()
+
+            #     self.motor0.set_torque(-(torques[0]))
+            #     self.motor1.set_torque(-(torques[1]))
+            # except:
+            #     break
+
+            i += 0.1
 
             self.rate.sleep()
 
     def landing_phase(self, request: Jump.Goal):
         """Moves both linkages back to their default positions."""
-        self.motor0.set_position(self.normal_pos0)
-        self.motor1.set_position(self.normal_pos1)
+        # self.motor0.set_position(self.normal_pos0)
+        # self.motor1.set_position(self.normal_pos1)
         self.wait_seconds(10)
 
 

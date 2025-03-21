@@ -46,6 +46,9 @@ class GUINode(Node):
         """Refreshes the node list and node views. First destroys all node views, then 
         searches for all nodes on the network, then creates a model and view for each node.
         """
+        if self.jump_test.goal_handle:
+            return
+        
         # Destroy all present node views
         for node_view in self.node_views:
             node_view.destroy()
@@ -80,7 +83,7 @@ def main():
     root = tk.Tk()
     node = GUINode(root)
     root.mainloop()
-    rclpy.spin(node)
+    threading.Thread(target=rclpy.spin, args=(node, rclpy.executors.MultiThreadedExecutor()))
     node.destroy_node()
     rclpy.shutdown()
 

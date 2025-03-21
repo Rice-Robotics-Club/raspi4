@@ -1,4 +1,6 @@
 import rclpy
+import rclpy.callback_groups
+import rclpy.executors
 from rclpy.node import Node
 import rclpy.parameter
 from ros2node.api import NodeName
@@ -21,15 +23,17 @@ class NodeModel:
         self.namespace: str = node_name.namespace
         self.full_name: str = node_name.full_name
         self.parameters: dict[str, ParameterModel] = {}
+        
+        callback_group = rclpy.callback_groups.ReentrantCallbackGroup()
 
         self.set_client = self.parent.create_client(
-            SetParameters, f"{self.full_name}/set_parameters"
+            SetParameters, f"{self.full_name}/set_parameters", callback_group=callback_group
         )
         self.get_client = self.parent.create_client(
-            GetParameters, f"{self.full_name}/get_parameters"
+            GetParameters, f"{self.full_name}/get_parameters", callback_group=callback_group
         )
         self.list_client = self.parent.create_client(
-            ListParameters, f"{self.full_name}/list_parameters"
+            ListParameters, f"{self.full_name}/list_parameters", callback_group=callback_group
         )
 
         self.set_parameters_req = SetParameters.Request()
