@@ -1,4 +1,5 @@
-float32 height
+float32 max_torque # Nm
+float32 height # m
 ---
 bool complete
 ---

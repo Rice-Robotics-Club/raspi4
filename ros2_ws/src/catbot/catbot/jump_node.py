@@ -6,11 +6,12 @@ from rclpy.action import ActionServer
 from rclpy.duration import Duration
 import rclpy.timer
 from .controllers.odrive_controller import ODriveController
+from .controllers.fk_controller import FKController
 from catbot_msg.action import Jump
 from odrive.enums import AxisState as AxisStates
 from rclpy.action import CancelResponse
+from collections.abc import Callable
 import numpy as np
-import math
 import typing
 
 
@@ -21,22 +22,26 @@ class JumpNode(Node):
         # declares all parameters for this node
         self.declare_parameter("gear_ratio", 8.0)
         self.declare_parameter("max_torque", 10.0)
-        
+
         self.declare_parameter("normal_pos0", -1.0)
         self.declare_parameter("normal_pos1", 0.5)
-        
+
         self.declare_parameter("min_pos0", 0.0)
         self.declare_parameter("min_pos1", 0.0)
-        
+
         # initalizes fields corresponding to each parameter
         self.update_parameters()
 
-        self.a1 = 0.129
-        self.a2 = 0.080
-        self.a3 = 0.104
-        self.a4 = 0.180
-        self.l1 = 0.225
-        self.l2 = 0.159
+        self.rate = self.create_rate(60)
+
+        a1 = 0.129
+        a2 = 0.080
+        a3 = 0.104
+        a4 = 0.180
+        l1 = 0.225
+        l2 = 0.159
+
+        self.fk = FKController(a1, a2, a3, a4, l1, l2)
 
         # initializes the ODriveController objects for each motor
         self.motor0 = ODriveController(
@@ -44,24 +49,24 @@ class JumpNode(Node):
             namespace="odrive_axis0",
             gear_ratio=self.gear_ratio,
             angle_offset=2.70526030718,
-            callback_group=rclpy.callback_groups.MutuallyExclusiveCallbackGroup()
+            callback_group=rclpy.callback_groups.ReentrantCallbackGroup(),
         )
         self.motor1 = ODriveController(
             self,
             namespace="odrive_axis1",
             gear_ratio=self.gear_ratio,
             angle_offset=5.84685330718,
-            callback_group=rclpy.callback_groups.MutuallyExclusiveCallbackGroup()
+            callback_group=rclpy.callback_groups.ReentrantCallbackGroup(),
         )
 
         # defines the sequence of phases for a jump
-        self.phases = [
+        self.phases: list[Callable[[Jump.Goal], None]] = [
             self.update_parameters,  # should always be first, since phases depend on parameters
             self.set_axis_closed_loop_control,  # enables closed loop control if previously set to idle
             self.poising_phase,
             self.jumping_phase,
             self.landing_phase,
-            self.set_axis_idle
+            self.set_axis_idle,
         ]
 
         # waits for the motors to be ready, and also sets them to closed loop control initially
@@ -74,8 +79,8 @@ class JumpNode(Node):
             Jump,
             "jump",
             self.jump_execute_callback,
-            cancel_callback= lambda _: CancelResponse.ACCEPT,
-            callback_group=rclpy.callback_groups.MutuallyExclusiveCallbackGroup()
+            cancel_callback=lambda _: CancelResponse.ACCEPT,
+            callback_group=rclpy.callback_groups.ReentrantCallbackGroup(),
         )
 
     def update_parameters(self):
@@ -86,17 +91,6 @@ class JumpNode(Node):
         self.min_pos0 = self.get_parameter("min_pos0").value
         self.normal_pos1 = self.get_parameter("normal_pos1").value
         self.min_pos1 = self.get_parameter("min_pos1").value
-
-    def angle_to_position(self, angle: float) -> float:
-        """Converts an angle in degrees to a motor position in rotations.
-
-        Args:
-            angle (float): The angle in degrees
-
-        Returns:
-            float: The motor position in rotations
-        """
-        return angle / (self.gear_ratio * 360)
 
     def wait_seconds(self, seconds: float):
         """Sleeps for a given number of seconds.
@@ -121,10 +115,10 @@ class JumpNode(Node):
             if goal_handle.is_cancel_requested:
                 self.get_logger().info(f"goal {goal_handle.goal_id} canceled")
                 goal_handle.canceled()
-                self.set_axis_idle()
                 return Jump.Result(complete=False)
 
-            phase()
+            phase(goal_handle.request)
+
             goal_handle.publish_feedback(
                 Jump.Feedback(phase=f"{phase.__name__} completed")
             )
@@ -132,322 +126,50 @@ class JumpNode(Node):
         goal_handle.succeed()
         return Jump.Result(complete=True)
 
-    def set_axis_idle(self):
+    def set_axis_idle(self, request: Jump.Goal):
         """Sets both ODrives to idle."""
         self.get_logger().info("setting ODrives to IDLE")
         self.motor0.request_axis_state(AxisStates.IDLE)
         self.motor1.request_axis_state(AxisStates.IDLE)
 
-    def set_axis_closed_loop_control(self):
+    def set_axis_closed_loop_control(self, request: Jump.Goal):
         """Sets both ODrives to closed loop control."""
+        self.get_logger().info("setting ODrives to CLOSED_LOOP_CONTROL")
         self.motor0.request_axis_state(AxisStates.CLOSED_LOOP_CONTROL)
         self.motor1.request_axis_state(AxisStates.CLOSED_LOOP_CONTROL)
 
-    def poising_phase(self):
+    def poising_phase(self, request: Jump.Goal):
         """Moves both linkages to their minimum positions, in preparation for the jump."""
         self.motor0.set_position(self.min_pos0)
         self.motor1.set_position(self.min_pos1)
         self.wait_seconds(2)
 
-    def jumping_phase(self):
-        for _ in range(20):
-            torques = (self.jacobianT() @ np.array([[0], [-1]])).flatten()
-        
-            ratio = self.max_torque / torques.max()
-            
-            # torques *= ratio
-            
-            self.get_logger().info(f"{self.motor0.angle}")
-
-            self.motor0.set_torque(-(torques[0]))
-            self.motor1.set_torque(-(torques[1]))
-            
-            self.wait_seconds(0.01)
-        
-    def forward(self) -> np.ndarray:
-        """Calculates the foot position based on the current angles of the motors.
-
-        Returns:
-            np.ndarray: 2D column vector of the foot position
+    def jumping_phase(self, request: Jump.Goal):
+        """Calculates leg jacobian based on current motor angles, and uses transpose of 
+        jacobian to calculate torques required to exert downward force at the foot. Then
+        scales up this torque vector to maximum torque limits.
         """
-        a1 = self.a1
-        a2 = self.a2
-        a3 = self.a3
-        a4 = self.a4
-        l1 = self.l1
-        l2 = self.l2
-        th1 = self.motor0.angle
-        th2 = self.motor1.angle
+        max_torque = min(self.max_torque, request.max_torque)
+        
+        while self.motor0.angle < 3 * np.pi / 2:
+            th1 = self.motor0.angle
+            th2 = self.motor1.angle
 
-        return np.array(
-            [
-                [
-                    -l1
-                    * math.cos(
-                        math.acos(
-                            -(
-                                -(a1**2)
-                                + 2 * a1 * a2 * math.cos(th1)
-                                - a2**2
-                                + a3**2
-                                - a4**2
-                            )
-                            / (
-                                2
-                                * a4
-                                * math.sqrt(
-                                    a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2
-                                )
-                            )
-                        )
-                        - math.asin(
-                            a2
-                            * math.sin(th1)
-                            / math.sqrt(
-                                a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2
-                            )
-                        )
-                    )
-                    + l2 * math.cos(th2)
-                ],
-                [
-                    -l1
-                    * math.sin(
-                        math.acos(
-                            -(
-                                -(a1**2)
-                                + 2 * a1 * a2 * math.cos(th1)
-                                - a2**2
-                                + a3**2
-                                - a4**2
-                            )
-                            / (
-                                2
-                                * a4
-                                * math.sqrt(
-                                    a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2
-                                )
-                            )
-                        )
-                        - math.asin(
-                            a2
-                            * math.sin(th1)
-                            / math.sqrt(
-                                a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2
-                            )
-                        )
-                    )
-                    + l2 * math.sin(th2)
-                ],
-            ]
-        )
+            try:
+                torques = (
+                    self.fk.jacobian(th1, th2).T @ np.array([[0], [-1]])
+                ).flatten()
 
-    def jacobianT(self) -> np.ndarray:
-        """Calculates the Jacobian transpose matrix of the leg based on the current angles of the motors.
+                torques *= max_torque / torques.max()
 
-        Returns:
-            np.ndarray: 2x2 Jacobian matrix
-        """
-        a1 = self.a1
-        a2 = self.a2
-        a3 = self.a3
-        a4 = self.a4
-        l1 = self.l1
-        l2 = self.l2
-        th1 = self.motor0.angle
-        th2 = self.motor1.angle
+                self.motor0.set_torque(-(torques[0]))
+                self.motor1.set_torque(-(torques[1]))
+            except:
+                break
 
-        # it works, and faster than the previous way
-        return np.array(
-            [
-                [
-                    l1
-                    * (
-                        -(
-                            -a1
-                            * a2**2
-                            * math.sin(th1) ** 2
-                            / (a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2)
-                            ** (3 / 2)
-                            + a2
-                            * math.cos(th1)
-                            / math.sqrt(
-                                a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2
-                            )
-                        )
-                        / math.sqrt(
-                            -(a2**2)
-                            * math.sin(th1) ** 2
-                            / (a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2)
-                            + 1
-                        )
-                        - (
-                            a1
-                            * a2
-                            * math.sin(th1)
-                            / (
-                                a4
-                                * math.sqrt(
-                                    a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2
-                                )
-                            )
-                            + a1
-                            * a2
-                            * (
-                                -(a1**2)
-                                + 2 * a1 * a2 * math.cos(th1)
-                                - a2**2
-                                + a3**2
-                                - a4**2
-                            )
-                            * math.sin(th1)
-                            / (
-                                2
-                                * a4
-                                * (a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2)
-                                ** (3 / 2)
-                            )
-                        )
-                        / math.sqrt(
-                            1
-                            - (
-                                -(a1**2)
-                                + 2 * a1 * a2 * math.cos(th1)
-                                - a2**2
-                                + a3**2
-                                - a4**2
-                            )
-                            ** 2
-                            / (
-                                4
-                                * a4**2
-                                * (a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2)
-                            )
-                        )
-                    )
-                    * math.sin(
-                        math.acos(
-                            -(
-                                -(a1**2)
-                                + 2 * a1 * a2 * math.cos(th1)
-                                - a2**2
-                                + a3**2
-                                - a4**2
-                            )
-                            / (
-                                2
-                                * a4
-                                * math.sqrt(
-                                    a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2
-                                )
-                            )
-                        )
-                        - math.asin(
-                            a2
-                            * math.sin(th1)
-                            / math.sqrt(
-                                a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2
-                            )
-                        )
-                    ),
-                    -l1
-                    * (
-                        -(
-                            -a1
-                            * a2**2
-                            * math.sin(th1) ** 2
-                            / (a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2)
-                            ** (3 / 2)
-                            + a2
-                            * math.cos(th1)
-                            / math.sqrt(
-                                a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2
-                            )
-                        )
-                        / math.sqrt(
-                            -(a2**2)
-                            * math.sin(th1) ** 2
-                            / (a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2)
-                            + 1
-                        )
-                        - (
-                            a1
-                            * a2
-                            * math.sin(th1)
-                            / (
-                                a4
-                                * math.sqrt(
-                                    a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2
-                                )
-                            )
-                            + a1
-                            * a2
-                            * (
-                                -(a1**2)
-                                + 2 * a1 * a2 * math.cos(th1)
-                                - a2**2
-                                + a3**2
-                                - a4**2
-                            )
-                            * math.sin(th1)
-                            / (
-                                2
-                                * a4
-                                * (a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2)
-                                ** (3 / 2)
-                            )
-                        )
-                        / math.sqrt(
-                            1
-                            - (
-                                -(a1**2)
-                                + 2 * a1 * a2 * math.cos(th1)
-                                - a2**2
-                                + a3**2
-                                - a4**2
-                            )
-                            ** 2
-                            / (
-                                4
-                                * a4**2
-                                * (a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2)
-                            )
-                        )
-                    )
-                    * math.cos(
-                        math.acos(
-                            -(
-                                -(a1**2)
-                                + 2 * a1 * a2 * math.cos(th1)
-                                - a2**2
-                                + a3**2
-                                - a4**2
-                            )
-                            / (
-                                2
-                                * a4
-                                * math.sqrt(
-                                    a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2
-                                )
-                            )
-                        )
-                        - math.asin(
-                            a2
-                            * math.sin(th1)
-                            / math.sqrt(
-                                a1**2 - 2 * a1 * a2 * math.cos(th1) + a2**2
-                            )
-                        )
-                    ),
-                ],
-                [
-                    -l2 * math.sin(th2),
-                    l2 * math.cos(th2),
-                ],
-            ]
-        )
+            self.rate.sleep()
 
-    def landing_phase(self):
+    def landing_phase(self, request: Jump.Goal):
         """Moves both linkages back to their default positions."""
         self.motor0.set_position(self.normal_pos0)
         self.motor1.set_position(self.normal_pos1)
@@ -457,7 +179,7 @@ class JumpNode(Node):
 def main(args=None):
     rclpy.init(args=args)
     jump_node = JumpNode()
-    executor=rclpy.executors.MultiThreadedExecutor()
+    executor = rclpy.executors.MultiThreadedExecutor()
     rclpy.spin(jump_node, executor=executor)
     jump_node.destroy_node()
     rclpy.shutdown()

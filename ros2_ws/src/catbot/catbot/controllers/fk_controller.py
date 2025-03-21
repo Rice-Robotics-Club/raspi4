@@ -1,54 +1,271 @@
 from math import sqrt, asin, asin, acos, cos, sin
-import sys
-import typing
 import numpy as np
-from numpy.typing import NDArray
+import typing
 
 
 class FKController:
     def __init__(
         self, a1: float, a2: float, a3: float, a4: float, l1: float, l2: float
     ):
-        self.legs = [
-            [0.0, 0.0],
-            [0.0, 0.0],
-            [0.0, 0.0],
-            [0.0, 0.0],
-        ]
         self.a1 = a1
         self.a2 = a2
         self.a3 = a3
         self.a4 = a4
-
-        self.a1s = self.a1**2
-        self.a2s = self.a2**2
-        self.a3s = self.a3**2
-        self.a4s = self.a4**2
-
         self.l1 = l1
-        self.l2 = l1
+        self.l2 = l2
 
-    def solve(self, vec: NDArray) -> NDArray:
-        m0, m1 = tuple(vec.tolist())
+    def forward(self, th1: float, th2: float) -> np.ndarray:
+        """Calculates the foot position based on the current angles of the motors.
 
-        b1s = self.a1s + self.a2s - 2 * self.a1 * self.a2 * cos(m0)
-        b1 = sqrt(b1)
+        Returns:
+            np.ndarray: 2D column vector of the foot position
+        """
+        a1 = self.a1
+        a2 = self.a2
+        a3 = self.a3
+        a4 = self.a4
+        l1 = self.l1
+        l2 = self.l2
 
-        phi = acos((self.a3s - self.a4s - b1s) / (2 * self.a4 * b1)) + asin(
-            (self.a2 * sin(m0)) / b1
+        
+        return np.array(
+            [
+                [
+                    -l1
+                    * cos(
+                        acos(
+                            -(
+                                -(a1**2)
+                                + 2 * a1 * a2 * cos(th1)
+                                - a2**2
+                                + a3**2
+                                - a4**2
+                            )
+                            / (
+                                2
+                                * a4
+                                * sqrt(a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                            )
+                        )
+                        - asin(
+                            a2
+                            * sin(th1)
+                            / sqrt(a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                        )
+                    )
+                    + l2 * cos(th2)
+                ],
+                [
+                    -l1
+                    * sin(
+                        acos(
+                            -(
+                                -(a1**2)
+                                + 2 * a1 * a2 * cos(th1)
+                                - a2**2
+                                + a3**2
+                                - a4**2
+                            )
+                            / (
+                                2
+                                * a4
+                                * sqrt(a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                            )
+                        )
+                        - asin(
+                            a2
+                            * sin(th1)
+                            / sqrt(a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                        )
+                    )
+                    + l2 * sin(th2)
+                ],
+            ]
         )
 
-        e_x = -self.l1 * cos(phi) + self.l2 * cos(m1)
-        e_y = -self.l1 * sin(phi) - self.l2 * sin(m1)
+    def jacobian(self, th1: float, th2: float) -> np.ndarray:
+        """Calculates the Jacobian matrix of the leg based on the current angles of the motors.
 
-        return np.array([e_x, e_y])
+        Returns:
+            np.ndarray: 2x2 Jacobian matrix
+        """
+        a1 = self.a1
+        a2 = self.a2
+        a3 = self.a3
+        a4 = self.a4
+        l1 = self.l1
+        l2 = self.l2
 
-
-# if __name__ == "__main__":
-#     print(len(sys.argv))
-#     if len(sys.argv) >= 4:
-#         x, y, z = tuple(map(lambda x: float(x), sys.argv[1:4]))
-#         controller = FKController(1.6, 1.0, 0.6, 2.8, 1.8)
-#         print(controller.solve([x, y, z]))
-#     else:
-#         print("needs 3 arguments")
+        # it works, and faster than the previous way
+        return np.array(
+            [
+                [
+                    l1
+                    * (
+                        -(
+                            -a1
+                            * a2**2
+                            * sin(th1) ** 2
+                            / (a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                            ** (3 / 2)
+                            + a2
+                            * cos(th1)
+                            / sqrt(a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                        )
+                        / sqrt(
+                            -(a2**2)
+                            * sin(th1) ** 2
+                            / (a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                            + 1
+                        )
+                        - (
+                            a1
+                            * a2
+                            * sin(th1)
+                            / (
+                                a4
+                                * sqrt(a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                            )
+                            + a1
+                            * a2
+                            * (
+                                -(a1**2)
+                                + 2 * a1 * a2 * cos(th1)
+                                - a2**2
+                                + a3**2
+                                - a4**2
+                            )
+                            * sin(th1)
+                            / (
+                                2
+                                * a4
+                                * (a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                                ** (3 / 2)
+                            )
+                        )
+                        / sqrt(
+                            1
+                            - (
+                                -(a1**2)
+                                + 2 * a1 * a2 * cos(th1)
+                                - a2**2
+                                + a3**2
+                                - a4**2
+                            )
+                            ** 2
+                            / (
+                                4
+                                * a4**2
+                                * (a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                            )
+                        )
+                    )
+                    * sin(
+                        acos(
+                            -(
+                                -(a1**2)
+                                + 2 * a1 * a2 * cos(th1)
+                                - a2**2
+                                + a3**2
+                                - a4**2
+                            )
+                            / (
+                                2
+                                * a4
+                                * sqrt(a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                            )
+                        )
+                        - asin(
+                            a2
+                            * sin(th1)
+                            / sqrt(a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                        )
+                    ),
+                    -l2 * sin(th2),
+                ],
+                [
+                    -l1
+                    * (
+                        -(
+                            -a1
+                            * a2**2
+                            * sin(th1) ** 2
+                            / (a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                            ** (3 / 2)
+                            + a2
+                            * cos(th1)
+                            / sqrt(a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                        )
+                        / sqrt(
+                            -(a2**2)
+                            * sin(th1) ** 2
+                            / (a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                            + 1
+                        )
+                        - (
+                            a1
+                            * a2
+                            * sin(th1)
+                            / (
+                                a4
+                                * sqrt(a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                            )
+                            + a1
+                            * a2
+                            * (
+                                -(a1**2)
+                                + 2 * a1 * a2 * cos(th1)
+                                - a2**2
+                                + a3**2
+                                - a4**2
+                            )
+                            * sin(th1)
+                            / (
+                                2
+                                * a4
+                                * (a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                                ** (3 / 2)
+                            )
+                        )
+                        / sqrt(
+                            1
+                            - (
+                                -(a1**2)
+                                + 2 * a1 * a2 * cos(th1)
+                                - a2**2
+                                + a3**2
+                                - a4**2
+                            )
+                            ** 2
+                            / (
+                                4
+                                * a4**2
+                                * (a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                            )
+                        )
+                    )
+                    * cos(
+                        acos(
+                            -(
+                                -(a1**2)
+                                + 2 * a1 * a2 * cos(th1)
+                                - a2**2
+                                + a3**2
+                                - a4**2
+                            )
+                            / (
+                                2
+                                * a4
+                                * sqrt(a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                            )
+                        )
+                        - asin(
+                            a2
+                            * sin(th1)
+                            / sqrt(a1**2 - 2 * a1 * a2 * cos(th1) + a2**2)
+                        )
+                    ),
+                    l2 * cos(th2),
+                ],
+            ]
+        )
