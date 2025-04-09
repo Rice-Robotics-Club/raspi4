@@ -164,7 +164,14 @@ def main(args=None):
     rclpy.init(args=args)
     jump_node = JumpNode()
     executor = rclpy.executors.MultiThreadedExecutor()
-    rclpy.spin(jump_node, executor=executor)
+    try:
+        rclpy.spin(jump_node, executor=executor)
+    except:
+        jump_node.destroy_node()
+        jump_node.set_axis_idle()
+        rclpy.shutdown()
+
+    jump_node.set_axis_idle()
     jump_node.destroy_node()
     rclpy.shutdown()
 
