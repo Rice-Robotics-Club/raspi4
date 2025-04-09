@@ -18,8 +18,8 @@ class JumpNode(Node):
         self.declare_parameter("gear_ratio", 8.0)
         self.declare_parameter("max_torque", 11.0)
 
-        self.declare_parameter("normal_pos0", -1.0)
-        self.declare_parameter("normal_pos1", 0.5)
+        self.declare_parameter("landing_pos0", -1.0)
+        self.declare_parameter("landing_pos1", 0.5)
 
         self.declare_parameter("min_pos0", 0.0)
         self.declare_parameter("min_pos1", 0.0)
@@ -36,6 +36,9 @@ class JumpNode(Node):
         l1 = 0.225
         l2 = 0.159
 
+        starting_offset0 = 2.70526030718
+        starting_offset1 = 5.84685330718
+
         self.fk = FKController(a1, a2, a3, a4, l1, l2)
 
         # initializes the ODriveController objects for each motor
@@ -43,15 +46,15 @@ class JumpNode(Node):
             self,
             namespace="odrive_axis0",
             gear_ratio=self.gear_ratio,
-            angle_offset=2.70526030718,
-            callback_group=rclpy.callback_groups.ReentrantCallbackGroup(),
+            angle_offset=starting_offset0,
+            callback_group=rclpy.callback_groups.MutuallyExclusiveCallbackGroup(),
         )
         self.motor1 = ODriveController(
             self,
             namespace="odrive_axis1",
             gear_ratio=self.gear_ratio,
-            angle_offset=5.84685330718,
-            callback_group=rclpy.callback_groups.ReentrantCallbackGroup(),
+            angle_offset=starting_offset1,
+            callback_group=rclpy.callback_groups.MutuallyExclusiveCallbackGroup(),
         )
 
         self.joy = self.create_subscription(Joy, "/joy", self._joy_callback, 10)
@@ -69,14 +72,14 @@ class JumpNode(Node):
             ),  # enables closed loop control if previously set to idle
             (
                 self.poising_phase,
-                lambda: self.motor0.is_about(2.70526030718)
-                or self.motor1.is_about(5.84685330718),
+                lambda: self.motor0.is_about(starting_offset0)
+                or self.motor1.is_about(starting_offset1),
             ),
             (self.jumping_phase, lambda: self.motor0.angle > (5 * np.pi / 4)),
             (
                 self.landing_phase,
-                lambda: self.motor0.is_about(2.70526030718)
-                or self.motor1.is_about(5.84685330718),
+                lambda: self.motor0.is_about(starting_offset0)
+                or self.motor1.is_about(starting_offset1),
             ),
         ]
 
@@ -109,9 +112,9 @@ class JumpNode(Node):
         self.interval = self.get_parameter("interval").value
         self.gear_ratio = self.get_parameter("gear_ratio").value
         self.max_torque = self.get_parameter("max_torque").value
-        self.normal_pos0 = self.get_parameter("normal_pos0").value
+        self.landing_pos0 = self.get_parameter("landing_pos0").value
         self.min_pos0 = self.get_parameter("min_pos0").value
-        self.normal_pos1 = self.get_parameter("normal_pos1").value
+        self.landing_pos1 = self.get_parameter("landing_pos1").value
         self.min_pos1 = self.get_parameter("min_pos1").value
 
     def set_axis_idle(self):
@@ -153,8 +156,8 @@ class JumpNode(Node):
 
     def landing_phase(self):
         """Moves both linkages back to their default positions."""
-        self.motor0.set_position(self.normal_pos0)
-        self.motor1.set_position(self.normal_pos1)
+        self.motor0.set_position(self.landing_pos0)
+        self.motor1.set_position(self.landing_pos1)
 
 
 def main(args=None):
