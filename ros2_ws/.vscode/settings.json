@@ -3,13 +3,15 @@
         "/opt/ros/humble/lib/python3.10/site-packages",
         "/opt/ros/humble/local/lib/python3.10/dist-packages",
         "$HOME/.local/lib/python3.10/site-packages",
-        "${workspaceFolder}/install/catbot_msg/local/lib/python3.10/dist-packages"
+        "${workspaceFolder}/install/catbot_msg/local/lib/python3.10/dist-packages",
+        "${workspaceFolder}/install/odrive_can/local/lib/python3.10/dist-packages"
     ],
     "python.analysis.extraPaths": [
         "/opt/ros/humble/lib/python3.10/site-packages",
         "/opt/ros/humble/local/lib/python3.10/dist-packages",
         "$HOME/.local/lib/python3.10/site-packages",
-        "${workspaceFolder}/install/catbot_msg/local/lib/python3.10/dist-packages"
+        "${workspaceFolder}/install/catbot_msg/local/lib/python3.10/dist-packages",
+        "${workspaceFolder}/install/odrive_can/local/lib/python3.10/dist-packages"
     ],
     "ros.distro": "humble"
 }
