@@ -46,6 +46,9 @@ class JumpNode(Node):
         l1 = 0.225
         l2 = 0.159
 
+        starting_offset0 = 2.70526030718
+        starting_offset1 = 5.84685330718
+
         self.fk = FKController(a1, a2, a3, a4, l1, l2)
 
         # initializes the ODriveController objects for each motor
@@ -152,7 +155,7 @@ class JumpNode(Node):
                 self.fk.jacobian(th1, th2).T @ np.array([[0], [-1]])
             ).flatten()
 
-            torques *= self.max_torque / torques.max()
+            torques *= self.max_torque / abs(max(torques, key=abs))
 
             self.motor0.set_torque(-(torques[0]))
             self.motor1.set_torque(-(torques[1]))
@@ -179,7 +182,15 @@ def main(args=None):
     rclpy.init(args=args)
     jump_node = JumpNode()
     executor = rclpy.executors.MultiThreadedExecutor()
-    rclpy.spin(jump_node, executor=executor)
+    
+    try:
+        rclpy.spin(jump_node, executor=executor)
+    except:
+        jump_node.set_axis_idle()
+        jump_node.destroy_node()
+        rclpy.shutdown()
+
+    jump_node.set_axis_idle()
     jump_node.destroy_node()
     rclpy.shutdown()
 

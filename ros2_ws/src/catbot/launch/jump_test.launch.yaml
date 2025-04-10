@@ -32,10 +32,10 @@ launch:
     name: "jump_node_0"
     param:
     -
-      name: "normal_pos0"
+      name: "landing_pos0"
       value: -0.1
     -
-      name: "normal_pos1"
+      name: "landing_pos1"
       value: 0.0
     -
       name: "min_pos0"
