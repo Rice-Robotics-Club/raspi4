@@ -28,5 +28,5 @@ launch:
 
 - node:
     pkg: "catbot"
-    exec: "leg_node"
-    name: "leg_node_0"
+    exec: "jump_node"
+    name: "jump_node_0"

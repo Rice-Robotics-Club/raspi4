@@ -66,12 +66,11 @@ class ODriveController:
             msg (ControllerStatus): interface provided by ODrive containing motor values
         """
         self.angle = (
-            (-msg.pos_estimate / self.gear_ratio) * math.tau
-        ) + self.angle_offset
+            ((-msg.pos_estimate / self.gear_ratio) * math.tau)
+            + self.angle_offset
+        ) % math.tau
         self.velocity = msg.vel_estimate
         self.torque = msg.torque_estimate
-
-        self.parent.get_logger().info(f"{self.namespace} angle: {self.angle}")
 
     def request_axis_state(self, state: AxisStates):
         self.axis_state_request.axis_requested_state = int(state)
@@ -122,7 +121,7 @@ class ODriveController:
         self.control_message.input_vel = velocity
         self.control_message_publisher.publish(self.control_message)
 
-    def set_position(self, position: float):
+    def set_position(self, angle: float):
         """Publishes a position control message to the ODrive
 
         Args:
@@ -130,5 +129,10 @@ class ODriveController:
         """
         self.control_message.control_mode = ControlMode.POSITION_CONTROL
         self.control_message.input_mode = InputMode.POS_FILTER
-        self.control_message.input_pos = position
+        self.control_message.input_pos = (
+            (self.angle_offset - angle) * self.gear_ratio / math.tau
+        )
         self.control_message_publisher.publish(self.control_message)
+
+    def is_about(self, target: float):
+        return (abs(self.angle - target) % math.tau) < 0.1

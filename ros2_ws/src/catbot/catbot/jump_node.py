@@ -1,18 +1,13 @@
 import rclpy
-import rclpy.action
 import rclpy.callback_groups
 from rclpy.node import Node
-from rclpy.action import ActionServer
-import rclpy.timer
 from .controllers.odrive_controller import ODriveController
 from .controllers.fk_controller import FKController
-from catbot_msg.action import Jump
 from odrive.enums import AxisState as AxisStates
-from rclpy.action import CancelResponse
-from collections.abc import Callable
+from sensor_msgs.msg import Joy
+from std_msgs.msg import Empty
 import numpy as np
-import threading
-import time
+from collections.abc import Callable
 import typing
 
 
@@ -21,19 +16,28 @@ class JumpNode(Node):
         super().__init__("jump_node")
 
         # declares all parameters for this node
-        self.declare_parameter("gear_ratio", 8.0)
-        self.declare_parameter("max_torque", 10.0)
+        self.interval = self.declare_parameter("interval", 0.01).value
+        self.gear_ratio = self.declare_parameter("gear_ratio", 8.0).value
+        self.max_torque = self.declare_parameter("max_torque", 11.0).value
 
-        self.declare_parameter("normal_pos0", -1.0)
-        self.declare_parameter("normal_pos1", 0.5)
-
-        self.declare_parameter("min_pos0", 0.0)
-        self.declare_parameter("min_pos1", 0.0)
+        # setpoint angles in radians
+        self.min_angle0 = self.declare_parameter(
+            "min_angle0", 2.70526030718
+        ).value
+        self.min_angle1 = self.declare_parameter(
+            "min_angle1", 5.84685330718
+        ).value
+        self.mid_angle0 = self.declare_parameter(
+            "mid_angle0", 3.49065847058
+        ).value
+        self.mid_angle1 = self.declare_parameter(
+            "mid_angle1", 5.45415422548
+        ).value
+        self.max_angle0 = None
+        self.max_angle1 = None
 
         # initalizes fields corresponding to each parameter
         self.update_parameters(None)
-
-        # self.rate = self.create_rate(60)
 
         a1 = 0.129
         a2 = 0.080
@@ -42,6 +46,9 @@ class JumpNode(Node):
         l1 = 0.225
         l2 = 0.159
 
+        starting_offset0 = 2.70526030718
+        starting_offset1 = 5.84685330718
+
         self.fk = FKController(a1, a2, a3, a4, l1, l2)
 
         # initializes the ODriveController objects for each motor
@@ -49,137 +56,141 @@ class JumpNode(Node):
             self,
             namespace="odrive_axis0",
             gear_ratio=self.gear_ratio,
-            angle_offset=2.70526030718,
-            callback_group=self.default_callback_group,
+            angle_offset=self.min_angle0,
+            callback_group=rclpy.callback_groups.ReentrantCallbackGroup(),
         )
         self.motor1 = ODriveController(
             self,
             namespace="odrive_axis1",
             gear_ratio=self.gear_ratio,
-            angle_offset=5.84685330718,
-            callback_group=self.default_callback_group,
+            angle_offset=self.min_angle1,
+            callback_group=rclpy.callback_groups.ReentrantCallbackGroup(),
         )
 
+        self.joy = self.create_subscription(Joy, "/joy", self._joy_callback, 10)
+
         # defines the sequence of phases for a jump
-        self.phases: list[Callable[[Jump.Goal], None]] = [
+        self.phases: list[Callable[[], bool]] = [
+            self.set_axis_idle,
             self.update_parameters,  # should always be first, since phases depend on parameters
             self.set_axis_closed_loop_control,  # enables closed loop control if previously set to idle
             self.poising_phase,
             self.jumping_phase,
             self.landing_phase,
-            self.set_axis_idle,
         ]
+
+        self.current_phase = 0
 
         # waits for the motors to be ready, and also sets them to closed loop control initially
         self.motor0.wait_for_axis_state()
         self.motor1.wait_for_axis_state()
 
-        # initializes the action server for the jump action, which always accepts cancel requests
-        self.jump_action = ActionServer(
-            self,
-            Jump,
-            "jump",
-            execute_callback=self.jump_execute_callback,
-            cancel_callback=lambda _: CancelResponse.ACCEPT,
-            callback_group=rclpy.callback_groups.ReentrantCallbackGroup(),
-        )
+        self.timer = self.create_timer(self.interval, self._timer_callback)
 
-    def update_parameters(self, result: Jump.Goal):
-        """Updates all parameters for this node. Should be called at the beginning of each jump."""
-        self.gear_ratio = self.get_parameter("gear_ratio").value
-        self.max_torque = self.get_parameter("max_torque").value
-        self.normal_pos0 = self.get_parameter("normal_pos0").value
-        self.min_pos0 = self.get_parameter("min_pos0").value
-        self.normal_pos1 = self.get_parameter("normal_pos1").value
-        self.min_pos1 = self.get_parameter("min_pos1").value
+    def next_phase(self):
+        self.current_phase = (self.current_phase + 1) % len(self.phases)
 
-    def jump_execute_callback(
-        self, goal_handle: rclpy.action.server.ServerGoalHandle
-    ) -> Jump.Result:
-        """Executes the jump action, phase by phase.
+    def _timer_callback(self):
+        if self.phases[self.current_phase]():
+            self.next_phase()
 
-        Args:
-            goal_handle (rclpy.action.server.ServerGoalHandle): The goal handle for the jump action
+    def _joy_callback(self, msg: Joy):
+        if msg.buttons[1] == 1 and self.current_phase == 0:
+            self.current_phase = 1
+        if msg.buttons[2] == 1:
+            self.current_phase = 0
 
-        Returns:
-            Jump.Result: The result of the jump action, indicating whether it was completed
-        """
-        for phase in self.phases:
-            if goal_handle.is_cancel_requested:
-                self.get_logger().info(f"goal {goal_handle.goal_id} canceled")
-                goal_handle.canceled()
-                return Jump.Result(complete=False)
-
-            phase(goal_handle.request)
-
-            goal_handle.publish_feedback(
-                Jump.Feedback(phase=f"{phase.__name__} completed")
-            )
-
-        goal_handle.succeed()
-        return Jump.Result(complete=True)
-
-    def set_axis_idle(self, request: Jump.Goal):
+    def set_axis_idle(self):
         """Sets both ODrives to idle."""
-        self.get_logger().info("setting ODrives to IDLE")
+        self.get_logger().info("setting ODrives to IDLE", once=True)
+
         self.motor0.request_axis_state(AxisStates.IDLE)
         self.motor1.request_axis_state(AxisStates.IDLE)
 
-    def set_axis_closed_loop_control(self, request: Jump.Goal):
+        return False
+
+    def update_parameters(self):
+        """Updates all parameters for this node. Should be called at the beginning of each jump."""
+        self.get_logger().info("updating parameter values", once=True)
+
+        for p in self._parameters:
+            self.__setattr__(p, self.get_parameter(p).value)
+
+        return True
+
+    def set_axis_closed_loop_control(self):
         """Sets both ODrives to closed loop control."""
-        self.get_logger().info("setting ODrives to CLOSED_LOOP_CONTROL")
+        self.get_logger().info(
+            "setting ODrives to CLOSED_LOOP_CONTROL", once=True
+        )
+
         self.motor0.request_axis_state(AxisStates.CLOSED_LOOP_CONTROL)
         self.motor1.request_axis_state(AxisStates.CLOSED_LOOP_CONTROL)
 
-    def poising_phase(self, request: Jump.Goal):
-        """Moves both linkages to their minimum positions, in preparation for the jump."""
-        self.motor0.set_position(self.min_pos0)
-        self.motor1.set_position(self.min_pos1)
-        time.sleep(2.0)
+        return True
 
-    def jumping_phase(self, request: Jump.Goal):
+    def poising_phase(self):
+        """Moves both linkages to their minimum positions, in preparation for the jump."""
+        self.get_logger().info("starting poising_phase", once=True)
+
+        self.motor0.set_position(self.min_angle0)
+        self.motor1.set_position(self.min_angle1)
+
+        return self.motor0.is_about(self.min_angle0) or self.motor1.is_about(
+            self.min_angle1
+        )
+
+    def jumping_phase(self):
         """Calculates leg jacobian based on current motor angles, and uses transpose of
         jacobian to calculate torques required to exert downward force at the foot. Then
         scales up this torque vector to maximum torque limits.
         """
-        max_torque = min(self.max_torque, request.max_torque)
-        self.get_logger().info(f"max_torque is: {max_torque}")
+        self.get_logger().info("starting jumping_phase", once=True)
 
-        timer: rclpy.timer.Timer = None
+        th1 = self.motor0.angle
+        th2 = self.motor1.angle
 
-        def jump_iteration():
-            th1 = self.motor0.angle
-            th2 = self.motor1.angle
+        try:
+            torques = (
+                self.fk.jacobian(th1, th2).T @ np.array([[0], [-1]])
+            ).flatten()
 
-            try:
-                torques = (
-                    self.fk.jacobian(th1, th2).T @ np.array([[0], [-1]])
-                ).flatten()
+            torques *= self.max_torque / abs(max(torques, key=abs))
 
-                torques *= max_torque / torques.max()
+            self.motor0.set_torque(-(torques[0]))
+            self.motor1.set_torque(-(torques[1]))
+        except:
+            return True
 
-                self.motor0.set_torque(-(torques[0]))
-                self.motor1.set_torque(-(torques[1]))
-            except:
-                timer.cancel()
+        return self.motor0.is_about(self.max_angle0) or self.motor1.is_about(
+            self.max_angle1
+        )
 
-            if self.motor0.angle > 3 * np.pi / 2:
-                timer.cancel()
-
-        timer = self.create_timer(0.01, jump_iteration)
-
-    def landing_phase(self, request: Jump.Goal):
+    def landing_phase(self):
         """Moves both linkages back to their default positions."""
-        self.motor0.set_position(self.normal_pos0)
-        self.motor1.set_position(self.normal_pos1)
-        time.sleep(10)
+        self.get_logger().info("starting landing_phase", once=True)
+
+        self.motor0.set_position(self.mid_angle0)
+        self.motor1.set_position(self.mid_angle1)
+
+        return self.motor0.is_about(self.mid_angle0) or self.motor1.is_about(
+            self.mid_angle1
+        )
 
 
 def main(args=None):
     rclpy.init(args=args)
     jump_node = JumpNode()
     executor = rclpy.executors.MultiThreadedExecutor()
-    rclpy.spin(jump_node, executor=executor)
+    
+    try:
+        rclpy.spin(jump_node, executor=executor)
+    except:
+        jump_node.set_axis_idle()
+        jump_node.destroy_node()
+        rclpy.shutdown()
+
+    jump_node.set_axis_idle()
     jump_node.destroy_node()
     rclpy.shutdown()
 

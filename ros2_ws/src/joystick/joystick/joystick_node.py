@@ -37,12 +37,12 @@ class JoystickNode(Node):
         for event in self.device.read_loop():
             if event.type == evdev.ecodes.EV_ABS:
                 match event.code:
-                    case evdev.ecodes.ABS_X:
-                        self.joy_msg.angular.z = (127.0 - event.value) / 128.0
-                    case evdev.ecodes.ABS_Z:
-                        self.joy_msg.linear.x = (event.value - 127.0) / 128.0
-                    case evdev.ecodes.ABS_RZ:
-                        self.joy_msg.linear.y = (127.0 - event.value) / 128.0
+                    case 0:
+                        self.joy_msg.angular.z = (32767.0 -event.value) / 32768.0
+                    case 3:
+                        self.joy_msg.linear.x = (event.value - 32767.0) / 32768.0
+                    case 4:
+                        self.joy_msg.linear.y = (32767.0-event.value) / 32768.0
             
             self.joystick_publisher.publish(self.joy_msg)
                 
