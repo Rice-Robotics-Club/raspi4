@@ -28,24 +28,5 @@ launch:
 
 - node:
     pkg: "catbot"
-    exec: "jump_node"
-    name: "jump_node_0"
-    param:
-    -
-      name: "normal_pos0"
-      value: -0.1
-    -
-      name: "normal_pos1"
-      value: 0.0
-    -
-      name: "min_pos0"
-      value: 0.4
-    -
-      name: "min_pos1"
-      value: -0.2
-    -
-      name: "max_pos0"
-      value: -2.5
-    -
-      name: "max_pos1"
-      value: 0.8
+    exec: "leg_node"
+    name: "leg_node_0"

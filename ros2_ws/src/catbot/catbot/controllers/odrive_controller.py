@@ -56,6 +56,7 @@ class ODriveController:
         only when the axis state has been set to closed loop control
         """
         self.axis_state_client.wait_for_service(timeout_sec=None)
+        self.request_axis_state(AxisStates.CLOSED_LOOP_CONTROL)
 
     def _controller_status_callback(self, msg: ControllerStatus):
         """Updates position, velocity and torque fields on every publish of
@@ -70,7 +71,7 @@ class ODriveController:
         self.velocity = msg.vel_estimate
         self.torque = msg.torque_estimate
 
-        # self.parent.get_logger().info(f"{self.namespace} angle: {self.angle}")
+        self.parent.get_logger().info(f"{self.namespace} angle: {self.angle}")
 
     def request_axis_state(self, state: AxisStates):
         self.axis_state_request.axis_requested_state = int(state)
