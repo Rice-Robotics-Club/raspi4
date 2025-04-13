@@ -33,8 +33,12 @@ class JumpNode(Node):
         self.mid_angle1 = self.declare_parameter(
             "mid_angle1", 5.45415422548
         ).value
-        self.max_angle0 = None
-        self.max_angle1 = None
+        self.max_angle0 = self.declare_parameter(
+            "max_angle0", 4.43359265359
+        ).value
+        self.max_angle1 = self.declare_parameter(
+            "max_angle1", 5.06159265359
+        ).value
 
         # initalizes fields corresponding to each parameter
         self.update_parameters()
@@ -45,9 +49,6 @@ class JumpNode(Node):
         a4 = 0.180
         l1 = 0.225
         l2 = 0.159
-
-        starting_offset0 = 2.70526030718
-        starting_offset1 = 5.84685330718
 
         self.fk = FKController(a1, a2, a3, a4, l1, l2)
 
