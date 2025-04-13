@@ -41,7 +41,7 @@ class JumpNode(Node):
         ).value
 
         # initalizes fields corresponding to each parameter
-        self.update_parameters()
+        self.update_parameters(None)
 
         a1 = 0.129
         a2 = 0.080
