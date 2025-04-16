@@ -27,6 +27,6 @@ launch:
     name: "gait_node_0"
 
 - node:
-    pkg: "joystick"
-    exec: "joystick_node"
-    name: "joystick_node_0"
+    pkg: "joy"
+    exec: "joy_node"
+    name: "joy_node_0"

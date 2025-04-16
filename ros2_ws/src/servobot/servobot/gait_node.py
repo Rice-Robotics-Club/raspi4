@@ -1,6 +1,6 @@
 from rclpy.node import Node
 from std_msgs.msg import Float64MultiArray
-from geometry_msgs.msg import Twist
+from sensor_msgs.msg import Joy
 import rclpy
 import math
 import typing
@@ -21,7 +21,7 @@ class GaitNode(Node):
         )
         
         self.motion_cmd = self.create_subscription(
-            Twist, "/joy_vel", self.joy_vel_callback, 10
+            Joy, "/joy", self._joy_callback, 10
         )
 
         self.timer = self.create_timer(self.timer_interval, self.timer_callback)
@@ -40,10 +40,10 @@ class GaitNode(Node):
             2: 5 * math.pi/4,
             3: 3 * math.pi/4
         }
-        
-    def joy_vel_callback(self, msg: Twist) -> None:
-        self.angular = msg.angular.z
-        self.velocity = (msg.linear.x, msg.linear.y)
+    
+    def _joy_callback(self, msg: Joy):
+        self.angular = msg.axes[0]
+        self.velocity = (-msg.axes[3], msg.axes[4])
         
     def gait_pos(self, leg: int, t: float, vel: tuple[float, float], ang: float, origin: tuple[float, float, float]) -> tuple[float, float, float]:
         t_leg = (t + self.leg_phase_offsets[leg] * self.gait_period) % self.gait_period
