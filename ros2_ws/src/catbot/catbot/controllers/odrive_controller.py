@@ -128,7 +128,7 @@ class ODriveController:
             position (float): value
         """
         self.control_message.control_mode = ControlMode.POSITION_CONTROL
-        self.control_message.input_mode = InputMode.POS_FILTER
+        self.control_message.input_mode = InputMode.PASSTHROUGH
         self.control_message.input_pos = (
             (self.angle_offset - angle) * self.gear_ratio / math.tau
         )
